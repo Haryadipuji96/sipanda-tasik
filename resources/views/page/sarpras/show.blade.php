@@ -1,0 +1,192 @@
+<x-app-layout>
+    <div class="py-6 px-6">
+        <div class="max-w-6xl mx-auto">
+            <!-- Header -->
+            <div class="mb-6">
+                <h1 class="text-2xl font-bold text-gray-800">Detail Data Sarpras</h1>
+                <p class="text-gray-600 mt-1">Informasi lengkap mengenai sarana dan prasarana</p>
+            </div>
+
+            <!-- Card Container -->
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200">
+                <!-- Card Header -->
+                <div class="bg-gradient-to-r from-green-500 to-green-600 px-6 py-4">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-xl font-semibold text-white">{{ $sarpras->nama_barang }}</h2>
+                        <span class="bg-green-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full">
+                            {{ $sarpras->kategori }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Card Body -->
+                <div class="p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Kolom Kiri -->
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-semibold text-gray-800 border-b pb-2">Informasi Utama</h3>
+                            
+                            <table class="w-full text-sm">
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="py-3 px-4 font-medium text-gray-700 bg-gray-50 w-1/3">Program Studi</td>
+                                        <td class="py-3 px-4">
+                                            @if($sarpras->prodi)
+                                                <span class="inline-flex items-center">
+                                                    <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                                                    {{ $sarpras->prodi->nama_prodi }}
+                                                    <span class="text-gray-500 text-xs ml-2">
+                                                        ({{ $sarpras->prodi->fakultas->nama_fakultas }})
+                                                    </span>
+                                                </span>
+                                            @else
+                                                <span class="text-gray-400">-</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3 px-4 font-medium text-gray-700 bg-gray-50">Kategori</td>
+                                        <td class="py-3 px-4">{{ $sarpras->kategori }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3 px-4 font-medium text-gray-700 bg-gray-50">Jumlah Barang</td>
+                                        <td class="py-3 px-4">
+                                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
+                                                {{ $sarpras->jumlah }} unit
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3 px-4 font-medium text-gray-700 bg-gray-50">Kondisi</td>
+                                        <td class="py-3 px-4">
+                                            @php
+                                                $kondisiColor = [
+                                                    'Baik' => 'bg-green-100 text-green-800',
+                                                    'Rusak Ringan' => 'bg-yellow-100 text-yellow-800',
+                                                    'Rusak Berat' => 'bg-red-100 text-red-800',
+                                                    'Perbaikan' => 'bg-orange-100 text-orange-800'
+                                                ][$sarpras->kondisi] ?? 'bg-gray-100 text-gray-800';
+                                            @endphp
+                                            <span class="px-2 py-1 rounded text-xs font-medium {{ $kondisiColor }}">
+                                                {{ $sarpras->kondisi }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3 px-4 font-medium text-gray-700 bg-gray-50">Tanggal Pengadaan</td>
+                                        <td class="py-3 px-4">
+                                            <div class="flex items-center text-gray-700">
+                                                <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                                </svg>
+                                                {{ \Carbon\Carbon::parse($sarpras->tanggal_pengadaan)->format('d F Y') }}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Kolom Kanan -->
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-semibold text-gray-800 border-b pb-2">Informasi Tambahan</h3>
+                            
+                            <table class="w-full text-sm">
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="py-3 px-4 font-medium text-gray-700 bg-gray-50 w-1/3">Kode / Seri</td>
+                                        <td class="py-3 px-4 font-mono text-blue-600">{{ $sarpras->kode_seri }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3 px-4 font-medium text-gray-700 bg-gray-50">Sumber Barang</td>
+                                        <td class="py-3 px-4">
+                                            @php
+                                                $sumberColor = [
+                                                    'HIBAH' => 'bg-purple-100 text-purple-800',
+                                                    'LEMBAGA' => 'bg-indigo-100 text-indigo-800',
+                                                    'YAYASAN' => 'bg-pink-100 text-pink-800'
+                                                ][$sarpras->sumber] ?? 'bg-gray-100 text-gray-800';
+                                            @endphp
+                                            <span class="px-2 py-1 rounded text-xs font-medium {{ $sumberColor }}">
+                                                {{ $sarpras->sumber }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3 px-4 font-medium text-gray-700 bg-gray-50">Lokasi Lain</td>
+                                        <td class="py-3 px-4">
+                                            @if($sarpras->lokasi_lain)
+                                                <span class="flex items-center">
+                                                    <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                    </svg>
+                                                    {{ $sarpras->lokasi_lain }}
+                                                </span>
+                                            @else
+                                                <span class="text-gray-400">-</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3 px-4 font-medium text-gray-700 bg-gray-50">File Dokumen</td>
+                                        <td class="py-3 px-4">
+                                            @if ($sarpras->file_dokumen)
+                                                <a href="{{ asset('storage/sarpras/' . $sarpras->file_dokumen) }}" 
+                                                   target="_blank" 
+                                                   class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium hover:bg-green-200 transition-colors">
+                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                    </svg>
+                                                    Lihat Dokumen
+                                                </a>
+                                            @else
+                                                <span class="text-gray-400">Tidak ada file</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Spesifikasi -->
+                    <div class="mt-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3">Spesifikasi Barang</h3>
+                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                            <p class="text-gray-700 leading-relaxed">{{ $sarpras->spesifikasi }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Keterangan -->
+                    @if($sarpras->keterangan)
+                    <div class="mt-4">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3">Keterangan</h3>
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                            <p class="text-gray-700 leading-relaxed">{{ $sarpras->keterangan }}</p>
+                        </div>
+                    </div>
+                    @endif
+                </div>
+
+                <!-- Card Footer -->
+                <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
+                    <div class="flex justify-between items-center">
+                        <div class="text-sm text-gray-500">
+                            Terakhir diperbarui: {{ $sarpras->updated_at->format('d M Y H:i') }}
+                        </div>
+                        <div class="flex space-x-3">
+                            <a href="{{ route('sarpras.index') }}" 
+                               class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                                </svg>
+                                Kembali
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</x-app-layout>
