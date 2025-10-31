@@ -1,21 +1,54 @@
 <x-app-layout>
+    <style>
+        .cssbuttons-io-button {
+            display: flex;
+            align-items: center;
+            font-family: inherit;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            padding: 0.4em 0.8em;
+            color: white;
+            background: #2563eb;
+            border: none;
+            letter-spacing: 0.05em;
+            border-radius: 15em;
+            transition: all 0.2s;
+        }
+
+        .cssbuttons-io-button svg {
+            margin-right: 4px;
+            fill: white;
+        }
+
+        .cssbuttons-io-button:hover {
+            box-shadow: 0 0.4em 1em -0.3em #0740bb;
+        }
+
+        .cssbuttons-io-button:active {
+            box-shadow: 0 0.2em 0.7em -0.3em #0740bb;
+            transform: translateY(1px);
+        }
+
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
+
     <div class="p-6">
         <div class="flex justify-between items-center mb-4">
             <h1 class="text-xl font-semibold">Data Dosen</h1>
-            <a href="{{ route('dosen.create') }}"
-               class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
-               Tambah Dosen
-            </a>
+            <button onclick="window.location='{{ route('dosen.create') }}'" class="cssbuttons-io-button">
+                <svg height="18" width="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0 0h24v24H0z" fill="none"></path>
+                    <path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z" fill="currentColor"></path>
+                </svg>
+                <span>Tambah</span>
+            </button>
         </div>
 
-        @if (session('success'))
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-                {{ session('success') }}
-            </div>
-        @endif
-
         <table class="w-full border text-sm">
-            <thead class="bg-green-600 text-white">
+            <thead class="bg-gray-600 text-white">
                 <tr>
                     <th rowspan="2" class="px-4 py-2 border text-center w-12">No</th>
                     <th rowspan="2" class="border px-4 py-2">Nama</th>
@@ -40,7 +73,7 @@
             </thead>
             <tbody>
                 @forelse ($dosen as $index => $d)
-                    <tr class="hover:bg-gray-50">
+                    <tr class="hover:bg-gray-50" x-data="{ openModal: false }">
                         <td class="border px-3 py-2 text-center">{{ $index + $dosen->firstItem() }}</td>
                         <td class="border px-4 py-2">{{ $d->nama ?? '-' }}</td>
                         <td class="border px-4 py-2">{{ $d->prodi->nama_prodi ?? '-' }}</td>
@@ -49,51 +82,224 @@
                         <td class="border px-4 py-2">{{ $d->pendidikan_terakhir ?? '-' }}</td>
                         <td class="border px-4 py-2">{{ $d->jabatan ?? '-' }}</td>
                         <td class="border px-4 py-2 text-center">{{ $d->tmt_kerja ?? '-' }}</td>
-
-                        <!-- Masa Kerja -->
                         <td class="border px-4 py-2 text-center">{{ $d->masa_kerja_tahun ?? 0 }}</td>
                         <td class="border px-4 py-2 text-center">{{ $d->masa_kerja_bulan ?? 0 }}</td>
-
-                        <!-- Golongan -->
                         <td class="border px-4 py-2 text-center">{{ $d->golongan ?? '-' }}</td>
-
-                        <!-- Masa Kerja Golongan -->
                         <td class="border px-4 py-2 text-center">{{ $d->masa_kerja_golongan_tahun ?? 0 }}</td>
                         <td class="border px-4 py-2 text-center">{{ $d->masa_kerja_golongan_bulan ?? 0 }}</td>
+                        <td class="border px-4 py-2 text-center">
+    @if ($d->file_dokumen)
+        <a href="{{ asset('storage/dokumen_dosen/' . $d->file_dokumen) }}" target="_blank"
+           class="inline-flex items-center text-blue-600 hover:text-blue-800 underline">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1" fill="none"
+                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Lihat
+        </a>
+    @else
+        <span class="text-gray-500 italic">-</span>
+    @endif
+</td>
 
-                        <!-- File Dokumen -->
+
                         <td class="border px-3 py-2 text-center">
-                            @if ($d->file_dokumen)
-                                <a href="{{ asset('storage/dokumen_dosen/' . $d->file_dokumen) }}"
-                                   target="_blank"
-                                   class="text-blue-600 underline">Lihat</a>
-                            @else
-                                <span class="text-gray-500 italic">-</span>
-                            @endif
-                        </td>
-
-                        <!-- Aksi -->
-                        <td class="border px-3 py-2 text-center space-x-2">
-                            <a href="{{ route('dosen.edit', $d->id_dosen) }}"
-                               class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
-                               Edit
-                            </a>
-                            <form action="{{ route('dosen.destroy', $d->id_dosen) }}"
-                                  method="POST"
-                                  class="inline-block"
-                                  onsubmit="return confirm('Yakin hapus data ini?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit"
-                                        class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">
-                                    Hapus
+                            <div class="flex items-center justify-center gap-2">
+                                <button @click="openModal = true"
+                                    class="p-2 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-full transition"
+                                    title="Edit">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M11 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                    </svg>
                                 </button>
-                            </form>
+
+                                <form action="{{ route('dosen.destroy', $d->id_dosen) }}" method="POST"
+                                    class="inline delete-form">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="button"
+                                        class="p-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-full transition btn-delete"
+                                        title="Hapus">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4h6v3m-9 0h12" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+
+                            <!-- Modal Edit -->
+                            <div x-show="openModal" x-cloak
+                                class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+                                <div @click.away="openModal = false"
+                                    class="relative bg-white rounded-xl shadow-xl w-full max-w-3xl p-6 mx-4 overflow-y-auto max-h-[90vh]">
+                                    <button @click="openModal = false"
+                                        class="absolute top-3 right-3 text-gray-400 hover:text-gray-600">✕</button>
+                                    <h1 class="text-xl font-semibold mb-5 text-gray-800 border-b pb-2 text-start">Edit
+                                        Data Dosen
+                                    </h1>
+
+                                    <form action="{{ route('dosen.update', $d->id_dosen) }}" method="POST"
+                                        enctype="multipart/form-data">
+                                        @csrf
+                                        @method('PUT')
+
+                                        <!-- Program Studi -->
+                                        <div class="mb-4">
+                                            <label class="block font-medium mb-1 text-start">Program Studi</label>
+                                            <select name="id_prodi" class="w-full border rounded px-3 py-2" required>
+                                                <option value="">-- Pilih Prodi --</option>
+                                                @foreach ($prodi as $p)
+                                                    <option value="{{ $p->id_prodi }}"
+                                                        {{ $p->id_prodi == $d->id_prodi ? 'selected' : '' }}>
+                                                        {{ $p->nama_prodi }} ({{ $p->fakultas->nama_fakultas }})
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        <!-- Nama -->
+                                        <div class="mb-4">
+                                            <label class="block font-medium mb-1 text-start">Nama Lengkap</label>
+                                            <input type="text" name="nama" value="{{ $d->nama }}"
+                                                class="w-full border rounded px-3 py-2" required>
+                                        </div>
+
+                                        <!-- Tempat & Tanggal Lahir -->
+                                        <div class="mb-4 grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="block font-medium mb-1 text-start">Tempat Lahir</label>
+                                                <input type="text" name="tempat_lahir"
+                                                    value="{{ $d->tempat_lahir }}"
+                                                    class="w-full border rounded px-3 py-2">
+                                            </div>
+                                            <div>
+                                                <label class="block font-medium mb-1 text-start">Tanggal Lahir</label>
+                                                <input type="date" name="tanggal_lahir"
+                                                    value="{{ $d->tanggal_lahir }}"
+                                                    class="w-full border rounded px-3 py-2">
+                                            </div>
+                                        </div>
+
+                                        <!-- NIK -->
+                                        <div class="mb-4">
+                                            <label class="block font-medium mb-1 text-start">NIK</label>
+                                            <input type="text" name="nik" value="{{ $d->nik }}"
+                                                class="w-full border rounded px-3 py-2">
+                                        </div>
+
+                                        <!-- Pendidikan Terakhir -->
+                                        <div class="mb-4">
+                                            <label class="block font-medium mb-1 text-start">Pendidikan
+                                                Terakhir</label>
+                                            <input type="text" name="pendidikan_terakhir"
+                                                value="{{ $d->pendidikan_terakhir }}"
+                                                class="w-full border rounded px-3 py-2">
+                                        </div>
+
+                                        <!-- Jabatan -->
+                                        <div class="mb-4">
+                                            <label class="block font-medium mb-1 text-start">Jabatan</label>
+                                            <input type="text" name="jabatan" value="{{ $d->jabatan }}"
+                                                class="w-full border rounded px-3 py-2">
+                                        </div>
+
+                                        <!-- TMT Kerja -->
+                                        <div class="mb-4">
+                                            <label class="block font-medium mb-1 text-start">TMT Kerja</label>
+                                            <input type="date" name="tmt_kerja" value="{{ $d->tmt_kerja }}"
+                                                class="w-full border rounded px-3 py-2">
+                                        </div>
+
+                                        <!-- Masa Kerja -->
+                                        <div class="mb-4 grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="block font-medium mb-1 text-start">Masa Kerja
+                                                    (Tahun)
+                                                </label>
+                                                <input type="number" name="masa_kerja_tahun"
+                                                    value="{{ $d->masa_kerja_tahun }}"
+                                                    class="w-full border rounded px-3 py-2" min="0">
+                                            </div>
+                                            <div>
+                                                <label class="block font-medium mb-1 text-start">Masa Kerja
+                                                    (Bulan)</label>
+                                                <input type="number" name="masa_kerja_bulan"
+                                                    value="{{ $d->masa_kerja_bulan }}"
+                                                    class="w-full border rounded px-3 py-2" min="0"
+                                                    max="11">
+                                            </div>
+                                        </div>
+
+                                        <!-- Golongan -->
+                                        <div class="mb-4">
+                                            <label class="block font-medium mb-1 text-start">Golongan</label>
+                                            <input type="text" name="golongan" value="{{ $d->golongan }}"
+                                                class="w-full border rounded px-3 py-2">
+                                        </div>
+
+                                        <!-- Masa Kerja Golongan -->
+                                        <div class="mb-4 grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="block font-medium mb-1 text-start">Masa Kerja Golongan
+                                                    (Tahun)
+                                                </label>
+                                                <input type="number" name="masa_kerja_golongan_tahun"
+                                                    value="{{ $d->masa_kerja_golongan_tahun }}"
+                                                    class="w-full border rounded px-3 py-2" min="0">
+                                            </div>
+                                            <div>
+                                                <label class="block font-medium mb-1 text-start">Masa Kerja Golongan
+                                                    (Bulan)</label>
+                                                <input type="number" name="masa_kerja_golongan_bulan"
+                                                    value="{{ $d->masa_kerja_golongan_bulan }}"
+                                                    class="w-full border rounded px-3 py-2" min="0"
+                                                    max="11">
+                                            </div>
+                                        </div>
+
+                                        <!-- File Dokumen -->
+                                        <div class="mb-4">
+                                            <label class="block font-medium mb-1 text-start">File Dokumen Saat
+                                                Ini</label>
+                                            @if ($d->file_dokumen)
+                                                <div class="flex items-center space-x-3">
+                                                    <a href="{{ asset('storage/dokumen_dosen/' . $d->file_dokumen) }}"
+                                                        target="_blank" class="text-blue-600 underline">Lihat
+                                                        Dokumen</a>
+                                                    <span class="text-gray-500 text-sm">(akan diganti jika upload
+                                                        baru)</span>
+                                                </div>
+                                            @else
+                                                <p class="text-gray-500 italic">Belum ada file.</p>
+                                            @endif
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <label class="block font-medium mb-1 text-start">Upload File Dokumen Baru
+                                                (opsional)</label>
+                                            <input type="file" name="file_dokumen"
+                                                class="w-full border rounded px-3 py-2">
+                                        </div>
+
+                                        <div class="flex justify-end space-x-2">
+                                            <button type="button" @click="openModal = false"
+                                                class="bg-red-500 text-white px-4 py-2 rounded">Batal</button>
+                                            <button type="submit"
+                                                class="bg-blue-600 text-white px-4 py-2 rounded">Update</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="14" class="text-center py-3 text-gray-600">Belum ada data dosen.</td>
+                        <td colspan="15" class="text-center py-3 text-gray-600">Belum ada data dosen.</td>
                     </tr>
                 @endforelse
             </tbody>
@@ -103,4 +309,41 @@
             {{ $dosen->links() }}
         </div>
     </div>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteButtons = document.querySelectorAll('.btn-delete');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const form = this.closest('form');
+                    Swal.fire({
+                        title: 'Apakah anda yakin??',
+                        text: "Data yang sudah dihapus tidak bisa di kembalikan!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#16a34a',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Ya, hapus!',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
+
+            @if (session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: "{{ session('success') }}",
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            @endif
+        });
+    </script>
 </x-app-layout>

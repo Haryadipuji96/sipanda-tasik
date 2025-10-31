@@ -12,7 +12,7 @@
         @endif
 
         <table class="w-full border">
-            <thead class="bg-gray-100">
+            <thead class="bg-green-600 text-white">
                 <tr>
                     <th class="border px-3 py-2 text-left">No</th>
                     <th class="border px-3 py-2 text-left">Nama</th>

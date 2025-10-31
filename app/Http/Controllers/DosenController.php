@@ -5,14 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Dosen;
 use App\Models\Prodi;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class DosenController extends Controller
 {
     public function index()
     {
-        $dosen = Dosen::with('prodi')->latest()->paginate(10);
-        return view('page.dosen.index', compact('dosen'));
+        $dosen = Dosen::with('prodi.fakultas')->paginate(10);
+        $prodi = Prodi::with('fakultas')->get();
+        return view('page.dosen.index', compact('dosen', 'prodi'));
     }
 
     public function create()
@@ -44,8 +45,8 @@ class DosenController extends Controller
 
         if ($request->hasFile('file_dokumen')) {
             $file = $request->file('file_dokumen');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->storeAs('public/dokumen_dosen', $filename);
+            $filename = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('storage/dokumen_dosen'), $filename);
             $data['file_dokumen'] = $filename;
         }
 
@@ -83,20 +84,20 @@ class DosenController extends Controller
 
         $data = $request->except('file_dokumen');
 
-        // 🔹 Hapus file lama jika upload baru
         if ($request->hasFile('file_dokumen')) {
-            if ($dosen->file_dokumen && Storage::exists('public/dokumen_dosen/' . $dosen->file_dokumen)) {
-                Storage::delete('public/dokumen_dosen/' . $dosen->file_dokumen);
+            // Hapus file lama
+            $oldFile = public_path('storage/dokumen_dosen/' . $dosen->file_dokumen);
+            if ($dosen->file_dokumen && file_exists($oldFile)) {
+                unlink($oldFile);
             }
 
             $file = $request->file('file_dokumen');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->storeAs('public/dokumen_dosen', $filename);
+            $filename = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('storage/dokumen_dosen'), $filename);
             $data['file_dokumen'] = $filename;
         }
 
         $dosen->update($data);
-
         return redirect()->route('dosen.index')->with('success', 'Data dosen berhasil diperbarui.');
     }
 
@@ -104,12 +105,12 @@ class DosenController extends Controller
     {
         $dosen = Dosen::findOrFail($id);
 
-        if ($dosen->file_dokumen && Storage::exists('public/dokumen_dosen/' . $dosen->file_dokumen)) {
-            Storage::delete('public/dokumen_dosen/' . $dosen->file_dokumen);
+        $oldFile = public_path('storage/dokumen_dosen/' . $dosen->file_dokumen);
+        if ($dosen->file_dokumen && file_exists($oldFile)) {
+            unlink($oldFile);
         }
 
         $dosen->delete();
-
         return redirect()->route('dosen.index')->with('success', 'Data dosen berhasil dihapus.');
     }
 }

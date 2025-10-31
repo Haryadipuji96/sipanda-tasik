@@ -11,8 +11,10 @@ class ProdiController extends Controller
     public function index()
     {
         $prodi = Prodi::with('fakultas')->latest()->paginate(10);
-        return view('page.prodi.index', compact('prodi'));
+        $fakultas = Fakultas::all(); // <-- tambahkan ini
+        return view('page.prodi.index', compact('prodi', 'fakultas'));
     }
+
 
     public function create()
     {

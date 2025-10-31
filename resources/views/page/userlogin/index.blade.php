@@ -38,10 +38,12 @@
                             <td class="border px-3 py-2">{{ $login->logged_in_at ? $login->logged_in_at->format('d/m/Y H:i:s') : '-' }}</td>
                             <td class="border px-3 py-2">{{ $login->logged_out_at ? $login->logged_out_at->format('d/m/Y H:i:s') : 'Masih Login' }}</td>
                             <td class="border px-3 py-2">
-                                @if($login->logged_in_at && $login->logged_out_at)
-                                    {{ $login->logged_in_at->diff($login->logged_out_at)->format('%H jam %i menit %s detik') }}
-                                @elseif($login->logged_in_at)
-                                    {{ $login->logged_in_at->diff(now())->format('%H jam %i menit %s detik') }}
+                                @if($login->logged_in_at)
+                                    @php
+                                        $end = $login->logged_out_at ?? now();
+                                        $diff = $login->logged_in_at->diff($end);
+                                    @endphp
+                                    {{ $diff->h }} jam {{ $diff->i }} menit {{ $diff->s }} detik
                                 @else
                                     -
                                 @endif
@@ -57,7 +59,6 @@
                     </tbody>
                 </table>
 
-                <!-- Pagination -->
                 @if($logins->hasPages())
                 <div class="mt-4">
                     {{ $logins->links() }}
