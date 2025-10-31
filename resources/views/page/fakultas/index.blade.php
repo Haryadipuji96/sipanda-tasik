@@ -75,7 +75,7 @@
                                 </button>
 
                                 <!-- Tombol Hapus -->
-                                <form action="{{ route('fakultas.destroy', $f->id_fakultas) }}" method="POST"
+                                <form action="{{ route('fakultas.destroy', $f->id) }}" method="POST"
                                     class="inline delete-form">
                                     @csrf
                                     @method('DELETE')
@@ -107,7 +107,7 @@
                                     <h1 class="text-xl font-semibold mb-5 text-gray-800 border-b pb-2 text-start">Edit Fakultas
                                     </h1>
 
-                                    <form action="{{ route('fakultas.update', $f->id_fakultas) }}" method="POST"
+                                    <form action="{{ route('fakultas.update', $f->id) }}" method="POST"
                                         class="space-y-4">
                                         @csrf
                                         @method('PUT')

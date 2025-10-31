@@ -10,12 +10,12 @@ class KategoriArsip extends Model
     use HasFactory;
 
     protected $table = 'kategori_arsip';
-    protected $primaryKey = 'id_kategori';
+    protected $primaryKey = 'id';
     protected $fillable = ['nama_kategori', 'deskripsi'];
 
     // Relasi ke arsip (nanti dipakai di tabel arsip)
     public function arsip()
     {
-        return $this->hasMany(Arsip::class, 'id_kategori');
+        return $this->hasMany(Arsip::class, 'id');
     }
 }

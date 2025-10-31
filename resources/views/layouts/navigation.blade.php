@@ -1,10 +1,9 @@
 <!-- Navbar dengan background Uiverse.io -->
-<div class="container relative">
+<div class="navbar-bg relative">
     <style>
-        /* From Uiverse.io by themrsami */
-        .container {
+        /* Ganti nama class agar tidak bentrok */
+        .navbar-bg {
             width: 100%;
-            height: 100%;
             background-color: #0f172a;
             background-image: linear-gradient(45deg,
                     rgba(59, 130, 246, 0.08) 25%,
@@ -27,21 +26,11 @@
                     rgba(99, 102, 241, 0.1) 60%,
                     transparent 60%),
                 radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
-            background-size:
-                60px 60px,
-                60px 60px,
-                120px 120px,
-                120px 120px,
-                100% 100%;
-            background-position:
-                0 0,
-                30px 30px,
-                0 0,
-                60px 60px,
-                0 0;
+            background-size: 60px 60px, 60px 60px, 120px 120px, 120px 120px, 100% 100%;
+            background-position: 0 0, 30px 30px, 0 0, 60px 60px, 0 0;
         }
 
-        .container::before {
+        .navbar-bg::before {
             content: "";
             position: absolute;
             inset: 0;
@@ -59,6 +48,7 @@
             filter: blur(0.5px);
         }
     </style>
+
 
     <nav x-data="{ open: false, openMaster: false, openSetting: false }" class="shadow-md text-white relative z-10">
         <div class="max-w-8xl mx-auto px-6 sm:px-8 lg:px-12">
@@ -193,7 +183,7 @@
         </div>
 
         <!-- Responsive Menu (Mobile) -->
-        <div :class="{ 'block': open, 'hidden': !open }" class="sm:hidden bg-green-700 text-white">
+        <div :class="{ 'block': open, 'hidden': !open }" class="sm:hidden bg-white text-gray-800">
             <div class="pt-2 pb-3 space-y-1">
                 <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                     {{ __('Dashboard') }}

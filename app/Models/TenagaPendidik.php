@@ -37,7 +37,7 @@ class TenagaPendidik extends Model
     // Relasi ke Prodi
     public function prodi()
     {
-        return $this->belongsTo(Prodi::class, 'id_prodi', 'id_prodi');
+        return $this->belongsTo(Prodi::class, 'id_prodi', 'id');
     }
 
     // Accessor untuk menampilkan path file lengkap

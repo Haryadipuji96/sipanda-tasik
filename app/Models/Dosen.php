@@ -31,6 +31,6 @@ class Dosen extends Model
 
     public function prodi()
     {
-        return $this->belongsTo(Prodi::class, 'id_prodi');
+        return $this->belongsTo(Prodi::class, 'id_prodi', 'id');
     }
 }

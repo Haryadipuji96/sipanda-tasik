@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tenaga_pendidik', function (Blueprint $table) {
-            $table->id('id_tenaga_pendidik');
+            $table->id();
             $table->foreignId('id_prodi')->constrained('prodi')->onUpdate('cascade')->onDelete('cascade');
             $table->string('nama_tendik');
             $table->string('nip')->nullable();

@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('kategori_arsip', function (Blueprint $table) {
-            $table->id('id_kategori');
+            $table->id();
             $table->string('nama_kategori');
             $table->text('deskripsi')->nullable();
             $table->timestamps();

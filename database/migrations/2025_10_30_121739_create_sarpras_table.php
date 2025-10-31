@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('data_sarpras', function (Blueprint $table) {
-            $table->id('id_data_sarpras');
+            $table->id();
             $table->unsignedBigInteger('id_prodi')->nullable();
             $table->string('nama_barang', 255);
             $table->string('kategori', 100);
@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('lokasi_lain', 255)->nullable();
             $table->timestamps();
 
-            $table->foreign('id_prodi')->references('id_prodi')->on('prodi')->onDelete('set null');
+            $table->foreign('id_prodi')->references('id')->on('prodi')->onDelete('set null');
         });
     }
 

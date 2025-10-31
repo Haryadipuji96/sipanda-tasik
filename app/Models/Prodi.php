@@ -10,7 +10,7 @@ class Prodi extends Model
     use HasFactory;
 
     protected $table = 'prodi';
-    protected $primaryKey = 'id_prodi';
+    protected $primaryKey = 'id';
 
     protected $fillable = [
         'id_fakultas',
@@ -22,6 +22,6 @@ class Prodi extends Model
     // Relasi ke fakultas
     public function fakultas()
     {
-        return $this->belongsTo(Fakultas::class, 'id_fakultas');
+        return $this->belongsTo(Fakultas::class, 'id_fakultas', 'id');
     }
 }

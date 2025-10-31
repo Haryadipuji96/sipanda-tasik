@@ -74,7 +74,7 @@
                             </button>
 
                             <!-- Tombol Hapus -->
-                            <form action="{{ route('kategori-arsip.destroy', $k->id_kategori) }}" method="POST"
+                            <form action="{{ route('kategori-arsip.destroy', $k->id) }}" method="POST"
                                 class="inline delete-form">
                                 @csrf
                                 @method('DELETE')
@@ -104,7 +104,7 @@
                                         Edit Kategori Arsip
                                     </h1>
 
-                                    <form action="{{ route('kategori-arsip.update', $k->id_kategori) }}"
+                                    <form action="{{ route('kategori-arsip.update', $k->id) }}"
                                         method="POST" class="edit-form">
                                         @csrf
                                         @method('PUT')

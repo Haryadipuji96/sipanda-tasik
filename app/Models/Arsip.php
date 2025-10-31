@@ -10,11 +10,10 @@ class Arsip extends Model
     use HasFactory;
 
     protected $table = 'arsip';
-    protected $primaryKey = 'id_arsip';
+    protected $primaryKey = 'id';
     protected $fillable = [
         'id_kategori',
         'id_prodi',
-        'id_dosen',
         'judul_dokumen',
         'nomor_dokumen',
         'tanggal_dokumen',
@@ -25,16 +24,12 @@ class Arsip extends Model
 
     public function kategori()
     {
-        return $this->belongsTo(KategoriArsip::class, 'id_kategori');
+        return $this->belongsTo(KategoriArsip::class, 'id_kategori', 'id');
     }
 
     public function prodi()
     {
-        return $this->belongsTo(Prodi::class, 'id_prodi');
+        return $this->belongsTo(Prodi::class, 'id_prodi', 'id');
     }
 
-    public function dosen()
-    {
-        return $this->belongsTo(Dosen::class, 'id_dosen');
-    }
 }

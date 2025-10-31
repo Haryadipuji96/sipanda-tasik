@@ -27,7 +27,6 @@
                     <th class="border px-3 py-2 text-left">Tahun</th>
                     <th class="border px-3 py-2 text-left">Kategori</th>
                     <th class="border px-3 py-2 text-left">Program Studi</th>
-                    <th class="border px-3 py-2 text-left">Dosen</th>
                     <th class="border px-3 py-2 text-left">Keterangan</th>
                     <th class="border px-3 py-2 text-center">File</th>
                     <th class="border px-3 py-2 text-center w-32">Aksi</th>
@@ -44,25 +43,31 @@
                         <td class="border px-3 py-2 text-center">{{ $a->tahun ?? '-' }}</td>
                         <td class="border px-3 py-2">{{ $a->kategori->nama_kategori ?? '-' }}</td>
                         <td class="border px-3 py-2">{{ $a->prodi->nama_prodi ?? '-' }}</td>
-                        <td class="border px-3 py-2">{{ $a->dosen->nama ?? '-' }}</td>
                         <td class="border px-3 py-2">{{ $a->keterangan ?? '-' }}</td>
 
-                        <!-- File Dokumen -->
-                        <td class="border px-3 py-2 text-center">
-                            @if ($a->file_dokumen)
-                                <a href="{{ asset('storage/arsip/' . $a->file_dokumen) }}" target="_blank"
-                                   class="text-blue-600 underline">Lihat</a>
-                            @else
-                                <span class="text-gray-500 italic">-</span>
-                            @endif
-                        </td>
+                        <td class="border px-4 py-2 text-center">
+                                @if ($a->file_dokumen)
+                                    <a href="{{ asset('storage/dokumen_dosen/' . $a->file_dokumen) }}" target="_blank"
+                                        class="inline-flex items-center text-blue-600 hover:text-blue-800 underline">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        Lihat
+                                    </a>
+                                @else
+                                    <span class="text-gray-500 italic">-</span>
+                                @endif
+                            </td>
+
 
                         <!-- Aksi -->
                         <td class="border px-3 py-2 text-center space-x-2">
-                            <a href="{{ route('arsip.edit', $a->id_arsip) }}"
+                            <a href="{{ route('arsip.edit', $a->id) }}"
                                class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">Edit</a>
 
-                            <form action="{{ route('arsip.destroy', $a->id_arsip) }}" method="POST"
+                            <form action="{{ route('arsip.destroy', $a->id) }}" method="POST"
                                   class="inline-block"
                                   onsubmit="return confirm('Yakin ingin menghapus data ini?')">
                                 @csrf

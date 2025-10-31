@@ -2,7 +2,7 @@
     <div class="p-6 max-w-4xl mx-auto">
         <h1 class="text-xl font-semibold mb-4">Edit Arsip</h1>
 
-        <form action="{{ route('arsip.update', $arsip->id_arsip) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('arsip.update', $arsip->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -11,7 +11,7 @@
                 <label class="block font-medium mb-1">Kategori Arsip</label>
                 <select name="id_kategori" class="w-full border rounded px-3 py-2" required>
                     @foreach ($kategori as $k)
-                        <option value="{{ $k->id_kategori }}" {{ $k->id_kategori == $arsip->id_kategori ? 'selected' : '' }}>
+                        <option value="{{ $k->id }}" {{ $k->id == $arsip->id_kategori ? 'selected' : '' }}>
                             {{ $k->nama_kategori }}
                         </option>
                     @endforeach
@@ -24,25 +24,14 @@
                 <select name="id_prodi" class="w-full border rounded px-3 py-2">
                     <option value="">-- Pilih Prodi --</option>
                     @foreach ($prodi as $p)
-                        <option value="{{ $p->id_prodi }}" {{ $p->id_prodi == $arsip->id_prodi ? 'selected' : '' }}>
+                        <option value="{{ $p->id }}" {{ $p->id == $arsip->id_prodi ? 'selected' : '' }}>
                             {{ $p->nama_prodi }} ({{ $p->fakultas->nama_fakultas }})
                         </option>
                     @endforeach
                 </select>
             </div>
 
-            {{-- Dosen --}}
-            <div class="mb-4">
-                <label class="block font-medium mb-1">Dosen Terkait</label>
-                <select name="id_dosen" class="w-full border rounded px-3 py-2">
-                    <option value="">-- Pilih Dosen --</option>
-                    @foreach ($dosen as $d)
-                        <option value="{{ $d->id_dosen }}" {{ $d->id_dosen == $arsip->id_dosen ? 'selected' : '' }}>
-                            {{ $d->nama }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
+           
 
             {{-- Judul --}}
             <div class="mb-4">

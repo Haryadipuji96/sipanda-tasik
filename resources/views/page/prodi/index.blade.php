@@ -76,7 +76,7 @@
                                 </button>
 
                                 <!-- Tombol Hapus -->
-                                <form action="{{ route('prodi.destroy', $p->id_prodi) }}" method="POST" class="inline">
+                                <form action="{{ route('prodi.destroy', $p->id) }}" method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="button"
@@ -94,7 +94,7 @@
                                 <div x-show="openModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                                     <div @click.away="openModal = false" class="bg-white rounded-lg w-full max-w-md p-6">
                                         <h2 class="text-lg font-semibold mb-4">Edit Program Studi</h2>
-                                        <form action="{{ route('prodi.update', $p->id_prodi) }}" method="POST">
+                                        <form action="{{ route('prodi.update', $p->id) }}" method="POST">
                                             @csrf
                                             @method('PUT')
 

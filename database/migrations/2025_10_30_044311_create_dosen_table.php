@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('dosen', function (Blueprint $table) {
-            $table->id('id_dosen');
+            $table->id();
             $table->unsignedBigInteger('id_prodi');
             $table->string('nama');
             $table->string('tempat_lahir')->nullable();
@@ -26,7 +26,7 @@ return new class extends Migration
             $table->string('file_dokumen')->nullable();
             $table->timestamps();
 
-            $table->foreign('id_prodi')->references('id_prodi')->on('prodi')->onDelete('cascade');
+            $table->foreign('id_prodi')->references('id')->on('prodi')->onDelete('cascade');
         });
     }
 

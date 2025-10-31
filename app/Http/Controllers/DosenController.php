@@ -11,7 +11,7 @@ class DosenController extends Controller
 {
     public function index()
     {
-        $dosen = Dosen::with('prodi.fakultas')->paginate(10);
+        $dosen = Dosen::with('prodi.fakultas')->paginate(20);
         $prodi = Prodi::with('fakultas')->get();
         return view('page.dosen.index', compact('dosen', 'prodi'));
     }
@@ -25,7 +25,7 @@ class DosenController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'id_prodi' => 'required|exists:prodi,id_prodi',
+            'id_prodi' => 'required|exists:prodi,id',
             'nama' => 'required|string|max:255',
             'tempat_lahir' => 'required|string|max:255',
             'tanggal_lahir' => 'required|date',
@@ -66,7 +66,7 @@ class DosenController extends Controller
         $dosen = Dosen::findOrFail($id);
 
         $request->validate([
-            'id_prodi' => 'required|exists:prodi,id_prodi',
+            'id_prodi' => 'required|exists:prodi,id',
             'nama' => 'required|string|max:255',
             'tempat_lahir' => 'required|string|max:255',
             'tanggal_lahir' => 'required|date',
