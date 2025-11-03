@@ -86,6 +86,7 @@
 
                             <div x-show="open" x-transition x-cloak @click.away="open = false"
                                 class="absolute left-0 mt-2 w-48 bg-white text-gray-700 rounded-lg shadow-lg z-50 border border-gray-200">
+                                @canSuperadmin
                                 <a href="{{ route('fakultas.index') }}"
                                     class="block px-4 py-2 text-sm hover:bg-blue-500 hover:text-white rounded">Fakultas</a>
                                 <a href="{{ route('prodi.index') }}"
@@ -94,6 +95,7 @@
                                 <a href="{{ route('kategori-arsip.index') }}"
                                     class="block px-4 py-2 text-sm hover:bg-blue-500 hover:text-white rounded">Kategori
                                     Arsip</a>
+                                @endcanSuperadmin
                                 <a href="{{ route('dosen.index') }}"
                                     class="block px-4 py-2 text-sm hover:bg-blue-500 hover:text-white rounded">Dosen</a>
                             </div>
@@ -135,7 +137,7 @@
                             <a href="{{ route('userlogin.index') }}"
                                 class="block px-4 py-2 text-sm hover:bg-blue-500 hover:text-white rounded">Laporan
                                 Aktivitas User</a>
-                            <a href="{{ route('users.index') }}"
+                            <a href="{{ route('register') }}"
                                 class="block px-4 py-2 text-sm hover:bg-blue-500 hover:text-white rounded">Pengguna</a>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf

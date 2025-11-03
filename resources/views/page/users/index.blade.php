@@ -144,7 +144,7 @@
                                     </form>
 
                                     <!-- Modal Edit -->
-                                    <div x-show="openModal"
+                                    <div x-show="openModal" x-cloak
                                         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                                         <div @click.away="openModal = false"
                                             class="bg-white rounded-lg w-full max-w-md p-6">

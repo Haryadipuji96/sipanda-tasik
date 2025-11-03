@@ -74,6 +74,7 @@
         <!-- Header -->
         <div class="flex justify-between items-center mb-8">
             <h2 class="text-2xl font-semibold text-gray-800">Data Tenaga Pendidik</h2>
+            @canSuperadmin
             <button onclick="window.location='{{ route('tenaga-pendidik.create') }}'" class="cssbuttons-io-button">
                 <svg height="18" width="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M0 0h24v24H0z" fill="none" />
@@ -81,6 +82,7 @@
                 </svg>
                 <span>Tambah</span>
             </button>
+            @endcanSuperadmin
         </div>
 
         <x-search-bar route="tenaga-pendidik.index" placeholder="Cari nama / prodi / jabatan..." />
@@ -149,6 +151,7 @@
                                         <i class="fa-solid fa-eye-low-vision"></i>
                                     </a>
 
+                                    @canSuperadmin
                                     <!-- Tombol Edit -->
                                     <button @click="openModal = {{ $t->id }}"
                                         class="p-2 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-full transition"
@@ -159,7 +162,9 @@
                                                 d="M11 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z" />
                                         </svg>
                                     </button>
+                                    @endcanSuperadmin
 
+                                    @canSuperadmin
                                     <!-- Tombol Hapus -->
                                     <form action="{{ route('tenaga-pendidik.destroy', $t->id) }}" method="POST"
                                         class="inline">
@@ -175,6 +180,7 @@
                                             </svg>
                                         </button>
                                     </form>
+                                    @endcanSuperadmin
                                 </div>
 
                                 <!-- Modal Edit -->

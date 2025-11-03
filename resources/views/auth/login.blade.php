@@ -18,9 +18,6 @@
             <input required class="input" type="password" name="password" id="password" placeholder="Password">
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
 
-            <!-- Confirm Password -->
-            <input required class="input" type="password" name="password_confirmation" id="password_confirmation" placeholder="Confirm Password">
-
             <!-- Remember Me & Forgot Password -->
             <div class="flex justify-between mt-2 items-center text-sm text-gray-600">
                 <label class="inline-flex items-center">

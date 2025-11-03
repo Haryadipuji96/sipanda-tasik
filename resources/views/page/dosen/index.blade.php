@@ -73,6 +73,7 @@
     <div class="p-6">
         <div class="flex justify-between items-center mb-4">
             <h1 class="text-xl font-semibold">Data Dosen</h1>
+            @canSuperadmin
             <button onclick="window.location='{{ route('dosen.create') }}'" class="cssbuttons-io-button">
                 <svg height="18" width="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M0 0h24v24H0z" fill="none"></path>
@@ -80,6 +81,7 @@
                 </svg>
                 <span>Tambah</span>
             </button>
+            @endcanSuperadmin
         </div>
 
 
@@ -170,6 +172,7 @@
                                 @endif
                             </td>
                             <td class="border px-3 py-2 text-center">
+                                @canSuperadmin
                                 <div class="flex items-center justify-center gap-2">
                                     <button @click="openModal = true"
                                         class="p-2 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-full transition"
@@ -196,6 +199,7 @@
                                         </button>
                                     </form>
                                 </div>
+                                @endcanSuperadmin
 
                                 <!-- Modal Edit -->
                                 <div x-show="openModal" x-cloak

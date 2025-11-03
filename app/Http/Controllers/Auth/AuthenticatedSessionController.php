@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\UserLogin;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,6 +29,15 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // 🔥 Tracking Login Otomatis
+        UserLogin::create([
+            'id_user' => Auth::id(),
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'logged_in_at' => now(),
+            'last_activity' => now(),
+        ]);
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 
@@ -36,6 +46,13 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        // 🔥 Update Logout Time
+        UserLogin::where('id_user', Auth::id())
+            ->whereNull('logged_out_at')
+            ->latest('logged_in_at')
+            ->first()
+            ?->update(['logged_out_at' => now()]);
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();

@@ -10,7 +10,7 @@
             <!-- Card Container -->
             <div class="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200">
                 <!-- Card Header -->
-                <div class="bg-gradient-to-r from-gray-500 to-gray-600 px-6 py-4">
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
                     <div class="flex justify-between items-center">
                         <h2 class="text-xl font-semibold text-white">{{ $sarpras->nama_barang }}</h2>
                         <span class="bg-green-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full">

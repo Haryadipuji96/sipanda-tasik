@@ -15,6 +15,7 @@ return new class extends Migration
             $table->string('user_agent')->nullable();
             $table->dateTime('logged_in_at')->nullable();
             $table->dateTime('logged_out_at')->nullable();
+            $table->timestamp('last_activity')->nullable();
             $table->timestamps();
         });
     }

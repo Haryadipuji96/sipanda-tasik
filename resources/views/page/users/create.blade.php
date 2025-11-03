@@ -81,10 +81,8 @@
                             <label class="block font-medium mb-1 text-sm sm:text-base">Role</label>
                             <select name="role" class="w-full border rounded px-3 py-2 text-sm sm:text-base" required>
                                 <option value="">-- Pilih Role --</option>
+                                <option value="superadmin">Super Admin</option>
                                 <option value="admin">Admin</option>
-                                <option value="staf">Staf</option>
-                                <option value="operator">Operator</option>
-                                <option value="dosen">Dosen</option>
                             </select>
                         </div>
 
