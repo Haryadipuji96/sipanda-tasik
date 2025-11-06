@@ -1,4 +1,5 @@
 <x-app-layout>
+     <x-slot name="title">{{ $tenagaPendidik->nama_tendik ?? 'Detail Sarpras' }}</x-slot>
     <div class="py-6 px-6">
         <div class="max-w-6xl mx-auto">
             <!-- Header -->

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
+
 <body class="bg-gray-50">
     <div class="min-h-screen">
         <!-- Header/Navbar -->
@@ -26,7 +28,8 @@
                                     <i class="fas fa-bell"></i>
                                 </a>
                                 <div class="flex items-center">
-                                    <div class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium">
+                                    <div
+                                        class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium">
                                         U
                                     </div>
                                     <span class="ml-2 text-gray-700 hidden sm:block">User</span>
@@ -46,8 +49,10 @@
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 pb-4 border-b">
                         <div class="flex items-center space-x-3 mb-3 sm:mb-0">
                             <div class="bg-green-100 text-blue-600 p-2 rounded-full">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 4v16m8-8H4" />
                                 </svg>
                             </div>
                             <h1 class="text-xl sm:text-2xl font-semibold text-gray-800">Tambah Data Sarpras</h1>
@@ -56,7 +61,8 @@
                             class="text-sm text-gray-600 hover:text-gray-800 transition flex items-center space-x-1 self-start sm:self-auto">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 19l-7-7 7-7" />
                             </svg>
                             <span>Kembali</span>
                         </a>
@@ -71,7 +77,8 @@
                             <select name="id_prodi" class="w-full border rounded px-3 py-2 text-sm sm:text-base">
                                 <option value="">-- Pilih Prodi --</option>
                                 @foreach ($prodi as $p)
-                                    <option value="{{ $p->id }}">{{ $p->nama_prodi }} ({{ $p->fakultas->nama_fakultas }})
+                                    <option value="{{ $p->id }}">{{ $p->nama_prodi }}
+                                        ({{ $p->fakultas->nama_fakultas }})
                                     </option>
                                 @endforeach
                             </select>
@@ -80,7 +87,8 @@
                         {{-- Nama Barang --}}
                         <div class="mb-4">
                             <label class="block font-medium mb-1 text-sm sm:text-base">Nama Barang</label>
-                            <input type="text" name="nama_barang" class="w-full border rounded px-3 py-2 text-sm sm:text-base" required
+                            <input type="text" name="nama_barang"
+                                class="w-full border rounded px-3 py-2 text-sm sm:text-base" required
                                 placeholder="Masukkan nama barang">
                         </div>
 
@@ -88,13 +96,21 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                             <div>
                                 <label class="block font-medium mb-1 text-sm sm:text-base">Kategori</label>
-                                <input type="text" name="kategori" class="w-full border rounded px-3 py-2 text-sm sm:text-base" required
+                                <input type="text" name="kategori"
+                                    class="w-full border rounded px-3 py-2 text-sm sm:text-base" required
                                     placeholder="Masukkan kategori barang">
                             </div>
                             <div>
                                 <label class="block font-medium mb-1 text-sm sm:text-base">Kondisi</label>
-                                <input type="text" name="kondisi" class="w-full border rounded px-3 py-2 text-sm sm:text-base" required
-                                    placeholder="Masukkan kondisi barang">
+                                <select name="kondisi" class="w-full border rounded px-3 py-2 text-sm sm:text-base"
+                                    required>
+                                    <option value="">-- Pilih Kondisi Barang --</option>
+                                    <option value="Baik Sekali">Baik Sekali</option>
+                                    <option value="Baik">Baik</option>
+                                    <option value="Cukup">Cukup</option>
+                                    <option value="Rusak Ringan">Rusak Ringan</option>
+                                    <option value="Rusak Berat">Rusak Berat</option>
+                                </select>
                             </div>
                         </div>
 
@@ -102,12 +118,14 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                             <div>
                                 <label class="block font-medium mb-1 text-sm sm:text-base">Jumlah Barang</label>
-                                <input type="number" name="jumlah" class="w-full border rounded px-3 py-2 text-sm sm:text-base" min="1"
-                                    required placeholder="0">
+                                <input type="number" name="jumlah"
+                                    class="w-full border rounded px-3 py-2 text-sm sm:text-base" min="1" required
+                                    placeholder="0">
                             </div>
                             <div>
                                 <label class="block font-medium mb-1 text-sm sm:text-base">Tanggal Pengadaan</label>
-                                <input type="date" name="tanggal_pengadaan" class="w-full border rounded px-3 py-2 text-sm sm:text-base" required>
+                                <input type="date" name="tanggal_pengadaan"
+                                    class="w-full border rounded px-3 py-2 text-sm sm:text-base" required>
                             </div>
                         </div>
 
@@ -122,12 +140,14 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                             <div>
                                 <label class="block font-medium mb-1 text-sm sm:text-base">Kode / Seri Barang</label>
-                                <input type="text" name="kode_seri" class="w-full border rounded px-3 py-2 text-sm sm:text-base" required
+                                <input type="text" name="kode_seri"
+                                    class="w-full border rounded px-3 py-2 text-sm sm:text-base" required
                                     placeholder="Masukkan kode/seri barang">
                             </div>
                             <div>
                                 <label class="block font-medium mb-1 text-sm sm:text-base">Sumber Barang</label>
-                                <select name="sumber" class="w-full border rounded px-3 py-2 text-sm sm:text-base" required>
+                                <select name="sumber" class="w-full border rounded px-3 py-2 text-sm sm:text-base"
+                                    required>
                                     <option value="">-- Pilih Sumber --</option>
                                     <option value="HIBAH">HIBAH</option>
                                     <option value="LEMBAGA">LEMBAGA</option>
@@ -139,7 +159,8 @@
                         {{-- Lokasi Lain --}}
                         <div class="mb-4">
                             <label class="block font-medium mb-1 text-sm sm:text-base">Lokasi Lain (Opsional)</label>
-                            <input type="text" name="lokasi_lain" class="w-full border rounded px-3 py-2 text-sm sm:text-base"
+                            <input type="text" name="lokasi_lain"
+                                class="w-full border rounded px-3 py-2 text-sm sm:text-base"
                                 placeholder="Misal: Gedung C Lantai 2">
                         </div>
 
@@ -167,12 +188,12 @@
 
                         {{-- Tombol --}}
                         <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2">
-                            <a href="{{ route('sarpras.index') }}" 
-                               class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-center transition">
+                            <a href="{{ route('sarpras.index') }}"
+                                class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-center transition">
                                 Batal
                             </a>
-                            <button type="submit" 
-                                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition">
+                            <button type="submit"
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition">
                                 Simpan
                             </button>
                         </div>
@@ -182,4 +203,5 @@
         </div>
     </div>
 </body>
+
 </html>

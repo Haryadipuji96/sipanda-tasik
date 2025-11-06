@@ -24,6 +24,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/user-activity', [UserLoginController::class, 'index'])->name('userlogin.index');
 });
 
+// Route::get('/sarpras/laporan', [DataSarprasController::class, 'laporan'])->name('sarpras.laporan');
+Route::get('/sarpras/laporan/preview', [DataSarprasController::class, 'preview'])->name('sarpras.laporan.preview');
+Route::get('/sarpras/laporan/pdf', [DataSarprasController::class, 'laporanPDF'])->name('sarpras.laporan.pdf');
 
 
 Route::middleware(['auth'])->group(function () {
@@ -40,12 +43,12 @@ Route::delete('tenaga-pendidik/delete-selected', [TenagaPendidikController::clas
 
 
 
-// Login khusus
-Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [LoginController::class, 'login']);
+// // Login khusus
+// Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+// Route::post('/login', [LoginController::class, 'login']);
 
-// Logout
-Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
+// // Logout
+// Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

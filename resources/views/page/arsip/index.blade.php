@@ -1,4 +1,5 @@
 <x-app-layout>
+    <x-slot name="title">Data arsip</x-slot>
     <style>
         .cssbuttons-io-button {
             display: flex;
@@ -69,6 +70,7 @@
             }
         }
     </style>
+
     <div class="p-6">
         <!-- Header -->
         <div class="flex justify-between items-center mb-4">

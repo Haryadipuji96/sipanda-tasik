@@ -1,4 +1,5 @@
 <x-app-layout>
+    <x-slot name="title">Data tendik</x-slot>
     <style>
         .cssbuttons-io-button {
             display: flex;

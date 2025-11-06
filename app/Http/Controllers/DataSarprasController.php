@@ -6,31 +6,70 @@ use App\Models\DataSarpras;
 use App\Models\Prodi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class DataSarprasController extends Controller
 {
     public function index(Request $request)
     {
-        // Mulai query dengan relasi prodi
         $query = DataSarpras::with('prodi')->latest();
 
-        if ($search = $request->search) {
-            $query->where('nama_barang', 'like', "%{$search}%")
-                ->orWhere('kategori', 'like', "%{$search}%")
-                ->orWhereHas('prodi', function ($q) use ($search) {
-                    $q->where('nama_prodi', 'like', "%{$search}%");
+        if ($request->filled('search')) {
+            $query->where('nama_barang', 'like', "%{$request->search}%")
+                ->orWhere('kategori', 'like', "%{$request->search}%")
+                ->orWhereHas('prodi', function ($q) use ($request) {
+                    $q->where('nama_prodi', 'like', "%{$request->search}%");
                 });
         }
 
-        // Ambil data paginasi
-        $sarpras = $query->paginate(15);
+        if ($request->filled('kondisi')) {
+            $query->where('kondisi', $request->kondisi);
+        }
 
-        // Ambil semua data prodi untuk dropdown
+        $sarpras = $query->paginate(15);
         $prodi = Prodi::with('fakultas')->get();
 
         return view('page.sarpras.index', compact('sarpras', 'prodi'));
     }
 
+    // ✅ Satu method untuk PDF, support portrait & landscape
+    public function laporanPDF(Request $request)
+    {
+        $query = DataSarpras::with('prodi')->latest();
+
+        if ($request->filled('kondisi')) {
+            $query->where('kondisi', $request->kondisi);
+        }
+
+        $sarpras = $query->get();
+        $kondisi = $request->kondisi; // null atau string kondisi
+
+        // Default portrait, bisa dikasih parameter orientasi jika mau
+        $orientation = $request->get('orientation', 'portrait'); // portrait atau landscape
+
+        $pdf = Pdf::loadView('page.sarpras.laporan_pdf', compact('sarpras', 'kondisi'))
+            ->setPaper('A4', $orientation);
+
+        $kondisiLabel = $kondisi ?? 'Semua_Kondisi';
+        $namaFile = 'Laporan_Sarpras_' . str_replace(' ', '_', $kondisiLabel) . '.pdf';
+
+        return $pdf->download($namaFile);
+    }
+
+    // ✅ Preview sebelum download
+    public function preview(Request $request)
+    {
+        $query = DataSarpras::with('prodi')->latest();
+
+        if ($request->filled('kondisi')) {
+            $query->where('kondisi', $request->kondisi);
+        }
+
+        $sarpras = $query->get();
+        $kondisi = $request->kondisi;
+
+        return view('page.sarpras.laporan.preview', compact('sarpras', 'kondisi'));
+    }
 
 
     public function create()

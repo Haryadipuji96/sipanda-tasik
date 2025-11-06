@@ -1,4 +1,5 @@
 <x-app-layout>
+    <x-slot name="title">Log aktivitas</x-slot>
     <style>
         .rank-badge {
             display: inline-flex;

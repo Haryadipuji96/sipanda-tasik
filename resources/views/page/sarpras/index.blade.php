@@ -1,4 +1,5 @@
 <x-app-layout>
+    <x-slot name="title">Sarpras</x-slot>
     <style>
         .cssbuttons-io-button {
             display: flex;
@@ -92,6 +93,34 @@
             <span>Hapus Terpilih</span>
         </button>
 
+        <form method="GET" action="{{ route('sarpras.index') }}" class="mb-4 flex items-center space-x-3">
+            <select name="kondisi" class="border rounded px-3 py-2 text-sm">
+                <option value="">-- Pilih Kondisi Barang --</option>
+                <option value="Baik Sekali" {{ request('kondisi') == 'Baik Sekali' ? 'selected' : '' }}>Baik Sekali
+                </option>
+                <option value="Baik" {{ request('kondisi') == 'Baik' ? 'selected' : '' }}>Baik</option>
+                <option value="Cukup" {{ request('kondisi') == 'Cukup' ? 'selected' : '' }}>Cukup</option>
+                <option value="Rusak Ringan" {{ request('kondisi') == 'Rusak Ringan' ? 'selected' : '' }}>Rusak Ringan
+                </option>
+                <option value="Rusak Berat" {{ request('kondisi') == 'Rusak Berat' ? 'selected' : '' }}>Rusak Berat
+                </option>
+            </select>
+
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm">
+                Filter
+            </button>
+
+            @if (request('kondisi'))
+                <a href="{{ route('sarpras.laporan.preview', ['kondisi' => request('kondisi')]) }}"
+                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm">
+                    Preview Laporan
+                </a>
+            @endif
+
+        </form>
+
+
+
         <div class="table-wrapper border border-gray-200 rounded-lg">
             <table class="w-full border text-sm bg-white">
                 <thead class="bg-blue-500 text-white">
@@ -158,7 +187,8 @@
 
                                     @canSuperadmin
                                     {{-- Tombol Hapus --}}
-                                    <form action="{{ route('sarpras.destroy', $s->id) }}" method="POST" class="inline">
+                                    <form action="{{ route('sarpras.destroy', $s->id) }}" method="POST"
+                                        class="inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="button"
@@ -197,7 +227,8 @@
                                                             Studi
                                                             (Opsional)
                                                         </label>
-                                                        <select name="id_prodi" class="w-full border rounded px-3 py-2">
+                                                        <select name="id_prodi"
+                                                            class="w-full border rounded px-3 py-2">
                                                             <option value="">-- Pilih Prodi --</option>
                                                             @foreach ($prodi as $p)
                                                                 <option value="{{ $p->id }}"
@@ -228,13 +259,27 @@
                                                     </div>
 
                                                     {{-- Kondisi --}}
-                                                    <div class="mb-4">
-                                                        <label
-                                                            class="block text-sm font-medium mb-1 text-start">Kondisi</label>
-                                                        <input type="text" name="kondisi"
-                                                            class="w-full border rounded px-3 py-2"
-                                                            value="{{ $s->kondisi }}" required>
-                                                    </div>
+                                                    <select name="kondisi"
+                                                        class="w-full border rounded px-3 py-2 text-sm sm:text-base"
+                                                        required>
+                                                        <option value="">-- Pilih Kondisi Barang --</option>
+                                                        <option value="Baik Sekali"
+                                                            {{ old('kondisi', $s->kondisi ?? '') == 'Baik Sekali' ? 'selected' : '' }}>
+                                                            Baik Sekali</option>
+                                                        <option value="Baik"
+                                                            {{ old('kondisi', $s->kondisi ?? '') == 'Baik' ? 'selected' : '' }}>
+                                                            Baik</option>
+                                                        <option value="Cukup"
+                                                            {{ old('kondisi', $s->kondisi ?? '') == 'Cukup' ? 'selected' : '' }}>
+                                                            Cukup</option>
+                                                        <option value="Rusak Ringan"
+                                                            {{ old('kondisi', $s->kondisi ?? '') == 'Rusak Ringan' ? 'selected' : '' }}>
+                                                            Rusak Ringan</option>
+                                                        <option value="Rusak Berat"
+                                                            {{ old('kondisi', $s->kondisi ?? '') == 'Rusak Berat' ? 'selected' : '' }}>
+                                                            Rusak Berat</option>
+                                                    </select>
+
 
                                                     {{-- Jumlah --}}
                                                     <div class="mb-4">

@@ -1,4 +1,5 @@
-<x-app-layout>
+{{-- <x-app-layout>
+    <x-slot name="title">Data pengguna</x-slot>
     <style>
         .cssbuttons-io-button {
             display: flex;
@@ -258,4 +259,4 @@
             @endif
         });
     </script>
-</x-app-layout>
+</x-app-layout> --}}

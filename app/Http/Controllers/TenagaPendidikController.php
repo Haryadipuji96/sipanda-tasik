@@ -10,7 +10,7 @@ class TenagaPendidikController extends Controller
 {
     public function index(Request $request)
     {
-        $query = TenagaPendidik::with('prodi')->latest();
+        $query = TenagaPendidik::with('prodi')->oldest();
 
         if ($search = $request->search) {
             $query->where('nama_tendik', 'like', "%{$search}%")

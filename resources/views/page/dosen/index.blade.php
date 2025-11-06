@@ -1,4 +1,5 @@
 <x-app-layout>
+    <x-slot name="title">Data dosen</x-slot>
     <style>
         .cssbuttons-io-button {
             display: flex;

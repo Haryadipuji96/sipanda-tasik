@@ -1,4 +1,5 @@
 <x-app-layout>
+    <x-slot name="title">Beranda</x-slot>
     <div class="p-6 bg-gray-50 min-h-screen">
 
         <!-- Header Interaktif -->

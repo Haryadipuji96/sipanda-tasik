@@ -1,5 +1,5 @@
 <x-app-layout>
-
+    <x-slot name="title">Fakultas</x-slot>
     <style>
         .cssbuttons-io-button {
             display: flex;
@@ -115,7 +115,7 @@
                     @forelse ($fakultas as $index => $f)
                         <tr x-data="{ openModal: false }">
                             <td class="border px-3 py-2">{{ $index + $fakultas->firstItem() }}</td>
-                           <td class="border px-3 py-2">{!! highlight($f->nama_fakultas, request('search')) !!}</td>
+                            <td class="border px-3 py-2">{!! highlight($f->nama_fakultas, request('search')) !!}</td>
                             <td class="border px-3 py-2">{!! highlight($f->dekan, request('search')) !!}</td>
                             <td class="border px-3 py-2">{{ $f->deskripsi }}</td>
                             <td class="border px-3 py-2 text-center space-x-2">

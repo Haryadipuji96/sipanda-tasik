@@ -51,7 +51,7 @@
             text-align: center;
             font-weight: 900;
             font-size: 30px;
-            color: rgb(16, 137, 211);
+            color: rgb(71, 71, 71);
             margin-bottom: 20px;
         }
 

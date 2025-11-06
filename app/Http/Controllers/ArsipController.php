@@ -12,7 +12,7 @@ class ArsipController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Arsip::with(['kategori', 'prodi'])->latest();
+        $query = Arsip::with(['kategori', 'prodi'])->oldest();
 
         if ($search = $request->search) {
             $query->where('judul_dokumen', 'like', "%{$search}%")

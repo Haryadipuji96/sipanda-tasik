@@ -1,4 +1,5 @@
 <x-app-layout>
+    <x-slot name="title">Daftar pengguna</x-slot>
     <style>
         .cssbuttons-io-button {
             display: flex;

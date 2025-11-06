@@ -16,7 +16,7 @@ class FakultasController extends Controller
                 ->orWhere('dekan', 'like', "%{$search}%");
         }
 
-        $fakultas = $query->latest()->paginate(20); // <--- pakai $query, bukan Fakultas::latest()
+        $fakultas = $query->oldest()->paginate(20); // <--- pakai $query, bukan Fakultas::latest()
 
         return view('page.fakultas.index', compact('fakultas'));
     }
