@@ -24,8 +24,9 @@ class ProdiController extends Controller
 
     public function store(Request $request)
     {
+        
         $request->validate([
-            'id_fakultas' => 'required|exists:fakultas,id_fakultas',
+            'id_fakultas' => 'required|exists:fakultas,id',
             'nama_prodi' => 'required|string|max:255',
             'jenjang' => 'nullable|string|max:50',
             'deskripsi' => 'nullable|string',
@@ -45,7 +46,7 @@ class ProdiController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'id_fakultas' => 'required|exists:fakultas,id_fakultas',
+            'id_fakultas' => 'required|exists:fakultas,id',
             'nama_prodi' => 'required|string|max:255',
             'jenjang' => 'nullable|string|max:50',
             'deskripsi' => 'nullable|string',

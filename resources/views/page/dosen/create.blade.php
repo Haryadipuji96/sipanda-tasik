@@ -137,12 +137,6 @@
                         </div>
                     </div>
 
-                    <!-- Golongan (Old) -->
-                    <div class="mb-4">
-                        <label class="block font-medium mb-1 text-sm sm:text-base">Golongan</label>
-                        <input type="text" name="golongan" class="w-full border rounded px-3 py-2 text-sm sm:text-base">
-                    </div>
-
                     <!-- Pangkat/Golongan & Jabatan Fungsional -->
                     <div class="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>

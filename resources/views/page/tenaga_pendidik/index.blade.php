@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="title">Data tendik</x-slot>
+    <x-slot name="title">Data Tenaga Pendidik</x-slot>
     <style>
         .cssbuttons-io-button {
             display: flex;
@@ -40,12 +40,8 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        /* =======================
-           Highlight Animasi
-        ======================= */
         .highlight {
             background-color: #fde68a;
-            /* kuning lembut */
             font-weight: 600;
             border-radius: 4px;
             padding: 0 2px;
@@ -55,7 +51,6 @@
         @keyframes fadeGlow {
             0% {
                 background-color: #facc15;
-                /* kuning terang */
                 box-shadow: 0 0 8px #facc15;
             }
 
@@ -86,7 +81,7 @@
             @endcanSuperadmin
         </div>
 
-        <x-search-bar route="tenaga-pendidik.index" placeholder="Cari nama / prodi / jabatan..." />
+        <x-search-bar route="tenaga-pendidik.index" placeholder="Cari nama / NIP / prodi..." />
 
         <button id="delete-selected"
             class="px-3 py-1.5 text-sm rounded-full font-medium text-white bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed mb-4"
@@ -94,29 +89,34 @@
             <span>Hapus Terpilih</span>
         </button>
 
-        <!-- Card Table -->
+        <!-- Table -->
         <div class="table-wrapper border border-gray-200 rounded-lg">
             <table class="w-full border text-sm bg-white">
                 <thead class="bg-blue-500 text-white">
                     <tr>
-                        <th class="px-4 py-2 border text-center w-12" rowspan="2">
+                        <th rowspan="2" class="px-4 py-2 border text-center w-12">
                             <input type="checkbox" id="select-all">
                         </th>
-                        <th class="px-4 py-3 border text-center w-16">No</th>
-                        <th class="px-4 py-3 border text-left w-64">Nama</th>
-                        <th class="px-4 py-3 border text-left w-56">Program Studi</th>
-                        <th class="px-4 py-3 border text-left w-48">Jabatan</th>
-                        <th class="px-4 py-3 border text-center w-44">Status</th>
-                        <th class="px-4 py-3 border text-center w-40">Aksi</th>
+                        <th rowspan="2" class="px-4 py-2 border text-center w-12">No</th>
+                        <th rowspan="2" class="border px-4 py-2">Nama Lengkap</th>
+                        <th rowspan="2" class="border px-4 py-2">Gelar Depan</th>
+                        <th rowspan="2" class="border px-4 py-2">Gelar Belakang</th>
+                        <th rowspan="2" class="border px-4 py-2">Program Studi</th>
+                        <th rowspan="2" class="border px-4 py-2">Status Kepegawaian</th>
+                        <th rowspan="2" class="border px-4 py-2">Jenis Kelamin</th>
+                        <th rowspan="2" class="border px-4 py-2">TMT Kerja</th>
+                        <th rowspan="2" class="border px-4 py-2 text-center">NIP/NIK</th>
+                        <th rowspan="2" class="border px-4 py-2 text-center">Keterangan</th>
+                        <th rowspan="2" class="border px-4 py-2 text-center w-40">Aksi</th>
                     </tr>
                 </thead>
+
                 @php
                     function highlight($text, $search)
                     {
                         if (!$search) {
                             return e($text);
                         }
-                        // Hanya ini yang diganti:
                         return preg_replace(
                             '/(' . preg_quote($search, '/') . ')/i',
                             '<span class="highlight">$1</span>',
@@ -124,29 +124,54 @@
                         );
                     }
                 @endphp
+
                 <tbody>
-                    @forelse($tenaga as $no => $t)
-                        <tr class="hover:bg-gray-50 transition">
+                    @forelse ($tenaga as $index => $t)
+                        <tr class="hover:bg-gray-50" x-data="{ openModal: false }">
                             <td class="border px-3 py-2 text-center">
-                                <input type="checkbox" class="select-item" name="selected_dosen[]"
+                                <input type="checkbox" class="select-item" name="selected_tendik[]"
                                     value="{{ $t->id }}">
                             </td>
-                            <td class="border px-3 py-2 text-center">{{ $no + $tenaga->firstItem() }}</td>
-                            <td class="border px-4 py-2">{!! highlight($t->nama_tendik, request('search')) !!}</td>
-                            <td class="border px-4 py-2">{!! highlight($t->prodi->nama_prodi ?? '-', request('search')) !!}</td>
-                            <td class="border px-4 py-2">{!! highlight($t->jabatan, request('search')) !!}</td>
-                            <td class="border px-4 py-2 text-center">
-                                <span
-                                    class="px-2 py-1 rounded-full text-xs font-semibold
-                                    {{ $t->status_kepegawaian === 'Aktif' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
-                                    {{ $t->status_kepegawaian }}
-                                </span>
+                            <td class="border px-3 py-2 text-center">
+                                {{ $index + $tenaga->firstItem() }}
                             </td>
-
+                            <td class="border px-4 py-2">
+                                {!! highlight($t->nama_tendik, request('search')) !!}
+                            </td>
+                            <td class="border px-4 py-2">
+                                {!! highlight($t->gelar_depan, request('search')) !!}
+                            </td>
+                            <td class="border px-4 py-2">
+                                {!! highlight($t->gelar_belakang, request('search')) !!}
+                            </td>
+                            <td class="border px-4 py-2">
+                                {!! highlight($t->prodi->nama_prodi ?? '-', request('search')) !!}
+                            </td>
+                            <td class="border px-4 py-2">
+                                {{ $t->status_kepegawaian ?? '-' }}
+                            </td>
+                            <td class="border px-4 py-2">
+                                @if($t->jenis_kelamin == 'laki-laki')
+                                    Laki-laki
+                                @elseif($t->jenis_kelamin == 'perempuan')
+                                    Perempuan
+                                @else
+                                    -
+                                @endif
+                            </td>
+                            <td class="border px-4 py-2 text-center">
+                                {{ $t->tmt_kerja ? $t->tmt_kerja->format('d/m/Y') : '-' }}
+                            </td>
+                            <td class="border px-4 py-2 text-center">
+                                {!! highlight($t->nip ?? '-', request('search')) !!}
+                            </td>
+                            <td class="border px-4 py-2 text-center">
+                                {{ $t->keterangan ?? '-' }}
+                            </td>
                             <td class="border px-3 py-2 text-center">
                                 <div class="flex items-center justify-center gap-2">
                                     <!-- Tombol Detail -->
-                                    <a href="{{ route('tenaga-pendidik.show', $t) }}"
+                                    <a href="{{ route('tenaga-pendidik.show', $t->id) }}"
                                         class="p-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full transition"
                                         title="Detail">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
@@ -169,19 +194,18 @@
                                                 d="M11 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z" />
                                         </svg>
                                     </button>
-                                    @endcanSuperadmin
 
-                                    @canSuperadmin
                                     <!-- Tombol Hapus -->
-                                    <form action="{{ route('tenaga-pendidik.destroy', $t->id) }}" method="POST"
-                                        class="inline">
+                                    <form action="{{ route('tenaga-pendidik.destroy', $t->id) }}"
+                                        method="POST" class="inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="button"
                                             class="btn-delete p-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-full transition"
                                             title="Hapus">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5"
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                                stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round"
                                                     d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4h6v3m-9 0h12" />
                                             </svg>
@@ -189,28 +213,30 @@
                                     </form>
                                     @endcanSuperadmin
                                 </div>
-
                                 <!-- Modal Edit -->
                                 <div x-show="openModal === {{ $t->id }}" x-cloak
                                     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                                     <div @click.away="openModal = null"
-                                        class="bg-white rounded-lg w-full max-w-5xl p-6 shadow-lg overflow-y-auto max-h-[90vh]">
-                                        <h2 class="text-xl font-semibold mb-5 text-gray-800 border-b pb-2">Edit Data
+                                        class="bg-white rounded-lg w-full max-w-4xl p-6 shadow-lg overflow-y-auto max-h-[90vh]"
+                                        x-data="formGolongan({{ json_encode($t->golongan_array) }})">
+                                        <h2 class="text-xl font-semibold mb-5 text-gray-800 border-b pb-2">Edit
+                                            Data
                                             Tenaga Pendidik</h2>
 
-                                        <form action="{{ route('tenaga-pendidik.update', $t->id) }}" method="POST"
-                                            enctype="multipart/form-data">
+                                        <form action="{{ route('tenaga-pendidik.update', $t->id) }}"
+                                            method="POST" enctype="multipart/form-data">
                                             @csrf
                                             @method('PUT')
 
-                                            <!-- Grid Landscape -->
                                             <div class="grid grid-cols-2 gap-4">
                                                 <!-- Kolom Kiri -->
                                                 <div class="space-y-3">
                                                     <div>
-                                                        <label class="block font-medium mb-1 text-start">Program
+                                                        <label
+                                                            class="block font-medium mb-1 text-start">Program
                                                             Studi</label>
-                                                        <select name="id_prodi" class="border p-2 rounded w-full">
+                                                        <select name="id_prodi"
+                                                            class="border p-2 rounded w-full">
                                                             <option value="">-- Pilih Prodi --</option>
                                                             @foreach ($prodi as $p)
                                                                 <option value="{{ $p->id }}"
@@ -222,39 +248,47 @@
                                                     </div>
 
                                                     <div>
-                                                        <label class="block font-medium mb-1 text-start">Nama Tenaga
-                                                            Pendidik</label>
+                                                        <label class="block font-medium mb-1 text-start">Gelar
+                                                            Depan</label>
+                                                        <input type="text" name="gelar_depan"
+                                                            value="{{ $t->gelar_depan }}"
+                                                            class="border p-2 rounded w-full"
+                                                            placeholder="Dr.">
+                                                    </div>
+
+                                                    <div>
+                                                        <label class="block font-medium mb-1 text-start">Nama
+                                                            Tenaga Pendidik</label>
                                                         <input type="text" name="nama_tendik"
                                                             value="{{ $t->nama_tendik }}"
-                                                            class="border p-2 rounded w-full">
+                                                            class="border p-2 rounded w-full" required>
                                                     </div>
 
                                                     <div>
-                                                        <label class="block font-medium mb-1 text-start">NIP</label>
-                                                        <input type="text" name="nip"
-                                                            value="{{ $t->nip }}"
-                                                            class="border p-2 rounded w-full">
+                                                        <label class="block font-medium mb-1 text-start">Gelar
+                                                            Belakang</label>
+                                                        <input type="text" name="gelar_belakang"
+                                                            value="{{ $t->gelar_belakang }}"
+                                                            class="border p-2 rounded w-full"
+                                                            placeholder="M.Pd">
                                                     </div>
 
                                                     <div>
-                                                        <label
-                                                            class="block font-medium mb-1 text-start">Jabatan</label>
-                                                        <input type="text" name="jabatan"
-                                                            value="{{ $t->jabatan }}"
-                                                            class="border p-2 rounded w-full">
+                                                        <label class="block font-medium mb-1 text-start">Status Kepegawaian</label>
+                                                        <select name="status_kepegawaian" class="border p-2 rounded w-full">
+                                                            <option value="">-- Pilih Status --</option>
+                                                            <option value="PNS" {{ $t->status_kepegawaian == 'PNS' ? 'selected' : '' }}>PNS</option>
+                                                            <option value="Honorer" {{ $t->status_kepegawaian == 'Honorer' ? 'selected' : '' }}>Honorer</option>
+                                                            <option value="Kontrak" {{ $t->status_kepegawaian == 'Kontrak' ? 'selected' : '' }}>Kontrak</option>
+                                                        </select>
                                                     </div>
 
                                                     <div>
-                                                        <label class="block font-medium mb-1 text-start">Status
-                                                            Kepegawaian</label>
-                                                        <select name="status_kepegawaian"
-                                                            class="border p-2 rounded w-full">
-                                                            @foreach (['PNS', 'Honorer', 'Kontrak'] as $status)
-                                                                <option value="{{ $status }}"
-                                                                    {{ $t->status_kepegawaian == $status ? 'selected' : '' }}>
-                                                                    {{ $status }}
-                                                                </option>
-                                                            @endforeach
+                                                        <label class="block font-medium mb-1 text-start">Jenis Kelamin</label>
+                                                        <select name="jenis_kelamin" class="border p-2 rounded w-full">
+                                                            <option value="">-- Pilih Jenis Kelamin --</option>
+                                                            <option value="laki-laki" {{ $t->jenis_kelamin == 'laki-laki' ? 'selected' : '' }}>Laki-laki</option>
+                                                            <option value="perempuan" {{ $t->jenis_kelamin == 'perempuan' ? 'selected' : '' }}>Perempuan</option>
                                                         </select>
                                                     </div>
                                                 </div>
@@ -262,24 +296,35 @@
                                                 <!-- Kolom Kanan -->
                                                 <div class="space-y-3">
                                                     <div>
-                                                        <label class="block font-medium mb-1 text-start">Pendidikan
-                                                            Terakhir</label>
-                                                        <input type="text" name="pendidikan_terakhir"
-                                                            value="{{ $t->pendidikan_terakhir }}"
+                                                        <label class="block font-medium mb-1 text-start">Tempat
+                                                            Lahir</label>
+                                                        <input type="text" name="tempat_lahir"
+                                                            value="{{ $t->tempat_lahir }}"
                                                             class="border p-2 rounded w-full">
                                                     </div>
 
                                                     <div>
-                                                        <label class="block font-medium mb-1 text-start">Jenis
-                                                            Kelamin</label>
-                                                        <select name="jenis_kelamin"
+                                                        <label
+                                                            class="block font-medium mb-1 text-start">Tanggal
+                                                            Lahir</label>
+                                                        <input type="date" name="tanggal_lahir"
+                                                            value="{{ $t->tanggal_lahir ? $t->tanggal_lahir->format('Y-m-d') : '' }}"
                                                             class="border p-2 rounded w-full">
-                                                            @foreach (['laki-laki', 'perempuan'] as $jk)
-                                                                <option value="{{ $jk }}"
-                                                                    {{ $t->jenis_kelamin == $jk ? 'selected' : '' }}>
-                                                                    {{ ucfirst($jk) }}</option>
-                                                            @endforeach
-                                                        </select>
+                                                    </div>
+
+                                                    <div>
+                                                        <label class="block font-medium mb-1 text-start">TMT
+                                                            Kerja</label>
+                                                        <input type="date" name="tmt_kerja"
+                                                            value="{{ $t->tmt_kerja ? $t->tmt_kerja->format('Y-m-d') : '' }}"
+                                                            class="border p-2 rounded w-full">
+                                                    </div>
+
+                                                    <div>
+                                                        <label class="block font-medium mb-1 text-start">NIP/NIK</label>
+                                                        <input type="text" name="nip"
+                                                            value="{{ $t->nip }}"
+                                                            class="border p-2 rounded w-full">
                                                     </div>
 
                                                     <div>
@@ -296,43 +341,86 @@
                                                             class="border p-2 rounded w-full">
                                                     </div>
 
-                                                    {{-- 🔹 File Dokumen Saat Ini --}}
-                                                    <div
-                                                        class="grid w-full max-w-xs items-start gap-1.5 mb-4 text-start">
-                                                        <label class="text-sm text-gray-400 font-medium leading-none">
-                                                            File Dokumen Saat Ini
-                                                        </label>
-
-                                                        @if ($t->file)
-                                                            <a href="{{ asset('dokumen_tendik/' . $t->file) }}"
-                                                                target="_blank" class="text-blue-600 hover:underline">
-                                                                {{ $t->file }}
-                                                            </a>
-
-                                                            <p class="text-gray-500 text-xs mt-1">
-                                                                Upload file baru untuk mengganti yang lama.
-                                                            </p>
-                                                        @else
-                                                            <p class="text-gray-500 italic text-sm">Belum ada file.</p>
-                                                        @endif
-
-                                                        <input type="file" name="file" id="file"
-                                                            class="flex w-full rounded-md border border-blue-300 bg-white text-sm text-gray-400 file:border-0 file:bg-blue-600 file:text-white file:text-sm file:font-medium"
-                                                            accept=".pdf,.doc,.docx,.jpg,.png" />
+                                                    <div>
+                                                        <label class="block font-medium mb-1 text-start">Alamat</label>
+                                                        <input type="text" name="alamat"
+                                                            value="{{ $t->alamat }}"
+                                                            class="border p-2 rounded w-full">
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <!-- Baris bawah -->
-                                            <div class="mt-4 grid grid-cols-2 gap-4">
-                                                <div>
-                                                    <label class="block font-medium mb-1 text-start">Alamat</label>
-                                                    <textarea name="alamat" class="border p-2 rounded w-full">{{ $t->alamat }}</textarea>
+                                            <!-- Riwayat Golongan -->
+                                            <div class="mt-4 border-t pt-4">
+                                                <div class="flex justify-between items-center mb-3">
+                                                    <label class="block font-medium">Riwayat Golongan</label>
+                                                    <button type="button" @click="addGolongan()"
+                                                        class="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600">
+                                                        + Update Riwayat
+                                                    </button>
                                                 </div>
-                                                <div>
-                                                    <label class="block font-medium mb-1 text-start">Keterangan</label>
-                                                    <textarea name="keterangan" class="border p-2 rounded w-full">{{ $t->keterangan }}</textarea>
-                                                </div>
+
+                                                <template x-for="(item, index) in golongan"
+                                                    :key="index">
+                                                    <div
+                                                        class="grid grid-cols-3 gap-3 mb-2 p-2 bg-gray-50 rounded">
+                                                        <div>
+                                                            <input type="text"
+                                                                :name="'golongan[' + index + '][tahun]'"
+                                                                x-model="item.tahun"
+                                                                class="border rounded px-2 py-1 w-full text-sm"
+                                                                placeholder="1991">
+                                                        </div>
+                                                        <div>
+                                                            <input type="text"
+                                                                :name="'golongan[' + index + '][golongan]'"
+                                                                x-model="item.golongan"
+                                                                class="border rounded px-2 py-1 w-full text-sm"
+                                                                placeholder="2A">
+                                                        </div>
+                                                        <div class="flex items-center">
+                                                            <button type="button"
+                                                                @click="removeGolongan(index)"
+                                                                class="px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600">
+                                                                × Hapus
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                            </div>
+
+                                            <!-- File Dokumen -->
+                                            <div class="mt-4">
+                                                <label class="block font-medium mb-1 text-start">File Dokumen Saat Ini</label>
+                                                @if ($t->file)
+                                                    <a href="{{ asset('dokumen_tendik/' . $t->file) }}"
+                                                        target="_blank"
+                                                        class="text-blue-600 hover:underline">
+                                                        {{ $t->file }}
+                                                    </a>
+                                                    <p class="text-gray-500 text-xs mt-1">
+                                                        Upload file baru untuk mengganti yang lama.
+                                                    </p>
+                                                @else
+                                                    <p class="text-gray-500 italic text-sm">Belum ada
+                                                        file.</p>
+                                                @endif
+
+                                                <input type="file" name="file"
+                                                    id="file"
+                                                    class="flex w-full rounded-md border border-blue-300 bg-white text-sm text-gray-400 file:border-0 file:bg-blue-600 file:text-white file:text-sm file:font-medium mt-2"
+                                                    accept=".pdf,.doc,.docx,.jpg,.png" />
+                                                <p class="text-gray-500 text-xs mt-1">
+                                                    Format diizinkan: <b>PDF, DOC, DOCX, JPG, PNG</b> | Maksimal
+                                                    <b>2MB</b>
+                                                </p>
+                                            </div>
+
+                                            <!-- Keterangan -->
+                                            <div class="mt-4">
+                                                <label
+                                                    class="block font-medium mb-1 text-start">Keterangan</label>
+                                                <textarea name="keterangan" class="border p-2 rounded w-full" rows="2">{{ $t->keterangan }}</textarea>
                                             </div>
 
                                             <div class="flex justify-end mt-6 gap-2">
@@ -348,7 +436,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center py-6 text-gray-500 italic">
+                            <td colspan="12" class="text-center py-6 text-gray-500 italic">
                                 Belum ada data tenaga pendidik.
                             </td>
                         </tr>
@@ -361,15 +449,36 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        function formGolongan(initialData = []) {
+            return {
+                golongan: initialData.length > 0 ? initialData : [{
+                    tahun: '',
+                    golongan: ''
+                }],
+                addGolongan() {
+                    this.golongan.push({
+                        tahun: '',
+                        golongan: ''
+                    });
+                },
+                removeGolongan(index) {
+                    if (this.golongan.length > 1) {
+                        this.golongan.splice(index, 1);
+                    }
+                }
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const deleteButtons = document.querySelectorAll('.btn-delete');
             deleteButtons.forEach(button => {
                 button.addEventListener('click', function() {
                     const form = this.closest('form');
                     Swal.fire({
-                        title: 'Apakah anda yakin??',
-                        text: "Data yang sudah dihapus tidak bisa di kembalikan!",
+                        title: 'Apakah anda yakin?',
+                        text: "Data yang sudah dihapus tidak bisa dikembalikan!",
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonColor: '#16a34a',
@@ -394,60 +503,52 @@
                 });
             @endif
         });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const selectAll = document.getElementById('select-all');
-            const checkboxes = document.querySelectorAll('.select-item');
-            const deleteBtn = document.getElementById('delete-selected');
 
-            // Toggle semua checkbox
-            selectAll.addEventListener('change', function() {
-                checkboxes.forEach(cb => cb.checked = selectAll.checked);
-                toggleDeleteBtn();
-            });
+        // Checkbox & Delete Selected
+        const selectAll = document.getElementById('select-all');
+        const checkboxes = document.querySelectorAll('.select-item');
+        const deleteBtn = document.getElementById('delete-selected');
 
-            // Toggle tombol hapus ketika checkbox dipilih
-            checkboxes.forEach(cb => {
-                cb.addEventListener('change', toggleDeleteBtn);
-            });
+        selectAll.addEventListener('change', function() {
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+            toggleDeleteBtn();
+        });
 
-            function toggleDeleteBtn() {
-                const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
-                deleteBtn.disabled = !anyChecked;
-            }
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', toggleDeleteBtn);
+        });
 
-            // Event hapus terpilih
-            deleteBtn.addEventListener('click', function() {
-                const selected = Array.from(checkboxes)
-                    .filter(cb => cb.checked)
-                    .map(cb => cb.value);
+        function toggleDeleteBtn() {
+            const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+            deleteBtn.disabled = !anyChecked;
+        }
 
-                if (selected.length === 0) return;
+        deleteBtn.addEventListener('click', function() {
+            const selected = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
+            if (selected.length === 0) return;
 
-                Swal.fire({
-                    title: 'Apakah anda yakin?',
-                    text: "Data yang terpilih akan dihapus!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#16a34a',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Ya, hapus!',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const form = document.createElement('form');
-                        form.method = 'POST';
-                        form.action = "{{ route('dosen.deleteSelected') }}";
-                        form.innerHTML = `
-                    @csrf
-                    @method('DELETE')
-                    ${selected.map(id => `<input type="hidden" name="selected_dosen[]" value="${id}">`).join('')}
-                `;
-                        document.body.appendChild(form);
-                        form.submit();
-                    }
-                });
+            Swal.fire({
+                title: 'Apakah anda yakin?',
+                text: "Data yang terpilih akan dihapus!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#16a34a',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = "{{ route('tenaga-pendidik.deleteSelected') }}";
+                    form.innerHTML = `
+                        @csrf
+                        @method('DELETE')
+                        ${selected.map(id => `<input type="hidden" name="selected_tendik[]" value="${id}">`).join('')}
+                    `;
+                    document.body.appendChild(form);
+                    form.submit();
+                }
             });
         });
     </script>

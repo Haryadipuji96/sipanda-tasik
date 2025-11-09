@@ -33,6 +33,10 @@ Route::get('/sarpras/laporan/pdf', [DataSarprasController::class, 'laporanPDF'])
 Route::get('dosen/{id}/preview-pdf', [DosenController::class, 'previewPDF'])->name('dosen.preview-pdf');
 Route::get('dosen/{id}/download-pdf', [DosenController::class, 'downloadPDF'])->name('dosen.download-pdf');
 
+// Tambahkan route PDF untuk Tendik
+Route::get('tenaga-pendidik/{id}/preview-pdf', [TenagaPendidikController::class, 'previewPDF'])->name('tenaga-pendidik.preview-pdf');
+Route::get('tenaga-pendidik/{id}/download-pdf', [TenagaPendidikController::class, 'downloadPDF'])->name('tenaga-pendidik.download-pdf');
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

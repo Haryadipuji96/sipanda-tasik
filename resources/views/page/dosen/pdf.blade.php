@@ -235,10 +235,6 @@
             <td>{{ $dosen->masa_kerja_tahun ?? 0 }} Tahun {{ $dosen->masa_kerja_bulan ?? 0 }} Bulan</td>
         </tr>
         <tr>
-            <td>Golongan</td>
-            <td>{{ $dosen->golongan ?? '-' }}</td>
-        </tr>
-        <tr>
             <td>Pangkat / Golongan</td>
             <td>{{ $dosen->pangkat_golongan ?? '-' }}</td>
         </tr>

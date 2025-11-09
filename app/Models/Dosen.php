@@ -24,7 +24,6 @@ class Dosen extends Model
         'tmt_kerja',
         'masa_kerja_tahun',
         'masa_kerja_bulan',
-        'golongan',
         'pangkat_golongan',
         'jabatan_fungsional',
         'masa_kerja_golongan_tahun',

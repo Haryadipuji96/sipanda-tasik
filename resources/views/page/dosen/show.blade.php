@@ -127,10 +127,6 @@
                                     {{ $dosen->masa_kerja_tahun ?? 0 }} Tahun {{ $dosen->masa_kerja_bulan ?? 0 }} Bulan
                                 </td>
                             </tr>
-                            <tr>
-                                <td class="border px-4 py-2 font-medium bg-gray-50">Golongan (Lama)</td>
-                                <td class="border px-4 py-2">{{ $dosen->golongan ?? '-' }}</td>
-                            </tr>
                             <tr class="bg-gray-50">
                                 <td class="border px-4 py-2 font-medium">Pangkat/Golongan</td>
                                 <td class="border px-4 py-2">{{ $dosen->pangkat_golongan ?? '-' }}</td>
