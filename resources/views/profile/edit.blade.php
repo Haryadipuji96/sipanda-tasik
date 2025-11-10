@@ -30,21 +30,26 @@
                         </div>
                     @endif
 
-                    <form method="POST" action="{{ route('profile.update-photo') }}" enctype="multipart/form-data" id="photo-form">
+                    <form method="POST" action="{{ route('profile.update-photo') }}" enctype="multipart/form-data">
                         @csrf
                         @method('PATCH')
-                        
+
+                        @php
+                            $user = Auth::user();
+                            $avatar =
+                                'https://ui-avatars.com/api/?name=' .
+                                urlencode($user->name) .
+                                '&background=047857&color=fff';
+                            $photoUrl = $user->profile_photo
+                                ? asset('profile_photos/' . $user->profile_photo)
+                                : $avatar;
+                        @endphp
+
+
                         <div class="flex items-center space-x-4 mb-4">
-                            @php
-                                $user = Auth::user();
-                                $avatar = 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=047857&color=fff';
-                                $photoUrl = $user->profile_photo ? asset('storage/' . $user->profile_photo) : $avatar;
-                            @endphp
-                            
                             <img src="{{ $photoUrl }}"
                                 class="w-20 h-20 rounded-full object-cover border-2 border-gray-300 shadow"
-                                id="profile-photo-preview"
-                                onerror="this.src='{{ $avatar }}'">
+                                id="profile-photo-preview" onerror="this.src='{{ $avatar }}'">
 
                             <div class="flex-1">
                                 <input type="file" name="profile_photo" accept="image/jpeg,image/png,image/jpg"
@@ -61,6 +66,7 @@
                     </form>
                 </div>
             </div>
+
 
             <!-- ✅ Update Info -->
             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
@@ -91,14 +97,14 @@
             if (input.files && input.files[0]) {
                 const file = input.files[0];
                 const maxSize = 2 * 1024 * 1024; // 2MB
-                
+
                 // Validasi ukuran file
                 if (file.size > maxSize) {
                     alert('Ukuran file terlalu besar. Maksimal 2MB.');
                     input.value = '';
                     return;
                 }
-                
+
                 // Validasi tipe file
                 const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
                 if (!validTypes.includes(file.type)) {
@@ -106,7 +112,7 @@
                     input.value = '';
                     return;
                 }
-                
+
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     document.getElementById('profile-photo-preview').src = e.target.result;

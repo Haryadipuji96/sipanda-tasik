@@ -62,7 +62,7 @@
         table { 
             width: 100%; 
             border-collapse: collapse; 
-            font-size: 9px;
+            font-size: 8px;
         }
         
         thead {
@@ -85,20 +85,23 @@
             background-color: #e8e8e8; 
             text-align: center;
             font-weight: bold;
-            font-size: 9px;
+            font-size: 8px;
             line-height: 1.2;
         }
 
-        /* Lebar Kolom Disesuaikan untuk 9 Kolom */
-        .col-no { width: 4%; text-align: center; }
-        .col-nama { width: 18%; }
-        .col-kategori { width: 10%; }
-        .col-jumlah { width: 6%; text-align: center; }
-        .col-kondisi { width: 8%; text-align: center; }
-        .col-tanggal { width: 10%; }
-        .col-lokasi { width: 12%; }
-        .col-spesifikasi { width: 16%; }
-        .col-keterangan { width: 16%; }
+        /* Lebar Kolom Disesuaikan untuk 12 Kolom */
+        .col-no { width: 3%; text-align: center; }
+        .col-nama { width: 14%; }
+        .col-prodi { width: 10%; }
+        .col-kategori { width: 8%; }
+        .col-jumlah { width: 4%; text-align: center; }
+        .col-kondisi { width: 6%; text-align: center; }
+        .col-tanggal { width: 7%; }
+        .col-kode { width: 7%; }
+        .col-sumber { width: 8%; }
+        .col-lokasi { width: 10%; }
+        .col-spesifikasi { width: 13%; }
+        .col-keterangan { width: 10%; }
 
         tr { page-break-inside: avoid; }
 
@@ -120,6 +123,31 @@
         }
 
         .clear { clear: both; }
+        
+        /* Kondisi styling */
+        .kondisi-baik {
+            background-color: #d1fae5;
+            color: #065f46;
+            padding: 2px 4px;
+            border-radius: 2px;
+            font-weight: bold;
+        }
+        
+        .kondisi-rusak-ringan {
+            background-color: #fef3c7;
+            color: #92400e;
+            padding: 2px 4px;
+            border-radius: 2px;
+            font-weight: bold;
+        }
+        
+        .kondisi-rusak-berat {
+            background-color: #fee2e2;
+            color: #991b1b;
+            padding: 2px 4px;
+            border-radius: 2px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -141,10 +169,13 @@
             <tr>
                 <th class="col-no">No</th>
                 <th class="col-nama">Nama Barang</th>
+                <th class="col-prodi">Prodi</th>
                 <th class="col-kategori">Kategori</th>
                 <th class="col-jumlah">Jml</th>
                 <th class="col-kondisi">Kondisi</th>
                 <th class="col-tanggal">Tgl<br>Pengadaan</th>
+                <th class="col-kode">Kode/Seri</th>
+                <th class="col-sumber">Sumber</th>
                 <th class="col-lokasi">Lokasi Lain</th>
                 <th class="col-spesifikasi">Spesifikasi</th>
                 <th class="col-keterangan">Keterangan</th>
@@ -155,17 +186,30 @@
                 <tr>
                     <td class="col-no">{{ $index + 1 }}</td>
                     <td class="col-nama">{{ $item->nama_barang }}</td>
+                    <td class="col-prodi">{{ $item->prodi->nama_prodi ?? '-' }}</td>
                     <td class="col-kategori">{{ $item->kategori }}</td>
                     <td class="col-jumlah">{{ $item->jumlah }}</td>
-                    <td class="col-kondisi">{{ $item->kondisi }}</td>
+                    <td class="col-kondisi">
+                        @if($item->kondisi == 'Baik')
+                            <span class="kondisi-baik">{{ $item->kondisi }}</span>
+                        @elseif($item->kondisi == 'Rusak Ringan')
+                            <span class="kondisi-rusak-ringan">{{ $item->kondisi }}</span>
+                        @elseif($item->kondisi == 'Rusak Berat')
+                            <span class="kondisi-rusak-berat">{{ $item->kondisi }}</span>
+                        @else
+                            {{ $item->kondisi }}
+                        @endif
+                    </td>
                     <td class="col-tanggal">{{ \Carbon\Carbon::parse($item->tanggal_pengadaan)->format('d/m/Y') }}</td>
+                    <td class="col-kode">{{ $item->kode_seri }}</td>
+                    <td class="col-sumber">{{ $item->sumber }}</td>
                     <td class="col-lokasi">{{ $item->lokasi_lain ?? '-' }}</td>
                     <td class="col-spesifikasi">{{ $item->spesifikasi }}</td>
                     <td class="col-keterangan">{{ $item->keterangan ?? '-' }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="9" style="text-align:center; padding:10px;">
+                    <td colspan="12" style="text-align:center; padding:10px;">
                         Tidak ada data ditemukan untuk kondisi ini.
                     </td>
                 </tr>

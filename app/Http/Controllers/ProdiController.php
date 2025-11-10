@@ -24,7 +24,7 @@ class ProdiController extends Controller
 
     public function store(Request $request)
     {
-        
+
         $request->validate([
             'id_fakultas' => 'required|exists:fakultas,id',
             'nama_prodi' => 'required|string|max:255',
@@ -45,17 +45,21 @@ class ProdiController extends Controller
 
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'id_fakultas' => 'required|exists:fakultas,id',
-            'nama_prodi' => 'required|string|max:255',
-            'jenjang' => 'nullable|string|max:50',
-            'deskripsi' => 'nullable|string',
-        ]);
+        try {
+            $request->validate([
+                'id_fakultas' => 'required|exists:fakultas,id', // PERBAIKAN: exists:fakultas,id
+                'nama_prodi' => 'required|string|max:255',
+                'jenjang' => 'nullable|string|max:50',
+                'deskripsi' => 'nullable|string',
+            ]);
 
-        $prodi = Prodi::findOrFail($id);
-        $prodi->update($request->all());
+            $prodi = Prodi::findOrFail($id);
+            $prodi->update($request->all());
 
-        return redirect()->route('prodi.index')->with('success', 'Data program studi berhasil diperbarui.');
+            return redirect()->route('prodi.index')->with('success', 'Data program studi berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal memperbarui data: ' . $e->getMessage());
+        }
     }
 
     public function destroy($id)

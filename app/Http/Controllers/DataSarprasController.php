@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\SarprasExport;
 use App\Models\DataSarpras;
 use App\Models\Prodi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Excel;
 
 class DataSarprasController extends Controller
 {
     public function index(Request $request)
     {
-        $query = DataSarpras::with('prodi')->latest();
+        $query = DataSarpras::with('prodi')->oldest();
 
         if ($request->filled('search')) {
             $query->where('nama_barang', 'like', "%{$request->search}%")
@@ -35,7 +37,7 @@ class DataSarprasController extends Controller
     // ✅ Satu method untuk PDF, support portrait & landscape
     public function laporanPDF(Request $request)
     {
-        $query = DataSarpras::with('prodi')->latest();
+        $query = DataSarpras::with('prodi')->oldest();
 
         if ($request->filled('kondisi')) {
             $query->where('kondisi', $request->kondisi);
@@ -174,17 +176,63 @@ class DataSarprasController extends Controller
 
     public function deleteSelected(Request $request)
     {
-        $ids = $request->selected_dosen;
+        $ids = $request->selected_sarpras; // ✅ BENAR
         if ($ids) {
-            $dosens = DataSarpras::whereIn('id', $ids)->get();
-            foreach ($dosens as $d) {
-                if ($d->file_dokumen && file_exists(public_path('storage/dokumen_dosen/' . $d->file_dokumen))) {
-                    unlink(public_path('storage/dokumen_dosen/' . $d->file_dokumen));
+            $sarpras = DataSarpras::whereIn('id', $ids)->get(); // ✅ BENAR
+            foreach ($sarpras as $s) {
+                if ($s->file_dokumen && file_exists(public_path('dokumen_sarpras/' . $s->file_dokumen))) {
+                    unlink(public_path('dokumen_sarpras/' . $s->file_dokumen)); // ✅ BENAR: path sarpras
                 }
             }
             DataSarpras::whereIn('id', $ids)->delete();
         }
 
-        return redirect()->route('dosen.index')->with('success', 'Data dosen terpilih berhasil dihapus.');
+        return redirect()->route('sarpras.index')->with('success', 'Data sarpras terpilih berhasil dihapus.'); // ✅ BENAR
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $search = $request->get('search', '');
+        $kondisi = $request->get('kondisi', '');
+
+        // Gunakan dependency injection
+        $excel = app('excel');
+
+        return $excel->download(
+            new SarprasExport($search, $kondisi),
+            'Data_Sarpras_' . date('Y-m-d_His') . '.xlsx'
+        );
+    }
+    // ✅ Preview PDF - Tampilkan di browser
+    public function previewPdf(Request $request)
+    {
+        $query = DataSarpras::with('prodi.fakultas');
+
+        // Filter berdasarkan pencarian jika ada
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_barang', 'like', "%{$search}%")
+                    ->orWhere('kategori', 'like', "%{$search}%")
+                    ->orWhere('kode_seri', 'like', "%{$search}%")
+                    ->orWhereHas('prodi', function ($q) use ($search) {
+                        $q->where('nama_prodi', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        // Filter berdasarkan kondisi jika ada
+        if ($request->filled('kondisi')) {
+            $query->where('kondisi', $request->kondisi);
+        }
+
+        $sarpras = $query->orderBy('nama_barang')->get();
+        $search = $request->search;
+        $kondisi = $request->kondisi;
+
+        $pdf = Pdf::loadView('page.laporan.preview.', compact('sarpras', 'search', 'kondisi'))
+            ->setPaper('a4', 'landscape');
+
+        return $pdf->stream('Preview_Data_Sarpras.pdf');
     }
 }

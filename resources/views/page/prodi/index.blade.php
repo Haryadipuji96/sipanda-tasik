@@ -116,8 +116,8 @@
                                                     <select name="id_fakultas" class="w-full border rounded px-3 py-2"
                                                         required>
                                                         @foreach ($fakultas as $f)
-                                                            <option value="{{ $f->id_fakultas }}"
-                                                                {{ $p->id_fakultas == $f->id_fakultas ? 'selected' : '' }}>
+                                                            <option value="{{ $f->id }}"
+                                                                {{ $p->id_fakultas == $f->id ? 'selected' : '' }}>
                                                                 {{ $f->nama_fakultas }}
                                                             </option>
                                                         @endforeach

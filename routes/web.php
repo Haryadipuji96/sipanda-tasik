@@ -1,8 +1,6 @@
 <?php
 
 use App\Http\Controllers\ArsipController;
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DataSarprasController;
 use App\Http\Controllers\DosenController;
@@ -25,17 +23,64 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/user-activity/{userId}/detail', [UserLoginController::class, 'detail'])->name('userlogin.detail');
 });
 
-// Laporan Sarpras Routes
+
+// ROUTE UNTUK DOSEN - PDF
+// ==========================================
+
+// Route untuk PDF Semua Data Dosen (dari index)
+Route::get('/dosen/preview.pdf', [DosenController::class, 'previewAllPdf'])->name('dosen.preview.pdf');
+Route::get('/dosen/download-all-pdf', [DosenController::class, 'downloadAllPdf'])->name('dosen.download-all.pdf');
+Route::get('/dosen/export-excel', [DosenController::class, 'exportExcel'])->name('dosen.export.excel');
+
+// Route untuk PDF Single Dosen (dari show)
+Route::get('/dosen/{id}/preview-pdf', [DosenController::class, 'previewPdfSingle'])->name('dosen.preview-single.pdf');
+Route::get('/dosen/{id}/download-pdf', [DosenController::class, 'downloadPdfSingle'])->name('dosen.download-single.pdf');
+
+// ==========================================
+// ROUTE UNTUK TENAGA PENDIDIK
+// ==========================================
+// Route untuk PDF Single Tendik (dari show)
+Route::get('/tenaga-pendidik/{id}/preview-pdf', [TenagaPendidikController::class, 'previewPDF'])->name('tenaga-pendidik.preview-pdf');
+Route::get('/tenaga-pendidik/{id}/download-pdf', [TenagaPendidikController::class, 'downloadPDF'])->name('tenaga-pendidik.download-pdf');
+
+// Route untuk PDF Semua Data Tendik (dari index)
+Route::get('/tenaga-pendidik/preview-all-pdf', [TenagaPendidikController::class, 'previewAllPdf'])->name('tenaga-pendidik.preview-all.pdf');
+Route::get('/tenaga-pendidik/download-all-pdf', [TenagaPendidikController::class, 'downloadAllPdf'])->name('tenaga-pendidik.download-all.pdf');
+Route::get('/tenaga-pendidik/export-excel', [TenagaPendidikController::class, 'exportExcel'])->name('tenaga-pendidik.export.excel');
+
+// ==========================================
+// ROUTE UNTUK SARPRAS
+// ==========================================
 Route::get('/sarpras/laporan/preview', [DataSarprasController::class, 'preview'])->name('sarpras.laporan.preview');
 Route::get('/sarpras/laporan/pdf', [DataSarprasController::class, 'laporanPDF'])->name('sarpras.laporan.pdf');
+Route::get('/sarpras/export-excel', [DataSarprasController::class, 'exportExcel'])->name('sarpras.export.excel');
 
-// Tambahkan di bagian route dosen
-Route::get('dosen/{id}/preview-pdf', [DosenController::class, 'previewPDF'])->name('dosen.preview-pdf');
-Route::get('dosen/{id}/download-pdf', [DosenController::class, 'downloadPDF'])->name('dosen.download-pdf');
+// ==========================================
+// ROUTE UNTUK ARSIP (jika ada)
+// ==========================================
+// Route untuk PDF Semua Data Arsip (dari index)
+Route::get('/arsip/preview-all-pdf', [ArsipController::class, 'previewAllPdf'])->name('arsip.preview-all.pdf');
+Route::get('/arsip/download-all-pdf', [ArsipController::class, 'downloadAllPdf'])->name('arsip.download-all.pdf');
+Route::get('/arsip/export-excel', [ArsipController::class, 'exportExcel'])->name('arsip.export.excel');
 
-// Tambahkan route PDF untuk Tendik
-Route::get('tenaga-pendidik/{id}/preview-pdf', [TenagaPendidikController::class, 'previewPDF'])->name('tenaga-pendidik.preview-pdf');
-Route::get('tenaga-pendidik/{id}/download-pdf', [TenagaPendidikController::class, 'downloadPDF'])->name('tenaga-pendidik.download-pdf');
+// Route untuk PDF Single Arsip (dari show) - jika diperlukan
+Route::get('/arsip/{id}/preview-pdf', [ArsipController::class, 'previewPdfSingle'])->name('arsip.preview-single.pdf');
+Route::get('/arsip/{id}/download-pdf', [ArsipController::class, 'downloadPdfSingle'])->name('arsip.download-single.pdf');
+// ==========================================
+// ROUTE UNTUK PRODI (jika butuh export)
+// ==========================================
+Route::get('/prodi/export-excel', [ProdiController::class, 'exportExcel'])->name('prodi.export.excel');
+Route::get('/prodi/preview-pdf', [ProdiController::class, 'previewPdf'])->name('prodi.preview.pdf');
+Route::get('/prodi/download-pdf', [ProdiController::class, 'downloadPdf'])->name('prodi.download.pdf');
+
+// ==========================================
+// ROUTE UNTUK FAKULTAS (jika butuh export)
+// ==========================================
+Route::get('/fakultas/export-excel', [FakultasController::class, 'exportExcel'])->name('fakultas.export.excel');
+Route::get('/fakultas/preview-pdf', [FakultasController::class, 'previewPdf'])->name('fakultas.preview.pdf');
+Route::get('/fakultas/download-pdf', [FakultasController::class, 'downloadPdf'])->name('fakultas.download.pdf');
+
+
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

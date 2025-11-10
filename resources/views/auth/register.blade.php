@@ -68,6 +68,9 @@
         }
     </style>
 
+    <!-- Include SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <div class="p-6" x-data="{ openAddModal: {{ $errors->any() ? 'true' : 'false' }} }">
         <div class="flex justify-between items-center mb-4">
             <h1 class="text-xl font-semibold">Data Pengguna</h1>
@@ -99,7 +102,6 @@
                         if (!$search) {
                             return e($text);
                         }
-                        // Hanya ini yang diganti:
                         return preg_replace(
                             '/(' . preg_quote($search, '/') . ')/i',
                             '<span class="highlight">$1</span>',
@@ -129,12 +131,13 @@
 
                                     <!-- Tombol Hapus -->
                                     @if(Auth::id() !== $user->id)
-                                        <form action="{{ route('register.destroy', $user->id) }}" method="POST" class="inline">
+                                        <form action="{{ route('register.destroy', $user->id) }}" method="POST" class="inline" id="delete-form-{{ $user->id }}">
                                             @csrf
                                             @method('DELETE')
                                             <button type="button"
                                                 class="p-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-full transition btn-delete"
-                                                title="Hapus">
+                                                title="Hapus"
+                                                onclick="confirmDelete({{ $user->id }}, '{{ addslashes($user->name) }}')">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
                                                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -160,7 +163,7 @@
                                         @click.self="openEditModal = false">
                                         <div class="bg-white rounded-lg w-full max-w-md p-6 mx-4">
                                             <h2 class="text-lg font-semibold mb-4">Edit Pengguna</h2>
-                                            <form action="{{ route('register.update', $user->id) }}" method="POST">
+                                            <form action="{{ route('register.update', $user->id) }}" method="POST" id="edit-form-{{ $user->id }}">
                                                 @csrf
                                                 @method('PUT')
 
@@ -202,7 +205,7 @@
                                                         class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">
                                                         Batal
                                                     </button>
-                                                    <button type="submit"
+                                                    <button type="button" onclick="confirmEdit({{ $user->id }})"
                                                         class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
                                                         Update
                                                     </button>
@@ -233,7 +236,7 @@
             <div class="bg-white rounded-lg w-full max-w-md p-6 mx-4 max-h-[90vh] overflow-y-auto">
                 <h2 class="text-lg font-semibold mb-4">Tambah Pengguna Baru</h2>
                 
-                <form method="POST" action="{{ route('register') }}">
+                <form method="POST" action="{{ route('register') }}" id="add-user-form">
                     @csrf
 
                     <div class="mb-4">
@@ -291,7 +294,7 @@
                             class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">
                             Batal
                         </button>
-                        <button type="submit"
+                        <button type="button" onclick="confirmAdd()"
                             class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
                             Simpan
                         </button>
@@ -302,23 +305,93 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const deleteButtons = document.querySelectorAll('.btn-delete');
-            deleteButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const form = this.closest('form');
-                    if (confirm('Apakah Anda yakin ingin menghapus pengguna ini? Data yang sudah dihapus tidak bisa dikembalikan!')) {
-                        form.submit();
-                    }
-                });
+        // SweetAlert Functions
+        function confirmDelete(userId, userName) {
+            Swal.fire({
+                title: 'Hapus Pengguna?',
+                html: `Apakah Anda yakin ingin menghapus pengguna <strong>${userName}</strong>?<br><br>Data yang sudah dihapus tidak bisa dikembalikan!`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById(`delete-form-${userId}`).submit();
+                }
             });
+        }
 
+        function confirmEdit(userId) {
+            Swal.fire({
+                title: 'Update Pengguna?',
+                text: 'Apakah Anda yakin ingin memperbarui data pengguna ini?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Update!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById(`edit-form-${userId}`).submit();
+                }
+            });
+        }
+
+        function confirmAdd() {
+            Swal.fire({
+                title: 'Tambah Pengguna?',
+                text: 'Apakah Anda yakin ingin menambahkan pengguna baru?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Simpan!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('add-user-form').submit();
+                }
+            });
+        }
+
+        // SweetAlert Notifications
+        document.addEventListener('DOMContentLoaded', function() {
             @if (session('success'))
-                alert('{{ session('success') }}');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: '{{ session('success') }}',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
             @endif
 
             @if (session('error'))
-                alert('{{ session('error') }}');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: '{{ session('error') }}',
+                    timer: 4000,
+                    showConfirmButton: true
+                });
+            @endif
+
+            @if ($errors->any())
+                @foreach ($errors->all() as $error)
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Terjadi Kesalahan!',
+                        text: '{{ $error }}',
+                        timer: 4000,
+                        showConfirmButton: true
+                    });
+                @endforeach
             @endif
         });
     </script>

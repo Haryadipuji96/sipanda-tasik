@@ -83,20 +83,55 @@
 
         <x-search-bar route="tenaga-pendidik.index" placeholder="Cari nama / NIP / prodi..." />
 
-        <button id="delete-selected"
-            class="px-3 py-1.5 text-sm rounded-full font-medium text-white bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed mb-4"
-            disabled>
-            <span>Hapus Terpilih</span>
-        </button>
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2 mb-4">
+            @canSuperadmin
+            <!-- Button Hapus Terpilih -->
+            <button id="delete-selected"
+                class="order-2 sm:order-1 px-3 py-1.5 text-sm rounded-full font-medium text-white bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-center sm:w-auto"
+                disabled>
+                <span>Hapus Terpilih</span>
+            </button>
+            @endcanSuperadmin
+            <!-- Export Buttons -->
+            <div class="order-1 sm:order-2 flex gap-2">
+                <!-- Button Preview PDF -->
+                 <a href="{{ route('tenaga-pendidik.preview-all.pdf', ['search' => request('search')]) }}" target="_blank"
+                    class="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm rounded-full font-medium text-white bg-orange-600 hover:bg-orange-700 transition text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    <span class="sm:hidden">Preview</span>
+                    <span class="hidden sm:inline">Preview PDF</span>
+                </a>
 
+                <!-- Button Export Excel -->
+                <a href="{{ route('tenaga-pendidik.export.excel', ['search' => request('search')]) }}"
+                    class="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm rounded-full font-medium text-white bg-green-600 hover:bg-green-700 transition text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span class="sm:hidden">Excel</span>
+                    <span class="hidden sm:inline">Export Excel</span>
+                </a>
+            </div>
+        </div>
+        
         <!-- Table -->
         <div class="table-wrapper border border-gray-200 rounded-lg">
             <table class="w-full border text-sm bg-white">
                 <thead class="bg-blue-500 text-white">
                     <tr>
+                        @canSuperadmin
                         <th rowspan="2" class="px-4 py-2 border text-center w-12">
                             <input type="checkbox" id="select-all">
                         </th>
+                        @endcanSuperadmin
                         <th rowspan="2" class="px-4 py-2 border text-center w-12">No</th>
                         <th rowspan="2" class="border px-4 py-2">Nama Lengkap</th>
                         <th rowspan="2" class="border px-4 py-2">Gelar Depan</th>
@@ -128,10 +163,12 @@
                 <tbody>
                     @forelse ($tenaga as $index => $t)
                         <tr class="hover:bg-gray-50" x-data="{ openModal: false }">
+                            @canSuperadmin
                             <td class="border px-3 py-2 text-center">
                                 <input type="checkbox" class="select-item" name="selected_tendik[]"
                                     value="{{ $t->id }}">
                             </td>
+                            @endcanSuperadmin
                             <td class="border px-3 py-2 text-center">
                                 {{ $index + $tenaga->firstItem() }}
                             </td>
@@ -151,7 +188,7 @@
                                 {{ $t->status_kepegawaian ?? '-' }}
                             </td>
                             <td class="border px-4 py-2">
-                                @if($t->jenis_kelamin == 'laki-laki')
+                                @if ($t->jenis_kelamin == 'laki-laki')
                                     Laki-laki
                                 @elseif($t->jenis_kelamin == 'perempuan')
                                     Perempuan
@@ -196,16 +233,15 @@
                                     </button>
 
                                     <!-- Tombol Hapus -->
-                                    <form action="{{ route('tenaga-pendidik.destroy', $t->id) }}"
-                                        method="POST" class="inline">
+                                    <form action="{{ route('tenaga-pendidik.destroy', $t->id) }}" method="POST"
+                                        class="inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="button"
                                             class="btn-delete p-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-full transition"
                                             title="Hapus">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5"
-                                                fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                                                stroke-width="2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round"
                                                     d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4h6v3m-9 0h12" />
                                             </svg>
@@ -223,8 +259,8 @@
                                             Data
                                             Tenaga Pendidik</h2>
 
-                                        <form action="{{ route('tenaga-pendidik.update', $t->id) }}"
-                                            method="POST" enctype="multipart/form-data">
+                                        <form action="{{ route('tenaga-pendidik.update', $t->id) }}" method="POST"
+                                            enctype="multipart/form-data">
                                             @csrf
                                             @method('PUT')
 
@@ -232,11 +268,9 @@
                                                 <!-- Kolom Kiri -->
                                                 <div class="space-y-3">
                                                     <div>
-                                                        <label
-                                                            class="block font-medium mb-1 text-start">Program
+                                                        <label class="block font-medium mb-1 text-start">Program
                                                             Studi</label>
-                                                        <select name="id_prodi"
-                                                            class="border p-2 rounded w-full">
+                                                        <select name="id_prodi" class="border p-2 rounded w-full">
                                                             <option value="">-- Pilih Prodi --</option>
                                                             @foreach ($prodi as $p)
                                                                 <option value="{{ $p->id }}"
@@ -252,8 +286,7 @@
                                                             Depan</label>
                                                         <input type="text" name="gelar_depan"
                                                             value="{{ $t->gelar_depan }}"
-                                                            class="border p-2 rounded w-full"
-                                                            placeholder="Dr.">
+                                                            class="border p-2 rounded w-full" placeholder="Dr.">
                                                     </div>
 
                                                     <div>
@@ -269,26 +302,39 @@
                                                             Belakang</label>
                                                         <input type="text" name="gelar_belakang"
                                                             value="{{ $t->gelar_belakang }}"
-                                                            class="border p-2 rounded w-full"
-                                                            placeholder="M.Pd">
+                                                            class="border p-2 rounded w-full" placeholder="M.Pd">
                                                     </div>
 
                                                     <div>
-                                                        <label class="block font-medium mb-1 text-start">Status Kepegawaian</label>
-                                                        <select name="status_kepegawaian" class="border p-2 rounded w-full">
+                                                        <label class="block font-medium mb-1 text-start">Status
+                                                            Kepegawaian</label>
+                                                        <select name="status_kepegawaian"
+                                                            class="border p-2 rounded w-full">
                                                             <option value="">-- Pilih Status --</option>
-                                                            <option value="PNS" {{ $t->status_kepegawaian == 'PNS' ? 'selected' : '' }}>PNS</option>
-                                                            <option value="Honorer" {{ $t->status_kepegawaian == 'Honorer' ? 'selected' : '' }}>Honorer</option>
-                                                            <option value="Kontrak" {{ $t->status_kepegawaian == 'Kontrak' ? 'selected' : '' }}>Kontrak</option>
+                                                            <option value="PNS"
+                                                                {{ $t->status_kepegawaian == 'PNS' ? 'selected' : '' }}>
+                                                                PNS</option>
+                                                            <option value="Honorer"
+                                                                {{ $t->status_kepegawaian == 'Honorer' ? 'selected' : '' }}>
+                                                                Honorer</option>
+                                                            <option value="Kontrak"
+                                                                {{ $t->status_kepegawaian == 'Kontrak' ? 'selected' : '' }}>
+                                                                Kontrak</option>
                                                         </select>
                                                     </div>
 
                                                     <div>
-                                                        <label class="block font-medium mb-1 text-start">Jenis Kelamin</label>
-                                                        <select name="jenis_kelamin" class="border p-2 rounded w-full">
+                                                        <label class="block font-medium mb-1 text-start">Jenis
+                                                            Kelamin</label>
+                                                        <select name="jenis_kelamin"
+                                                            class="border p-2 rounded w-full">
                                                             <option value="">-- Pilih Jenis Kelamin --</option>
-                                                            <option value="laki-laki" {{ $t->jenis_kelamin == 'laki-laki' ? 'selected' : '' }}>Laki-laki</option>
-                                                            <option value="perempuan" {{ $t->jenis_kelamin == 'perempuan' ? 'selected' : '' }}>Perempuan</option>
+                                                            <option value="laki-laki"
+                                                                {{ $t->jenis_kelamin == 'laki-laki' ? 'selected' : '' }}>
+                                                                Laki-laki</option>
+                                                            <option value="perempuan"
+                                                                {{ $t->jenis_kelamin == 'perempuan' ? 'selected' : '' }}>
+                                                                Perempuan</option>
                                                         </select>
                                                     </div>
                                                 </div>
@@ -304,8 +350,7 @@
                                                     </div>
 
                                                     <div>
-                                                        <label
-                                                            class="block font-medium mb-1 text-start">Tanggal
+                                                        <label class="block font-medium mb-1 text-start">Tanggal
                                                             Lahir</label>
                                                         <input type="date" name="tanggal_lahir"
                                                             value="{{ $t->tanggal_lahir ? $t->tanggal_lahir->format('Y-m-d') : '' }}"
@@ -321,7 +366,8 @@
                                                     </div>
 
                                                     <div>
-                                                        <label class="block font-medium mb-1 text-start">NIP/NIK</label>
+                                                        <label
+                                                            class="block font-medium mb-1 text-start">NIP/NIK</label>
                                                         <input type="text" name="nip"
                                                             value="{{ $t->nip }}"
                                                             class="border p-2 rounded w-full">
@@ -360,10 +406,8 @@
                                                     </button>
                                                 </div>
 
-                                                <template x-for="(item, index) in golongan"
-                                                    :key="index">
-                                                    <div
-                                                        class="grid grid-cols-3 gap-3 mb-2 p-2 bg-gray-50 rounded">
+                                                <template x-for="(item, index) in golongan" :key="index">
+                                                    <div class="grid grid-cols-3 gap-3 mb-2 p-2 bg-gray-50 rounded">
                                                         <div>
                                                             <input type="text"
                                                                 :name="'golongan[' + index + '][tahun]'"
@@ -379,8 +423,7 @@
                                                                 placeholder="2A">
                                                         </div>
                                                         <div class="flex items-center">
-                                                            <button type="button"
-                                                                @click="removeGolongan(index)"
+                                                            <button type="button" @click="removeGolongan(index)"
                                                                 class="px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600">
                                                                 × Hapus
                                                             </button>
@@ -391,11 +434,11 @@
 
                                             <!-- File Dokumen -->
                                             <div class="mt-4">
-                                                <label class="block font-medium mb-1 text-start">File Dokumen Saat Ini</label>
+                                                <label class="block font-medium mb-1 text-start">File Dokumen Saat
+                                                    Ini</label>
                                                 @if ($t->file)
                                                     <a href="{{ asset('dokumen_tendik/' . $t->file) }}"
-                                                        target="_blank"
-                                                        class="text-blue-600 hover:underline">
+                                                        target="_blank" class="text-blue-600 hover:underline">
                                                         {{ $t->file }}
                                                     </a>
                                                     <p class="text-gray-500 text-xs mt-1">
@@ -406,8 +449,7 @@
                                                         file.</p>
                                                 @endif
 
-                                                <input type="file" name="file"
-                                                    id="file"
+                                                <input type="file" name="file" id="file"
                                                     class="flex w-full rounded-md border border-blue-300 bg-white text-sm text-gray-400 file:border-0 file:bg-blue-600 file:text-white file:text-sm file:font-medium mt-2"
                                                     accept=".pdf,.doc,.docx,.jpg,.png" />
                                                 <p class="text-gray-500 text-xs mt-1">
@@ -418,8 +460,7 @@
 
                                             <!-- Keterangan -->
                                             <div class="mt-4">
-                                                <label
-                                                    class="block font-medium mb-1 text-start">Keterangan</label>
+                                                <label class="block font-medium mb-1 text-start">Keterangan</label>
                                                 <textarea name="keterangan" class="border p-2 rounded w-full" rows="2">{{ $t->keterangan }}</textarea>
                                             </div>
 

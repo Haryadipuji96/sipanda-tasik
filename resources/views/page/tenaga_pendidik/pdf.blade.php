@@ -6,47 +6,147 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Lengkap Tenaga Pendidik - {{ $tenagaPendidik->nama_tendik }}</title>
     <style>
-        @page { margin: 2cm 1.5cm; }
-        body { font-family: 'Times New Roman', Times, serif; font-size: 12pt; line-height: 1.5; color: #000; background-color: #fff; }
-        
+        @page {
+            margin: 2cm 1.5cm;
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 12pt;
+            line-height: 1.5;
+            color: #000;
+            background-color: #fff;
+        }
+
         /* === KOP SURAT === */
-        .kop { display: flex; align-items: center; justify-content: center; position: relative; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 25px; }
-        .kop img { width: 75px; position: absolute; left: 20px; top: 10px; }
-        .kop-text { text-align: center; }
-        .kop-text h2 { margin: 0; font-size: 16pt; font-weight: bold; }
-        .kop-text h3 { margin: 2px 0; font-size: 11pt; font-weight: normal; }
+        .kop {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+        }
 
-        /* === JUDUL === */
-        .judul { text-align: center; font-size: 14pt; font-weight: bold; text-decoration: underline; margin: 25px 0 20px; text-transform: uppercase; }
+        .kop img {
+            width: 75px;
+            position: absolute;
+            left: 20px;
+            top: 10px;
+        }
 
-        /* === SECTION TITLE === */
-        .section-title { font-size: 12pt; font-weight: bold; background-color: #efefef; padding: 6px 10px; margin-top: 25px; margin-bottom: 10px; border-left: 4px solid #333; }
-
-        /* === TABEL BIODATA === */
-        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
-        table.biodata td { padding: 6px 10px; border: 1px solid #000; vertical-align: top; }
-        table.biodata td:first-child { width: 35%; font-weight: bold; background-color: #f9f9f9; }
-
-        /* === TABEL RIWAYAT GOLONGAN === */
-        table.golongan th { background-color: #dcdcdc; font-weight: bold; padding: 8px; border: 1px solid #000; text-align: center; }
-        table.golongan td { padding: 6px 8px; border: 1px solid #000; text-align: center; }
-
-        /* === FOOTER === */
-        .footer { margin-top: 40px; text-align: right; font-size: 11pt; border-top: 1px solid #ccc; padding-top: 10px; }
-        .footer p { margin: 3px 0; }
-
-        /* === STATUS BADGE === */
-        .status-badge { 
-            display: inline-block; 
-            padding: 2px 8px; 
-            border-radius: 10px; 
-            font-size: 10pt; 
-            font-weight: bold; 
+        .kop-text {
             text-align: center;
         }
-        .status-pns { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .status-honorer { background-color: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
-        .status-kontrak { background-color: #cce7ff; color: #004085; border: 1px solid #b3d7ff; }
+
+        .kop-text h2 {
+            margin: 0;
+            font-size: 16pt;
+            font-weight: bold;
+        }
+
+        .kop-text h3 {
+            margin: 2px 0;
+            font-size: 11pt;
+            font-weight: normal;
+        }
+
+        /* === JUDUL === */
+        .judul {
+            text-align: center;
+            font-size: 14pt;
+            font-weight: bold;
+            text-decoration: underline;
+            margin: 25px 0 20px;
+            text-transform: uppercase;
+        }
+
+        /* === SECTION TITLE === */
+        .section-title {
+            font-size: 12pt;
+            font-weight: bold;
+            background-color: #efefef;
+            padding: 6px 10px;
+            margin-top: 25px;
+            margin-bottom: 10px;
+            border-left: 4px solid #333;
+        }
+
+        /* === TABEL BIODATA === */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+
+        table.biodata td {
+            padding: 6px 10px;
+            border: 1px solid #000;
+            vertical-align: top;
+        }
+
+        table.biodata td:first-child {
+            width: 35%;
+            font-weight: bold;
+            background-color: #f9f9f9;
+        }
+
+        /* === TABEL RIWAYAT GOLONGAN === */
+        table.golongan th {
+            background-color: #dcdcdc;
+            font-weight: bold;
+            padding: 8px;
+            border: 1px solid #000;
+            text-align: center;
+        }
+
+        table.golongan td {
+            padding: 6px 8px;
+            border: 1px solid #000;
+            text-align: center;
+        }
+
+        /* === FOOTER === */
+        .footer {
+            margin-top: 40px;
+            text-align: right;
+            font-size: 11pt;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+        }
+
+        .footer p {
+            margin: 3px 0;
+        }
+
+        /* === STATUS BADGE === */
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10pt;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .status-pns {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-honorer {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .status-kontrak {
+            background-color: #cce7ff;
+            color: #004085;
+            border: 1px solid #b3d7ff;
+        }
     </style>
 </head>
 
@@ -84,22 +184,30 @@
         </tr>
         <tr>
             <td>Status Kepegawaian</td>
-            <td>
-                @if($tenagaPendidik->status_kepegawaian == 'PNS')
-                    <span class="status-badge status-pns">PNS</span>
-                @elseif($tenagaPendidik->status_kepegawaian == 'Honorer')
-                    <span class="status-badge status-honorer">HONORER</span>
-                @elseif($tenagaPendidik->status_kepegawaian == 'Kontrak')
-                    <span class="status-badge status-kontrak">KONTRAK</span>
+            <td class="text-center">
+                @if (isset($isPdf) && $isPdf)
+                    {{-- Versi PDF: hanya teks biasa (hitam putih) --}}
+                    {{ $tenagaPendidik->status_kepegawaian ?? '-' }}
                 @else
-                    -
+                    {{-- Versi web: badge hitam putih --}}
+                    @if ($tenagaPendidik->status_kepegawaian == 'PNS')
+                        <span class="status-badge">PNS</span>
+                    @elseif($tenagaPendidik->status_kepegawaian == 'Honorer')
+                        <span class="status-badge">HONORER</span>
+                    @elseif($tenagaPendidik->status_kepegawaian == 'Kontrak')
+                        <span class="status-badge">KONTRAK</span>
+                    @else
+                        -
+                    @endif
                 @endif
             </td>
+
+
         </tr>
         <tr>
             <td>Jenis Kelamin</td>
             <td>
-                @if($tenagaPendidik->jenis_kelamin == 'laki-laki')
+                @if ($tenagaPendidik->jenis_kelamin == 'laki-laki')
                     Laki-laki
                 @elseif($tenagaPendidik->jenis_kelamin == 'perempuan')
                     Perempuan
@@ -163,7 +271,7 @@
                     $golonganArray = is_array($decoded) ? $decoded : [];
                 }
             @endphp
-            
+
             @forelse($golonganArray as $index => $gol)
                 <tr>
                     <td>{{ $index + 1 }}</td>
@@ -180,19 +288,8 @@
         </tbody>
     </table>
 
-    <!-- DOKUMEN -->
-    @if($tenagaPendidik->file)
-    <div class="section-title">DOKUMEN</div>
-    <table class="biodata">
-        <tr>
-            <td>File Dokumen</td>
-            <td>{{ $tenagaPendidik->file }}</td>
-        </tr>
-    </table>
-    @endif
-
     <!-- KETERANGAN -->
-    @if($tenagaPendidik->keterangan)
+    @if ($tenagaPendidik->keterangan)
         <div class="section-title">KETERANGAN</div>
         <p style="text-align: justify; line-height: 1.6;">{{ $tenagaPendidik->keterangan }}</p>
     @endif

@@ -7,8 +7,9 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+
+
 
 class ProfileController extends Controller
 {
@@ -27,53 +28,50 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        /** @var \App\Models\User $user */
         $user = $request->user();
-
-        // Data hasil validasi form utama
         $data = $request->validated();
 
-        // Update data user
         $user->fill($data);
 
-        // Reset verifikasi email jika berubah
+        // Reset verifikasi email jika email berubah
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
         }
 
-        // Simpan ke database
         $user->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
     /**
-     * Update hanya foto profil.
+     * Update hanya foto profil (disimpan ke public/profile_photos).
      */
-    public function updatePhoto(Request $request): RedirectResponse
+    public function updatePhoto(Request $request)
     {
         $request->validate([
             'profile_photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         /** @var \App\Models\User $user */
-        $user = Auth::user();
+       $user = Auth::user();
 
         // Hapus foto lama jika ada
-        if ($user->profile_photo && Storage::disk('public')->exists($user->profile_photo)) {
-            Storage::disk('public')->delete($user->profile_photo);
+        if ($user->profile_photo && file_exists(public_path('profile_photos/' . $user->profile_photo))) {
+            unlink(public_path('profile_photos/' . $user->profile_photo));
         }
 
-        // Upload foto baru ke storage/public/profile_photos
-        $path = $request->file('profile_photo')->store('profile_photos', 'public');
+        // Upload ke folder public/profile_photos
+        $file = $request->file('profile_photo');
+        $filename = time() . '_' . $file->getClientOriginalName();
+        $file->move(public_path('profile_photos'), $filename);
 
-        // Update di database
-        $user->update([
-            'profile_photo' => $path,
-        ]);
+        // Simpan nama file ke database
+        $user->profile_photo = $filename;
+        $user->save();
 
         return back()->with('success', 'Foto profil berhasil diperbarui.');
     }
+
 
     /**
      * Hapus akun pengguna.

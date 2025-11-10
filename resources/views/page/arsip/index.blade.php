@@ -88,20 +88,58 @@
 
         <x-search-bar route="arsip.index" placeholder="Cari judul / kategori / prodi..." />
 
-        <button id="delete-selected"
-            class="px-3 py-1.5 text-sm rounded-full font-medium text-white bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed mb-4"
-            disabled>
-            <span>Hapus Terpilih</span>
-        </button>
+
+        <!-- Letakkan setelah button "Hapus Terpilih" dan sebelum tabel -->
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2 mb-4">
+            @canSuperadmin
+            <!-- Button Hapus Terpilih -->
+            <button id="delete-selected"
+                class="order-2 sm:order-1 px-3 py-1.5 text-sm rounded-full font-medium text-white bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-center sm:w-auto"
+                disabled>
+                <span>Hapus Terpilih</span>
+            </button>
+            @endcanSuperadmin
+
+            <!-- Export Buttons -->
+            <div class="order-1 sm:order-2 flex gap-2">
+                <!-- Button Preview PDF -->
+                <a href="{{ route('arsip.preview-all.pdf', request()->query()) }}" target="_blank"
+                    class="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm rounded-full font-medium text-white bg-orange-600 hover:bg-orange-700 transition text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    <span class="sm:hidden">Preview</span>
+                    <span class="hidden sm:inline">Preview PDF</span>
+                </a>
+
+                <!-- Button Export Excel -->
+                <a href="{{ route('arsip.export.excel', ['search' => request('search')]) }}"
+                    class="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm rounded-full font-medium text-white bg-green-600 hover:bg-green-700 transition text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span class="sm:hidden">Excel</span>
+                    <span class="hidden sm:inline">Export Excel</span>
+                </a>
+            </div>
+        </div>
 
         <!-- Tabel Arsip -->
         <div class="table-wrapper border border-gray-200 rounded-lg">
             <table class="w-full border text-sm bg-white">
                 <thead class="bg-blue-500 text-white">
                     <tr>
+                        @canSuperadmin
                         <th class="px-4 py-2 border text-center w-12" rowspan="2">
                             <input type="checkbox" id="select-all">
                         </th>
+                        @endcanSuperadmin
                         <th class="border px-3 py-2 text-center w-12">No</th>
                         <th class="border px-3 py-2 text-left">Judul Dokumen</th>
                         <th class="border px-3 py-2 text-left">Nomor Dokumen</th>
@@ -131,10 +169,12 @@
                 <tbody>
                     @forelse ($arsip as $index => $a)
                         <tr class="hover:bg-gray-50">
+                            @canSuperadmin
                             <td class="border px-3 py-2 text-center">
                                 <input type="checkbox" class="select-item" name="selected_dosen[]"
                                     value="{{ $a->id }}">
                             </td>
+                            @endcanSuperadmin
                             <td class="border px-3 py-2 text-center">{{ $index + $arsip->firstItem() }}</td>
                             <td class="border px-3 py-2">{!! highlight($a->judul_dokumen, request('search')) !!}</td>
                             <td class="border px-3 py-2">{{ $a->nomor_dokumen ?? '-' }}</td>
@@ -185,8 +225,9 @@
                                             <button type="button"
                                                 class="p-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-full transition btn-delete"
                                                 title="Hapus">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
-                                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5"
+                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                                    stroke-width="2">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                         d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4h6v3m-9 0h12" />
                                                 </svg>

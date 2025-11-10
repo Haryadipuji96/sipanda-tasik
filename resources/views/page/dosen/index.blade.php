@@ -82,19 +82,57 @@
 
         <x-search-bar route="dosen.index" placeholder="Cari nama / prodi / jabatan..." />
 
-        <button id="delete-selected"
-            class="px-3 py-1.5 text-sm rounded-full font-medium text-white bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed mb-4"
-            disabled>
-            <span>Hapus Terpilih</span>
-        </button>
+        <!-- GANTI bagian button export di view dosen (setelah button Hapus Terpilih) -->
+
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2 mb-4">
+            @canSuperadmin
+            <!-- Button Hapus Terpilih -->
+            <button id="delete-selected"
+                class="order-2 sm:order-1 px-3 py-1.5 text-sm rounded-full font-medium text-white bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-center sm:w-auto"
+                disabled>
+                <span>Hapus Terpilih</span>
+            </button>
+            @endcanSuperadmin
+
+            <!-- Export Buttons -->
+            <div class="order-1 sm:order-2 flex gap-2">
+                <!-- Button Preview PDF -->
+                <a href="{{ route('dosen.preview.pdf', ['search' => request('search')]) }}" target="_blank"
+                    class="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm rounded-full font-medium text-white bg-orange-600 hover:bg-orange-700 transition text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    <span class="sm:hidden">Preview</span>
+                    <span class="hidden sm:inline">Preview PDF</span>
+                </a>
+
+                <!-- Button Export Excel -->
+                <a href="{{ route('dosen.export.excel', ['search' => request('search')]) }}"
+                    class="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm rounded-full font-medium text-white bg-green-600 hover:bg-green-700 transition text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span class="sm:hidden">Excel</span>
+                    <span class="hidden sm:inline">Export Excel</span>
+                </a>
+            </div>
+        </div>
 
         <div class="table-wrapper border border-gray-200 rounded-lg">
             <table class="w-full border text-sm bg-white">
                 <thead class="bg-blue-500 text-white">
                     <tr>
+                        @canSuperadmin
                         <th class="px-4 py-2 border text-center w-12" rowspan="3">
                             <input type="checkbox" id="select-all">
                         </th>
+                        @endcanSuperadmin
                         <th rowspan="3" class="px-4 py-2 border text-center w-12">No</th>
                         <th rowspan="3" class="border px-4 py-2">Nama</th>
                         <th rowspan="3" class="border px-4 py-2">Prodi</th>
@@ -148,10 +186,12 @@
                         @for ($i = 0; $i < $maxRows; $i++)
                             <tr class="hover:bg-gray-50" x-data="{ openModal: false }">
                                 @if ($i === 0)
+                                    @canSuperadmin
                                     <td class="border px-3 py-2 text-center" rowspan="{{ $maxRows }}">
                                         <input type="checkbox" class="select-item" name="selected_dosen[]"
                                             value="{{ $d->id }}">
                                     </td>
+                                    @endcanSuperadmin
                                     <td class="border px-3 py-2 text-center" rowspan="{{ $maxRows }}">
                                         {{ $index + $dosen->firstItem() }}</td>
                                     <td class="border px-4 py-2" rowspan="{{ $maxRows }}">{!! highlight($d->nama, request('search')) !!}
@@ -255,13 +295,12 @@
                                         </div>
                                         @endcanSuperadmin
 
-                                        <!-- Modal Edit (unchanged, will provide separately) -->
                                         <!-- Modal Edit -->
                                         <div x-show="openModal" x-cloak
                                             class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
                                             <div @click.away="openModal = false"
                                                 class="relative bg-white rounded-xl shadow-xl w-full max-w-4xl p-6 mx-4 overflow-y-auto max-h-[90vh]"
-                                                x-data="formPendidikanEdit({{ json_encode($d->pendidikan ?? []) }})">
+                                                x-data="formPendidikanEdit({{ json_encode($d->pendidikan_array ?? []) }})">
                                                 <button @click="openModal = false"
                                                     class="absolute top-3 right-3 text-gray-400 hover:text-gray-600">✕</button>
                                                 <h1

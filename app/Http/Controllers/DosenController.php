@@ -6,6 +6,8 @@ use App\Models\Dosen;
 use App\Models\Prodi;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\DosenExport;
 
 class DosenController extends Controller
 {
@@ -61,7 +63,7 @@ class DosenController extends Controller
 
         // Handle pendidikan dinamis
         if ($request->has('pendidikan')) {
-            $pendidikanArray = array_filter($request->pendidikan, function($item) {
+            $pendidikanArray = array_filter($request->pendidikan, function ($item) {
                 return !empty($item['jenjang']) || !empty($item['prodi']) || !empty($item['tahun_lulus']) || !empty($item['universitas']);
             });
             $data['pendidikan_data'] = json_encode(array_values($pendidikanArray));
@@ -115,7 +117,7 @@ class DosenController extends Controller
 
         // Handle pendidikan dinamis
         if ($request->has('pendidikan')) {
-            $pendidikanArray = array_filter($request->pendidikan, function($item) {
+            $pendidikanArray = array_filter($request->pendidikan, function ($item) {
                 return !empty($item['jenjang']) || !empty($item['prodi']) || !empty($item['tahun_lulus']) || !empty($item['universitas']);
             });
             $data['pendidikan_data'] = json_encode(array_values($pendidikanArray));
@@ -170,19 +172,152 @@ class DosenController extends Controller
         return redirect()->route('dosen.index')->with('success', 'Data dosen terpilih berhasil dihapus.');
     }
 
-    // Preview PDF
-    public function previewPDF($id)
+    // ==========================================
+    // EXPORT UNTUK SEMUA DATA DOSEN
+    // ==========================================
+
+    /**
+     * Preview PDF - Tampilkan semua data dosen dalam format PDF
+     */
+    public function previewAllPdf(Request $request)
     {
-        $dosen = Dosen::with('prodi.fakultas')->findOrFail($id);
-        $pdf = PDF::loadView('page.dosen.pdf', compact('dosen'));
-        return $pdf->stream('Data-Dosen-' . $dosen->nama . '.pdf');
+        $query = Dosen::with(['prodi.fakultas']);
+
+        // Filter berdasarkan pencarian jika ada
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                    ->orWhere('jabatan', 'like', "%{$search}%")
+                    ->orWhere('nik', 'like', "%{$search}%")
+                    ->orWhereHas('prodi', function ($q) use ($search) {
+                        $q->where('nama_prodi', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        // Filter berdasarkan prodi jika ada
+        if ($request->has('prodi') && $request->prodi != '') {
+            $query->whereHas('prodi', function ($q) use ($request) {
+                $q->where('nama_prodi', $request->prodi);
+            });
+        }
+
+        // Filter berdasarkan sertifikasi jika ada
+        if ($request->has('sertifikasi') && $request->sertifikasi != '') {
+            $query->where('sertifikasi', $request->sertifikasi);
+        }
+
+        // Filter berdasarkan inpasing jika ada
+        if ($request->has('inpasing') && $request->inpasing != '') {
+            $query->where('inpasing', $request->inpasing);
+        }
+
+        $dosen = $query->orderBy('nama')->get();
+        $prodi = Prodi::with('fakultas')->get(); // Untuk info filter
+
+        return view('page.dosen.laporan.preview', compact('dosen', 'prodi'));
     }
 
-    // Download PDF
-    public function downloadPDF($id)
+    /**
+     * Download PDF - Download semua data dosen dalam format PDF
+     */
+    public function downloadAllPdf(Request $request)
     {
-        $dosen = Dosen::with('prodi.fakultas')->findOrFail($id);
-        $pdf = PDF::loadView('page.dosen.pdf', compact('dosen'));
-        return $pdf->download('Data-Dosen-' . $dosen->nama . '.pdf');
+        $query = Dosen::with(['prodi.fakultas']);
+
+        // Filter berdasarkan pencarian jika ada
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                    ->orWhere('jabatan', 'like', "%{$search}%")
+                    ->orWhere('nik', 'like', "%{$search}%")
+                    ->orWhereHas('prodi', function ($q) use ($search) {
+                        $q->where('nama_prodi', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        // Filter berdasarkan prodi jika ada
+        if ($request->has('prodi') && $request->prodi != '') {
+            $query->whereHas('prodi', function ($q) use ($request) {
+                $q->where('nama_prodi', $request->prodi);
+            });
+        }
+
+        // Filter berdasarkan sertifikasi jika ada
+        if ($request->has('sertifikasi') && $request->sertifikasi != '') {
+            $query->where('sertifikasi', $request->sertifikasi);
+        }
+
+        // Filter berdasarkan inpasing jika ada
+        if ($request->has('inpasing') && $request->inpasing != '') {
+            $query->where('inpasing', $request->inpasing);
+        }
+
+        $dosen = $query->orderBy('nama')->get();
+
+        $pdf = Pdf::loadView('page.dosen.pdf-preview', compact('dosen'))
+            ->setPaper('a4', 'landscape');
+
+        return $pdf->download('Data_Dosen_' . date('Y-m-d_His') . '.pdf');
+    }
+
+    /**
+     * Export ke Excel - Download data dosen dalam format Excel
+     */
+    // Di DosenController, ganti method exportExcel:
+
+    /**
+     * Export ke Excel - Download data dosen dalam format Excel
+     */
+    public function exportExcel(Request $request)
+    {
+        $search = $request->get('search', '');
+
+        // Pilih salah satu:
+
+        // Option 1: Export dengan kolom pendidikan horizontal
+        return Excel::download(
+            new DosenExport($search),
+            'Data_Dosen_' . date('Y-m-d_His') . '.xlsx'
+        );
+
+        // Option 2: Export dengan multiple rows
+        // return Excel::download(
+        //     new DosenExportMultipleRows($search), 
+        //     'Data_Dosen_Multiple_Rows_' . date('Y-m-d_His') . '.xlsx'
+        // );
+    }
+
+    // Di DosenController, tambahkan method baru:
+
+    /**
+     * Preview PDF Single - Tampilkan 1 data dosen dalam format PDF (dari show)
+     */
+    public function previewPdfSingle($id)
+    {
+        $dosen = Dosen::with(['prodi.fakultas'])->findOrFail($id);
+
+        // Generate PDF untuk single dosen
+        $pdf = Pdf::loadView('page.dosen.pdf', compact('dosen'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->stream('Detail_Dosen_' . $dosen->nama . '.pdf');
+    }
+
+    /**
+     * Download PDF Single - Download 1 data dosen dalam format PDF (dari show)
+     */
+    public function downloadPdfSingle($id)
+    {
+        $dosen = Dosen::with(['prodi.fakultas'])->findOrFail($id);
+
+        // Generate dan download PDF untuk single dosen
+        $pdf = Pdf::loadView('page.dosen.pdf', compact('dosen'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->download('Detail_Dosen_' . $dosen->nama . '_' . date('Y-m-d_His') . '.pdf');
     }
 }

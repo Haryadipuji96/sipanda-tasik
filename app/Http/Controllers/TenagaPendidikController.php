@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\TenagaPendidikExport;
 use App\Models\TenagaPendidik;
 use App\Models\Prodi;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
 
 class TenagaPendidikController extends Controller
 {
@@ -181,25 +183,109 @@ class TenagaPendidikController extends Controller
         return redirect()->route('tenaga-pendidik.index')->with('success', 'Data tenaga pendidik terpilih berhasil dihapus.');
     }
 
-    // Preview PDF
-    public function previewPDF($id)
+    public function previewAllPdf(Request $request)
     {
-        $tenagaPendidik = TenagaPendidik::with('prodi.fakultas')->findOrFail($id);
+        $query = TenagaPendidik::with('prodi.fakultas');
 
-        $pdf = PDF::loadView('page.tenaga_pendidik.pdf', compact('tenagaPendidik'))
-            ->setPaper('a4', 'portrait');
+        // Filter berdasarkan pencarian jika ada
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_tendik', 'like', "%{$search}%")
+                    ->orWhere('nip', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhereHas('prodi', function ($q) use ($search) {
+                        $q->where('nama_prodi', 'like', "%{$search}%");
+                    });
+            });
+        }
 
-        return $pdf->stream('Data-Tendik-' . $tenagaPendidik->nama_tendik . '.pdf');
+        // Filter berdasarkan status kepegawaian jika ada
+        if ($request->has('status_kepegawaian') && $request->status_kepegawaian != '') {
+            $query->where('status_kepegawaian', $request->status_kepegawaian);
+        }
+
+        // Filter berdasarkan prodi jika ada
+        if ($request->has('id_prodi') && $request->id_prodi != '') {
+            $query->where('id_prodi', $request->id_prodi);
+        }
+
+        $tenaga = $query->orderBy('nama_tendik')->get();
+        $prodi = Prodi::with('fakultas')->get();
+
+        // Gunakan file preview-all-pdf.blade.php yang baru
+        return view('page.tenaga_pendidik.laporan.preview', compact('tenaga', 'prodi'));
     }
 
-    // Download PDF
-    public function downloadPDF($id)
+    /**
+     * Download PDF - Download semua data tendik dalam format PDF
+     */
+    public function downloadAllPdf(Request $request)
+    {
+        $query = TenagaPendidik::with('prodi.fakultas');
+
+        // Filter berdasarkan pencarian jika ada
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_tendik', 'like', "%{$search}%")
+                    ->orWhere('nip', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhereHas('prodi', function ($q) use ($search) {
+                        $q->where('nama_prodi', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $tenaga = $query->orderBy('nama_tendik')->get();
+
+        // PERBAIKAN: Hapus spasi dari nama view
+        $pdf = Pdf::loadView('page.tenaga_pendidik.pdf-all', compact('tenaga'))
+            ->setPaper('a4', 'landscape');
+
+        return $pdf->download('Data_Tenaga_Pendidik_' . date('Y-m-d_His') . '.pdf');
+    }
+
+    /**
+     * Export ke Excel - Download data tendik dalam format Excel
+     */
+    public function exportExcel(Request $request)
+    {
+        $search = $request->get('search', '');
+
+        return Excel::download(
+            new TenagaPendidikExport($search),
+            'Data_Tenaga_Pendidik_' . date('Y-m-d_His') . '.xlsx'
+        );
+    }
+
+    // ==========================================
+    // EXPORT UNTUK SINGLE DATA TENAGA PENDIDIK
+    // ==========================================
+
+    /**
+     * Preview PDF Single - Tampilkan 1 data tendik dalam format PDF (dari show)
+     */
+    public function previewPdf($id)
     {
         $tenagaPendidik = TenagaPendidik::with('prodi.fakultas')->findOrFail($id);
 
-        $pdf = PDF::loadView('page.tenaga_pendidik.pdf', compact('tenagaPendidik'))
+        $pdf = Pdf::loadView('page.tenaga_pendidik.pdf', compact('tenagaPendidik'))
             ->setPaper('a4', 'portrait');
 
-        return $pdf->download('Data-Tendik-' . $tenagaPendidik->nama_tendik . '.pdf');
+        return $pdf->stream('Detail_Tenaga_Pendidik_' . $tenagaPendidik->nama_tendik . '.pdf');
+    }
+
+    /**
+     * Download PDF Single - Download 1 data tendik dalam format PDF (dari show)
+     */
+    public function downloadPdf($id)
+    {
+        $tenagaPendidik = TenagaPendidik::with('prodi.fakultas')->findOrFail($id);
+
+        $pdf = Pdf::loadView('page.tenaga_pendidik.pdf', compact('tenagaPendidik'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->download('Detail_Tenaga_Pendidik_' . $tenagaPendidik->nama_tendik . '_' . date('Y-m-d_His') . '.pdf');
     }
 }
