@@ -91,7 +91,30 @@
                 "“Ilmu pengetahuan adalah harta yang paling berharga.” – Mahatma Gandhi",
                 "“Orang yang berhenti belajar akan menjadi tua, baik umur 20 atau 80.” – Henry Ford",
                 "“Kampus bukan hanya tempat belajar, tapi tempat menginspirasi perubahan.”",
-                "“Setiap hari adalah kesempatan baru untuk belajar sesuatu yang baru.”"
+                "“Setiap hari adalah kesempatan baru untuk belajar sesuatu yang baru.”",
+                "“Pendidikan membuka pikiran, memperluas pandangan, dan membentuk masa depan.”",
+                "“Tidak ada kata terlambat untuk belajar dan memperbaiki diri.”",
+                "“Guru membuka pintu, tapi kamu harus masuk sendiri.” – Pepatah Tiongkok",
+                "“Masa depan milik mereka yang mempersiapkan diri hari ini.” – Malcolm X",
+                "“Kegagalan adalah bagian dari proses menuju keberhasilan.”",
+                "“Belajarlah seolah-olah kamu akan hidup selamanya.” – Mahatma Gandhi",
+                "“Tujuan pendidikan adalah menggantikan pikiran kosong dengan pikiran terbuka.” – Malcolm Forbes",
+                "“Ilmu tanpa amal bagaikan pohon tanpa buah.” – Ali bin Abi Thalib",
+                "“Pendidikan bukan persiapan untuk hidup, pendidikan adalah kehidupan itu sendiri.” – John Dewey",
+                "“Satu jam belajar akan mengubah hari, satu hari belajar akan mengubah hidup.”",
+                "“Kampus adalah tempat menanam mimpi, bukan sekadar mencari nilai.”",
+                "“Belajar adalah investasi terbaik yang hasilnya tidak akan pernah hilang.”",
+                "“Orang berilmu tidak hanya pintar, tapi juga bijak dalam bertindak.”",
+                "“Motivasi datang dari dalam diri, bukan dari nilai di kertas.”",
+                "“Pendidikan adalah perjalanan tanpa akhir.”",
+                "“Setiap buku yang kamu baca membuka satu jendela baru di pikiranmu.”",
+                "“Keberhasilan akademik bukanlah akhir, tapi awal dari kontribusi nyata.”",
+                "“Jangan takut salah, karena dari kesalahanlah kita belajar menjadi benar.”",
+                "“Berpikir kritis adalah kunci dari kemajuan peradaban.”",
+                "“Mahasiswa sejati bukan hanya mengejar gelar, tapi juga kebenaran dan perubahan.”",
+                "“Pendidikan sejati adalah yang membebaskan, bukan yang membatasi.” – Ki Hajar Dewantara",
+                "“Dengan ilmu, kita terangkat. Dengan adab, kita dimuliakan.”",
+                "“Semakin banyak kamu tahu, semakin kamu sadar betapa banyak yang belum kamu ketahui.” – Aristoteles"
             ];
             const today = new Date();
             const dayIndex = today.getDate() % quotes.length;
