@@ -15,7 +15,7 @@
             margin: 0;
             padding: 0;
             color: #000;
-            font-size: 10px;
+            font-size: 9px;
         }
 
         /* KOP Surat - Hanya Halaman Pertama */
@@ -99,31 +99,39 @@
         }
 
         .col-nama {
-            width: 12%;
-        }
-
-        .col-prodi {
             width: 10%;
         }
 
-        .col-ttl {
+        .col-gelar {
+            width: 6%;
+        }
+
+        .col-prodi {
             width: 8%;
+        }
+
+        .col-ttl {
+            width: 7%;
         }
 
         .col-nidn {
-            width: 6%;
+            width: 5%;
+        }
+
+        .col-nuptk {
+            width: 5%;
         }
 
         .col-pendidikan {
-            width: 8%;
+            width: 7%;
         }
 
         .col-jabatan {
-            width: 8%;
+            width: 7%;
         }
 
         .col-tmt {
-            width: 6%;
+            width: 5%;
             text-align: center;
         }
 
@@ -138,16 +146,16 @@
         }
 
         .col-pangkat {
-            width: 7%;
+            width: 6%;
         }
 
         .col-sertifikasi {
-            width: 5%;
+            width: 4%;
             text-align: center;
         }
 
         .col-inpasing {
-            width: 5%;
+            width: 4%;
             text-align: center;
         }
 
@@ -172,6 +180,24 @@
         .status-belum {
             background-color: #fee2e2;
             color: #991b1b;
+        }
+
+        /* File Indicator */
+        .file-indicator {
+            font-size: 5px;
+            color: #059669;
+            font-weight: bold;
+        }
+
+        /* Gelar Style */
+        .gelar-depan {
+            color: #1e40af;
+            font-weight: bold;
+        }
+
+        .gelar-belakang {
+            color: #059669;
+            font-weight: bold;
         }
 
         /* Footer */
@@ -266,10 +292,12 @@
         <thead>
             <tr>
                 <th class="col-no">No</th>
-                <th class="col-nama">Nama</th>
+                <th class="col-nama">Nama Lengkap</th>
+                <th class="col-gelar">Gelar</th>
                 <th class="col-prodi">Program Studi</th>
                 <th class="col-ttl">Tempat/Tgl Lahir</th>
                 <th class="col-nidn">NIDN</th>
+                <th class="col-nuptk">NUPTK</th>
                 <th class="col-pendidikan">Pendidikan</th>
                 <th class="col-jabatan">Jabatan</th>
                 <th class="col-tmt">TMT Kerja</th>
@@ -284,10 +312,32 @@
             @forelse($dosen as $index => $d)
                 <tr>
                     <td class="col-no">{{ $index + 1 }}</td>
-                    <td class="col-nama">{{ $d->nama }}</td>
+                    <td class="col-nama">
+                        <div style="font-weight: bold;">{{ $d->nama }}</div>
+                        @if ($d->gelar_depan || $d->gelar_belakang)
+                            <div style="font-size: 6px; color: #666;">
+                                {{ $d->gelar_depan ? $d->gelar_depan . ' ' : '' }}{{ $d->nama }}{{ $d->gelar_belakang ? ', ' . $d->gelar_belakang : '' }}
+                            </div>
+                        @endif
+                    </td>
+                    <td class="col-gelar">
+                        @if ($d->gelar_depan || $d->gelar_belakang)
+                            <div style="text-align: center;">
+                                @if ($d->gelar_depan)
+                                    <div class="gelar-depan" style="font-size: 6px;">{{ $d->gelar_depan }}</div>
+                                @endif
+                                @if ($d->gelar_belakang)
+                                    <div class="gelar-belakang" style="font-size: 6px;">{{ $d->gelar_belakang }}</div>
+                                @endif
+                            </div>
+                        @else
+                            <span style="color: #999;">-</span>
+                        @endif
+                    </td>
                     <td class="col-prodi">{{ $d->prodi->nama_prodi ?? '-' }}</td>
                     <td class="col-ttl">{{ $d->tempat_tanggal_lahir ?? '-' }}</td>
                     <td class="col-nidn">{{ $d->nik ?? '-' }}</td>
+                    <td class="col-nuptk">{{ $d->nuptk ?? '-' }}</td>
                     <td class="col-pendidikan">{{ $d->pendidikan_terakhir ?? '-' }}</td>
                     <td class="col-jabatan">{{ $d->jabatan ?? '-' }}</td>
                     <td class="col-tmt">
@@ -297,15 +347,25 @@
                     <td class="col-mk-bln">{{ $d->masa_kerja_bulan ?? 0 }}</td>
                     <td class="col-pangkat">{{ $d->pangkat_golongan ?? '-' }}</td>
                     <td class="col-sertifikasi">
-                        <strong>{{ $d->sertifikasi }}</strong>
+                        <div style="text-align: center;">
+                            <strong>{{ $d->sertifikasi }}</strong>
+                            @if ($d->sertifikasi == 'SUDAH' && $d->file_sertifikasi)
+                                <div class="file-indicator">✓ File</div>
+                            @endif
+                        </div>
                     </td>
                     <td class="col-inpasing">
-                        <strong>{{ $d->inpasing }}</strong>
+                        <div style="text-align: center;">
+                            <strong>{{ $d->inpasing }}</strong>
+                            @if ($d->inpasing == 'SUDAH' && $d->file_inpasing)
+                                <div class="file-indicator">✓ File</div>
+                            @endif
+                        </div>
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="13" style="text-align:center; padding:12px; font-style: italic;">
+                    <td colspan="15" style="text-align:center; padding:12px; font-style: italic;">
                         Tidak ada data dosen ditemukan.
                     </td>
                 </tr>
@@ -328,6 +388,18 @@
                 | Inpasing: <strong>{{ request('inpasing') }}</strong>
                 ({{ $dosen->where('inpasing', request('inpasing'))->count() }})
             @endif
+
+            <!-- Additional Stats - PERBAIKI BAGIAN INI -->
+            <div style="margin-top: 4px;">
+                <strong>Detail:</strong>
+                Gelar:
+                <strong>{{ $dosen->filter(function ($item) {return !empty($item->gelar_depan) || !empty($item->gelar_belakang);})->count() }}</strong>
+                |
+                NUPTK: <strong>{{ $dosen->whereNotNull('nuptk')->count() }}</strong> |
+                File KTP: <strong>{{ $dosen->whereNotNull('file_ktp')->count() }}</strong> |
+                File Sertif:
+                <strong>{{ $dosen->where('sertifikasi', 'SUDAH')->whereNotNull('file_sertifikasi')->count() }}</strong>
+            </div>
         </div>
     @endif
 

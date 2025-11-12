@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="title">Preview Laporan Dosen</x-slot>
-    
+
     <div class="p-4 md:p-6 bg-white shadow rounded-lg">
         <!-- Header -->
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-5">
@@ -23,32 +23,32 @@
         </div>
 
         <!-- Info Filter -->
-        @if(request()->has('search') || request()->has('prodi') || request()->has('sertifikasi') || request()->has('inpasing'))
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <h3 class="font-semibold text-blue-800 mb-2">Filter yang diterapkan:</h3>
-            <div class="flex flex-wrap gap-2">
-                @if(request('search'))
-                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
-                    Pencarian: "{{ request('search') }}"
-                </span>
-                @endif
-                @if(request('prodi'))
-                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
-                    Prodi: {{ request('prodi') }}
-                </span>
-                @endif
-                @if(request('sertifikasi'))
-                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
-                    Sertifikasi: {{ request('sertifikasi') }}
-                </span>
-                @endif
-                @if(request('inpasing'))
-                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
-                    Inpasing: {{ request('inpasing') }}
-                </span>
-                @endif
+        @if (request()->has('search') || request()->has('prodi') || request()->has('sertifikasi') || request()->has('inpasing'))
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <h3 class="font-semibold text-blue-800 mb-2">Filter yang diterapkan:</h3>
+                <div class="flex flex-wrap gap-2">
+                    @if (request('search'))
+                        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                            Pencarian: "{{ request('search') }}"
+                        </span>
+                    @endif
+                    @if (request('prodi'))
+                        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                            Prodi: {{ request('prodi') }}
+                        </span>
+                    @endif
+                    @if (request('sertifikasi'))
+                        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                            Sertifikasi: {{ request('sertifikasi') }}
+                        </span>
+                    @endif
+                    @if (request('inpasing'))
+                        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                            Inpasing: {{ request('inpasing') }}
+                        </span>
+                    @endif
+                </div>
             </div>
-        </div>
         @endif
 
         <!-- Desktop Table View (hidden on mobile) -->
@@ -57,10 +57,12 @@
                 <thead class="bg-blue-500 text-white">
                     <tr>
                         <th class="border border-gray-300 px-3 py-2">No</th>
-                        <th class="border border-gray-300 px-3 py-2">Nama</th>
+                        <th class="border border-gray-300 px-3 py-2">Nama Lengkap</th>
+                        <th class="border border-gray-300 px-3 py-2">Gelar</th>
                         <th class="border border-gray-300 px-3 py-2">Program Studi</th>
                         <th class="border border-gray-300 px-3 py-2">Tempat/Tgl Lahir</th>
                         <th class="border border-gray-300 px-3 py-2">NIDN</th>
+                        <th class="border border-gray-300 px-3 py-2">NUPTK</th>
                         <th class="border border-gray-300 px-3 py-2">Pendidikan</th>
                         <th class="border border-gray-300 px-3 py-2">Jabatan</th>
                         <th class="border border-gray-300 px-3 py-2">TMT Kerja</th>
@@ -75,34 +77,82 @@
                     @forelse ($dosen as $index => $d)
                         <tr class="hover:bg-gray-100">
                             <td class="border border-gray-300 px-3 py-2 text-center">{{ $index + 1 }}</td>
-                            <td class="border border-gray-300 px-3 py-2">{{ $d->nama }}</td>
+                            <td class="border border-gray-300 px-3 py-2">
+                                <div class="font-medium">{{ $d->nama }}</div>
+                                @if ($d->gelar_depan || $d->gelar_belakang)
+                                    <div class="text-xs text-gray-500">
+                                        {{ $d->gelar_depan ? $d->gelar_depan . ' ' : '' }}{{ $d->nama }}{{ $d->gelar_belakang ? ', ' . $d->gelar_belakang : '' }}
+                                    </div>
+                                @endif
+                            </td>
+                            <td class="border border-gray-300 px-3 py-2 text-center">
+                                @if ($d->gelar_depan || $d->gelar_belakang)
+                                    <div class="text-xs">
+                                        @if ($d->gelar_depan)
+                                            <div class="bg-blue-100 text-blue-800 px-1 py-0.5 rounded mb-1">
+                                                {{ $d->gelar_depan }}</div>
+                                        @endif
+                                        @if ($d->gelar_belakang)
+                                            <div class="bg-green-100 text-green-800 px-1 py-0.5 rounded">
+                                                {{ $d->gelar_belakang }}</div>
+                                        @endif
+                                    </div>
+                                @else
+                                    <span class="text-gray-400">-</span>
+                                @endif
+                            </td>
                             <td class="border border-gray-300 px-3 py-2">{{ $d->prodi->nama_prodi ?? '-' }}</td>
                             <td class="border border-gray-300 px-3 py-2">{{ $d->tempat_tanggal_lahir ?? '-' }}</td>
                             <td class="border border-gray-300 px-3 py-2">{{ $d->nik ?? '-' }}</td>
+                            <td class="border border-gray-300 px-3 py-2">{{ $d->nuptk ?? '-' }}</td>
                             <td class="border border-gray-300 px-3 py-2">{{ $d->pendidikan_terakhir ?? '-' }}</td>
                             <td class="border border-gray-300 px-3 py-2">{{ $d->jabatan ?? '-' }}</td>
                             <td class="border border-gray-300 px-3 py-2">
                                 {{ $d->tmt_kerja ? \Carbon\Carbon::parse($d->tmt_kerja)->format('d/m/Y') : '-' }}
                             </td>
-                            <td class="border border-gray-300 px-3 py-2 text-center">{{ $d->masa_kerja_tahun ?? 0 }}</td>
-                            <td class="border border-gray-300 px-3 py-2 text-center">{{ $d->masa_kerja_bulan ?? 0 }}</td>
+                            <td class="border border-gray-300 px-3 py-2 text-center">{{ $d->masa_kerja_tahun ?? 0 }}
+                            </td>
+                            <td class="border border-gray-300 px-3 py-2 text-center">{{ $d->masa_kerja_bulan ?? 0 }}
+                            </td>
                             <td class="border border-gray-300 px-3 py-2">{{ $d->pangkat_golongan ?? '-' }}</td>
                             <td class="border border-gray-300 px-3 py-2 text-center">
-                                <span class="px-2 py-1 rounded text-xs font-semibold
+                                <span
+                                    class="px-2 py-1 rounded text-xs font-semibold
                                     {{ $d->sertifikasi == 'SUDAH' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                                     {{ $d->sertifikasi }}
                                 </span>
+                                @if ($d->sertifikasi == 'SUDAH' && $d->file_sertifikasi)
+                                    <div class="text-xs text-green-600 mt-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        File Ada
+                                    </div>
+                                @endif
                             </td>
                             <td class="border border-gray-300 px-3 py-2 text-center">
-                                <span class="px-2 py-1 rounded text-xs font-semibold
+                                <span
+                                    class="px-2 py-1 rounded text-xs font-semibold
                                     {{ $d->inpasing == 'SUDAH' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                                     {{ $d->inpasing }}
                                 </span>
+                                @if ($d->inpasing == 'SUDAH' && $d->file_inpasing)
+                                    <div class="text-xs text-green-600 mt-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        File Ada
+                                    </div>
+                                @endif
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="13" class="text-center py-4 text-gray-500">
+                            <td colspan="15" class="text-center py-4 text-gray-500">
                                 Tidak ada data dosen.
                             </td>
                         </tr>
@@ -123,20 +173,29 @@
                                     {{ $index + 1 }}
                                 </span>
                                 <div class="flex gap-1">
-                                    <span class="px-2 py-1 rounded text-xs font-semibold
+                                    <span
+                                        class="px-2 py-1 rounded text-xs font-semibold
                                         {{ $d->sertifikasi == 'SUDAH' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                                         Sertif: {{ $d->sertifikasi }}
                                     </span>
-                                    <span class="px-2 py-1 rounded text-xs font-semibold
+                                    <span
+                                        class="px-2 py-1 rounded text-xs font-semibold
                                         {{ $d->inpasing == 'SUDAH' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                                         Inpasing: {{ $d->inpasing }}
                                     </span>
                                 </div>
                             </div>
-                            <h3 class="font-semibold text-gray-800 text-base">{{ $d->nama }}</h3>
-                            @if($d->nik)
-                            <p class="text-gray-600 text-sm mt-1">NIDN: {{ $d->nik }}</p>
-                            @endif
+                            <h3 class="font-semibold text-gray-800 text-base">
+                                {{ $d->gelar_depan ? $d->gelar_depan . ' ' : '' }}{{ $d->nama }}{{ $d->gelar_belakang ? ', ' . $d->gelar_belakang : '' }}
+                            </h3>
+                            <div class="flex flex-wrap gap-1 mt-1">
+                                @if ($d->nik)
+                                    <span class="text-gray-600 text-xs">NIDN: {{ $d->nik }}</span>
+                                @endif
+                                @if ($d->nuptk)
+                                    <span class="text-gray-600 text-xs">NUPTK: {{ $d->nuptk }}</span>
+                                @endif
+                            </div>
                         </div>
                     </div>
 
@@ -166,23 +225,60 @@
                         </div>
                         <div>
                             <p class="text-gray-500 text-xs mb-1">Masa Kerja</p>
-                            <p class="font-medium text-gray-800">{{ $d->masa_kerja_tahun ?? 0 }} Thn {{ $d->masa_kerja_bulan ?? 0 }} Bln</p>
+                            <p class="font-medium text-gray-800">{{ $d->masa_kerja_tahun ?? 0 }} Thn
+                                {{ $d->masa_kerja_bulan ?? 0 }} Bln</p>
+                        </div>
+                    </div>
+
+                    <!-- Gelar -->
+                    @if ($d->gelar_depan || $d->gelar_belakang)
+                        <div class="mt-3 pt-3 border-t">
+                            <p class="text-gray-500 text-xs mb-1">Gelar</p>
+                            <div class="flex flex-wrap gap-1">
+                                @if ($d->gelar_depan)
+                                    <span
+                                        class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">{{ $d->gelar_depan }}</span>
+                                @endif
+                                @if ($d->gelar_belakang)
+                                    <span
+                                        class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">{{ $d->gelar_belakang }}</span>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- File Status -->
+                    <div class="mt-3 pt-3 border-t">
+                        <p class="text-gray-500 text-xs mb-1">Status File</p>
+                        <div class="flex flex-wrap gap-2">
+                            @if ($d->file_ktp)
+                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">KTP ✓</span>
+                            @endif
+                            @if ($d->sertifikasi == 'SUDAH' && $d->file_sertifikasi)
+                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Sertif ✓</span>
+                            @endif
+                            @if ($d->inpasing == 'SUDAH' && $d->file_inpasing)
+                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Inpasing ✓</span>
+                            @endif
                         </div>
                     </div>
 
                     <!-- Full Width Details -->
-                    @if($d->pangkat_golongan)
-                    <div class="mt-3 pt-3 border-t">
-                        <p class="text-gray-500 text-xs mb-1">Pangkat/Golongan</p>
-                        <p class="font-medium text-gray-800 text-sm">{{ $d->pangkat_golongan }}</p>
-                    </div>
+                    @if ($d->pangkat_golongan)
+                        <div class="mt-3 pt-3 border-t">
+                            <p class="text-gray-500 text-xs mb-1">Pangkat/Golongan</p>
+                            <p class="font-medium text-gray-800 text-sm">{{ $d->pangkat_golongan }}</p>
+                        </div>
                     @endif
                 </div>
             @empty
                 <div class="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
-                    <svg class="w-16 h-16 mx-auto text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l9-5-9-5-9 5 9 5zm0 0v10" />
+                    <svg class="w-16 h-16 mx-auto text-gray-400 mb-3" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 14l9-5-9-5-9 5 9 5z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 14l9-5-9-5-9 5 9 5zm0 0l9-5-9-5-9 5 9 5zm0 0v10" />
                     </svg>
                     <p class="text-gray-500 font-medium">Tidak ada data dosen.</p>
                 </div>
@@ -190,27 +286,47 @@
         </div>
 
         <!-- Summary -->
-        @if($dosen->count() > 0)
-        <div class="mt-6 p-4 bg-gray-50 rounded-lg">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                <div class="text-center">
-                    <p class="text-2xl font-bold text-blue-600">{{ $dosen->count() }}</p>
-                    <p class="text-gray-600">Total Dosen</p>
+        @if ($dosen->count() > 0)
+            <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-blue-600">{{ $stats['total_dosen'] }}</p>
+                        <p class="text-gray-600">Total Dosen</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-green-600">{{ $stats['sudah_sertifikasi'] }}</p>
+                        <p class="text-gray-600">Sudah Sertifikasi</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-red-600">{{ $stats['belum_sertifikasi'] }}</p>
+                        <p class="text-gray-600">Belum Sertifikasi</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-green-600">{{ $stats['sudah_inpasing'] }}</p>
+                        <p class="text-gray-600">Sudah Inpasing</p>
+                    </div>
                 </div>
-                <div class="text-center">
-                    <p class="text-2xl font-bold text-green-600">{{ $dosen->where('sertifikasi', 'SUDAH')->count() }}</p>
-                    <p class="text-gray-600">Sudah Sertifikasi</p>
-                </div>
-                <div class="text-center">
-                    <p class="text-2xl font-bold text-red-600">{{ $dosen->where('sertifikasi', 'BELUM')->count() }}</p>
-                    <p class="text-gray-600">Belum Sertifikasi</p>
-                </div>
-                <div class="text-center">
-                    <p class="text-2xl font-bold text-green-600">{{ $dosen->where('inpasing', 'SUDAH')->count() }}</p>
-                    <p class="text-gray-600">Sudah Inpasing</p>
+
+                <!-- Additional Stats -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mt-4 pt-4 border-t">
+                    <div class="text-center">
+                        <p class="text-xl font-bold text-purple-600">{{ $stats['punya_nuptk'] }}</p>
+                        <p class="text-gray-600">Punya NUPTK</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-xl font-bold text-orange-600">{{ $stats['punya_gelar'] }}</p>
+                        <p class="text-gray-600">Punya Gelar</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-xl font-bold text-indigo-600">{{ $stats['file_ktp_ada'] }}</p>
+                        <p class="text-gray-600">File KTP Ada</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-xl font-bold text-teal-600">{{ $stats['file_sertif_ada'] }}</p>
+                        <p class="text-gray-600">File Sertif Ada</p>
+                    </div>
                 </div>
             </div>
-        </div>
         @endif
     </div>
 </x-app-layout>

@@ -14,10 +14,13 @@ class Dosen extends Model
 
     protected $fillable = [
         'id_prodi',
+        'gelar_depan',
         'nama',
+        'gelar_belakang',
         'tempat_lahir',
         'tanggal_lahir',
         'nik',
+        'nuptk',
         'pendidikan_terakhir',
         'pendidikan_data',
         'jabatan',
@@ -33,6 +36,24 @@ class Dosen extends Model
         'file_dokumen',
         'sertifikasi',
         'inpasing',
+        // File upload baru
+        'file_sertifikasi',
+        'file_inpasing',
+        'file_ktp',
+        'file_ijazah_s1',
+        'file_transkrip_s1',
+        'file_ijazah_s2',
+        'file_transkrip_s2',
+        'file_ijazah_s3',
+        'file_transkrip_s3',
+        'file_jafung',
+        'file_kk',
+        'file_perjanjian_kerja',
+        'file_sk_pengangkatan',
+        'file_surat_pernyataan',
+        'file_sktp',
+        'file_surat_tugas',
+        'file_sk_aktif',
     ];
 
     protected $casts = [
@@ -57,5 +78,18 @@ class Dosen extends Model
             return $this->tempat_lahir . ', ' . $this->tanggal_lahir->format('d/m/Y');
         }
         return $this->tempat_lahir ?? '-';
+    }
+
+    // Helper untuk nama lengkap dengan gelar
+    public function getNamaLengkapAttribute()
+    {
+        $nama = $this->nama;
+        if ($this->gelar_depan) {
+            $nama = $this->gelar_depan . ' ' . $nama;
+        }
+        if ($this->gelar_belakang) {
+            $nama = $nama . ', ' . $this->gelar_belakang;
+        }
+        return $nama;
     }
 }

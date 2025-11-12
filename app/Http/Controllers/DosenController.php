@@ -16,11 +16,17 @@ class DosenController extends Controller
         $query = Dosen::with('prodi.fakultas');
 
         if ($search = $request->search) {
-            $query->where('nama', 'like', "%{$search}%")
-                ->orWhere('jabatan', 'like', "%{$search}%")
-                ->orWhereHas('prodi', function ($q) use ($search) {
-                    $q->where('nama_prodi', 'like', "%{$search}%");
-                });
+            $query->where(function ($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                    ->orWhere('jabatan', 'like', "%{$search}%")
+                    ->orWhere('nik', 'like', "%{$search}%")
+                    ->orWhere('nuptk', 'like', "%{$search}%")
+                    ->orWhere('gelar_depan', 'like', "%{$search}%")
+                    ->orWhere('gelar_belakang', 'like', "%{$search}%")
+                    ->orWhereHas('prodi', function ($q) use ($search) {
+                        $q->where('nama_prodi', 'like', "%{$search}%");
+                    });
+            });
         }
 
         $dosen = $query->paginate(15);
@@ -39,10 +45,13 @@ class DosenController extends Controller
     {
         $request->validate([
             'id_prodi' => 'required|exists:prodi,id',
+            'gelar_depan' => 'nullable|string|max:50',
             'nama' => 'required|string|max:255',
+            'gelar_belakang' => 'nullable|string|max:100',
             'tempat_lahir' => 'nullable|string|max:255',
             'tanggal_lahir' => 'nullable|date',
             'nik' => 'nullable|string|max:20|unique:dosen,nik',
+            'nuptk' => 'nullable|string|max:50',
             'pendidikan_terakhir' => 'nullable|string|max:100',
             'jabatan' => 'nullable|string|max:100',
             'tmt_kerja' => 'nullable|date',
@@ -56,10 +65,48 @@ class DosenController extends Controller
             'masa_kerja_golongan_bulan' => 'nullable|integer|min:0|max:11',
             'sertifikasi' => 'required|in:SUDAH,BELUM',
             'inpasing' => 'required|in:SUDAH,BELUM',
+            // Validasi file upload
+            'file_sertifikasi' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_inpasing' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_ktp' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_ijazah_s1' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_transkrip_s1' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_ijazah_s2' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_transkrip_s2' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_ijazah_s3' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_transkrip_s3' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_jafung' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_kk' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_perjanjian_kerja' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_sk_pengangkatan' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_surat_pernyataan' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_sktp' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_surat_tugas' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_sk_aktif' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
             'file_dokumen' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
         ]);
 
-        $data = $request->except(['file_dokumen', 'pendidikan']);
+        $data = $request->except([
+            'pendidikan',
+            'file_sertifikasi',
+            'file_inpasing',
+            'file_ktp',
+            'file_ijazah_s1',
+            'file_transkrip_s1',
+            'file_ijazah_s2',
+            'file_transkrip_s2',
+            'file_ijazah_s3',
+            'file_transkrip_s3',
+            'file_jafung',
+            'file_kk',
+            'file_perjanjian_kerja',
+            'file_sk_pengangkatan',
+            'file_surat_pernyataan',
+            'file_sktp',
+            'file_surat_tugas',
+            'file_sk_aktif',
+            'file_dokumen'
+        ]);
 
         // Handle pendidikan dinamis
         if ($request->has('pendidikan')) {
@@ -69,12 +116,35 @@ class DosenController extends Controller
             $data['pendidikan_data'] = json_encode(array_values($pendidikanArray));
         }
 
-        // Handle file upload
-        if ($request->hasFile('file_dokumen')) {
-            $file = $request->file('file_dokumen');
-            $filename = now()->format('YmdHis') . '-Dosen.' . $file->getClientOriginalExtension();
-            $file->move(public_path('dokumen_dosen'), $filename);
-            $data['file_dokumen'] = $filename;
+        // Handle file uploads
+        $fileFields = [
+            'file_sertifikasi',
+            'file_inpasing',
+            'file_ktp',
+            'file_ijazah_s1',
+            'file_transkrip_s1',
+            'file_ijazah_s2',
+            'file_transkrip_s2',
+            'file_ijazah_s3',
+            'file_transkrip_s3',
+            'file_jafung',
+            'file_kk',
+            'file_perjanjian_kerja',
+            'file_sk_pengangkatan',
+            'file_surat_pernyataan',
+            'file_sktp',
+            'file_surat_tugas',
+            'file_sk_aktif',
+            'file_dokumen'
+        ];
+
+        foreach ($fileFields as $field) {
+            if ($request->hasFile($field)) {
+                $file = $request->file($field);
+                $filename = now()->format('YmdHis') . '_' . $field . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('dokumen_dosen'), $filename);
+                $data[$field] = $filename;
+            }
         }
 
         Dosen::create($data);
@@ -93,10 +163,13 @@ class DosenController extends Controller
 
         $request->validate([
             'id_prodi' => 'required|exists:prodi,id',
+            'gelar_depan' => 'nullable|string|max:50',
             'nama' => 'required|string|max:255',
+            'gelar_belakang' => 'nullable|string|max:100',
             'tempat_lahir' => 'nullable|string|max:255',
             'tanggal_lahir' => 'nullable|date',
             'nik' => 'nullable|string|max:20|unique:dosen,nik,' . $dosen->id . ',id',
+            'nuptk' => 'nullable|string|max:50',
             'pendidikan_terakhir' => 'nullable|string|max:100',
             'jabatan' => 'nullable|string|max:100',
             'tmt_kerja' => 'nullable|date',
@@ -110,10 +183,48 @@ class DosenController extends Controller
             'masa_kerja_golongan_bulan' => 'nullable|integer|min:0|max:11',
             'sertifikasi' => 'required|in:SUDAH,BELUM',
             'inpasing' => 'required|in:SUDAH,BELUM',
+            // Validasi file upload
+            'file_sertifikasi' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_inpasing' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_ktp' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_ijazah_s1' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_transkrip_s1' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_ijazah_s2' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_transkrip_s2' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_ijazah_s3' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_transkrip_s3' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_jafung' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_kk' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_perjanjian_kerja' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_sk_pengangkatan' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_surat_pernyataan' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_sktp' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_surat_tugas' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_sk_aktif' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
             'file_dokumen' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
         ]);
 
-        $data = $request->except(['file_dokumen', 'pendidikan']);
+        $data = $request->except([
+            'pendidikan',
+            'file_sertifikasi',
+            'file_inpasing',
+            'file_ktp',
+            'file_ijazah_s1',
+            'file_transkrip_s1',
+            'file_ijazah_s2',
+            'file_transkrip_s2',
+            'file_ijazah_s3',
+            'file_transkrip_s3',
+            'file_jafung',
+            'file_kk',
+            'file_perjanjian_kerja',
+            'file_sk_pengangkatan',
+            'file_surat_pernyataan',
+            'file_sktp',
+            'file_surat_tugas',
+            'file_sk_aktif',
+            'file_dokumen'
+        ]);
 
         // Handle pendidikan dinamis
         if ($request->has('pendidikan')) {
@@ -123,19 +234,41 @@ class DosenController extends Controller
             $data['pendidikan_data'] = json_encode(array_values($pendidikanArray));
         }
 
-        // Handle file upload
-        if ($request->hasFile('file_dokumen')) {
-            $oldFile = $dosen->file_dokumen;
+        // Handle file uploads
+        $fileFields = [
+            'file_sertifikasi',
+            'file_inpasing',
+            'file_ktp',
+            'file_ijazah_s1',
+            'file_transkrip_s1',
+            'file_ijazah_s2',
+            'file_transkrip_s2',
+            'file_ijazah_s3',
+            'file_transkrip_s3',
+            'file_jafung',
+            'file_kk',
+            'file_perjanjian_kerja',
+            'file_sk_pengangkatan',
+            'file_surat_pernyataan',
+            'file_sktp',
+            'file_surat_tugas',
+            'file_sk_aktif',
+            'file_dokumen'
+        ];
 
-            if ($oldFile && file_exists(public_path('dokumen_dosen/' . $oldFile))) {
-                unlink(public_path('dokumen_dosen/' . $oldFile));
+        foreach ($fileFields as $field) {
+            if ($request->hasFile($field)) {
+                // Hapus file lama jika ada
+                $oldFile = $dosen->$field;
+                if ($oldFile && file_exists(public_path('dokumen_dosen/' . $oldFile))) {
+                    unlink(public_path('dokumen_dosen/' . $oldFile));
+                }
+
+                $file = $request->file($field);
+                $filename = now()->format('YmdHis') . '_' . $field . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('dokumen_dosen'), $filename);
+                $data[$field] = $filename;
             }
-
-            $file = $request->file('file_dokumen');
-            $filename = now()->format('YmdHis') . '-Dosen.' . $file->getClientOriginalExtension();
-            $file->move(public_path('dokumen_dosen'), $filename);
-
-            $data['file_dokumen'] = $filename;
         }
 
         $dosen->update($data);
@@ -147,9 +280,33 @@ class DosenController extends Controller
     {
         $dosen = Dosen::findOrFail($id);
 
-        $oldFile = public_path('dokumen_dosen/' . $dosen->file_dokumen);
-        if ($dosen->file_dokumen && file_exists($oldFile)) {
-            unlink($oldFile);
+        // Hapus semua file yang terkait
+        $fileFields = [
+            'file_sertifikasi',
+            'file_inpasing',
+            'file_ktp',
+            'file_ijazah_s1',
+            'file_transkrip_s1',
+            'file_ijazah_s2',
+            'file_transkrip_s2',
+            'file_ijazah_s3',
+            'file_transkrip_s3',
+            'file_jafung',
+            'file_kk',
+            'file_perjanjian_kerja',
+            'file_sk_pengangkatan',
+            'file_surat_pernyataan',
+            'file_sktp',
+            'file_surat_tugas',
+            'file_sk_aktif',
+            'file_dokumen'
+        ];
+
+        foreach ($fileFields as $field) {
+            $oldFile = public_path('dokumen_dosen/' . $dosen->$field);
+            if ($dosen->$field && file_exists($oldFile)) {
+                unlink($oldFile);
+            }
         }
 
         $dosen->delete();
@@ -161,11 +318,37 @@ class DosenController extends Controller
         $ids = $request->selected_dosen;
         if ($ids) {
             $dosens = Dosen::whereIn('id', $ids)->get();
+
+            $fileFields = [
+                'file_sertifikasi',
+                'file_inpasing',
+                'file_ktp',
+                'file_ijazah_s1',
+                'file_transkrip_s1',
+                'file_ijazah_s2',
+                'file_transkrip_s2',
+                'file_ijazah_s3',
+                'file_transkrip_s3',
+                'file_jafung',
+                'file_kk',
+                'file_perjanjian_kerja',
+                'file_sk_pengangkatan',
+                'file_surat_pernyataan',
+                'file_sktp',
+                'file_surat_tugas',
+                'file_sk_aktif',
+                'file_dokumen'
+            ];
+
             foreach ($dosens as $d) {
-                if ($d->file_dokumen && file_exists(public_path('dokumen_dosen/' . $d->file_dokumen))) {
-                    unlink(public_path('dokumen_dosen/' . $d->file_dokumen));
+                foreach ($fileFields as $field) {
+                    $oldFile = public_path('dokumen_dosen/' . $d->$field);
+                    if ($d->$field && file_exists($oldFile)) {
+                        unlink($oldFile);
+                    }
                 }
             }
+
             Dosen::whereIn('id', $ids)->delete();
         }
 
@@ -176,6 +359,9 @@ class DosenController extends Controller
     // EXPORT UNTUK SEMUA DATA DOSEN
     // ==========================================
 
+    /**
+     * Preview PDF - Tampilkan semua data dosen dalam format PDF
+     */
     /**
      * Preview PDF - Tampilkan semua data dosen dalam format PDF
      */
@@ -190,6 +376,9 @@ class DosenController extends Controller
                 $q->where('nama', 'like', "%{$search}%")
                     ->orWhere('jabatan', 'like', "%{$search}%")
                     ->orWhere('nik', 'like', "%{$search}%")
+                    ->orWhere('nuptk', 'like', "%{$search}%")
+                    ->orWhere('gelar_depan', 'like', "%{$search}%")
+                    ->orWhere('gelar_belakang', 'like', "%{$search}%")
                     ->orWhereHas('prodi', function ($q) use ($search) {
                         $q->where('nama_prodi', 'like', "%{$search}%");
                     });
@@ -214,11 +403,28 @@ class DosenController extends Controller
         }
 
         $dosen = $query->orderBy('nama')->get();
-        $prodi = Prodi::with('fakultas')->get(); // Untuk info filter
+        $prodi = Prodi::with('fakultas')->get();
 
-        return view('page.dosen.laporan.preview', compact('dosen', 'prodi'));
+        // Hitung statistik tambahan di Controller, bukan di View
+        $stats = [
+            'total_dosen' => $dosen->count(),
+            'sudah_sertifikasi' => $dosen->where('sertifikasi', 'SUDAH')->count(),
+            'belum_sertifikasi' => $dosen->where('sertifikasi', 'BELUM')->count(),
+            'sudah_inpasing' => $dosen->where('inpasing', 'SUDAH')->count(),
+            'punya_nuptk' => $dosen->whereNotNull('nuptk')->count(),
+            'punya_gelar' => $dosen->filter(function ($item) {
+                return !empty($item->gelar_depan) || !empty($item->gelar_belakang);
+            })->count(),
+            'file_ktp_ada' => $dosen->whereNotNull('file_ktp')->count(),
+            'file_sertif_ada' => $dosen->where('sertifikasi', 'SUDAH')->whereNotNull('file_sertifikasi')->count(),
+        ];
+
+        return view('page.dosen.laporan.preview', compact('dosen', 'prodi', 'stats'));
     }
 
+    /**
+     * Download PDF - Download semua data dosen dalam format PDF
+     */
     /**
      * Download PDF - Download semua data dosen dalam format PDF
      */
@@ -233,6 +439,9 @@ class DosenController extends Controller
                 $q->where('nama', 'like', "%{$search}%")
                     ->orWhere('jabatan', 'like', "%{$search}%")
                     ->orWhere('nik', 'like', "%{$search}%")
+                    ->orWhere('nuptk', 'like', "%{$search}%")
+                    ->orWhere('gelar_depan', 'like', "%{$search}%")
+                    ->orWhere('gelar_belakang', 'like', "%{$search}%")
                     ->orWhereHas('prodi', function ($q) use ($search) {
                         $q->where('nama_prodi', 'like', "%{$search}%");
                     });
@@ -267,31 +476,15 @@ class DosenController extends Controller
     /**
      * Export ke Excel - Download data dosen dalam format Excel
      */
-    // Di DosenController, ganti method exportExcel:
-
-    /**
-     * Export ke Excel - Download data dosen dalam format Excel
-     */
     public function exportExcel(Request $request)
     {
         $search = $request->get('search', '');
 
-        // Pilih salah satu:
-
-        // Option 1: Export dengan kolom pendidikan horizontal
         return Excel::download(
             new DosenExport($search),
             'Data_Dosen_' . date('Y-m-d_His') . '.xlsx'
         );
-
-        // Option 2: Export dengan multiple rows
-        // return Excel::download(
-        //     new DosenExportMultipleRows($search), 
-        //     'Data_Dosen_Multiple_Rows_' . date('Y-m-d_His') . '.xlsx'
-        // );
     }
-
-    // Di DosenController, tambahkan method baru:
 
     /**
      * Preview PDF Single - Tampilkan 1 data dosen dalam format PDF (dari show)
@@ -300,7 +493,6 @@ class DosenController extends Controller
     {
         $dosen = Dosen::with(['prodi.fakultas'])->findOrFail($id);
 
-        // Generate PDF untuk single dosen
         $pdf = Pdf::loadView('page.dosen.pdf', compact('dosen'))
             ->setPaper('a4', 'portrait');
 
@@ -314,7 +506,6 @@ class DosenController extends Controller
     {
         $dosen = Dosen::with(['prodi.fakultas'])->findOrFail($id);
 
-        // Generate dan download PDF untuk single dosen
         $pdf = Pdf::loadView('page.dosen.pdf', compact('dosen'))
             ->setPaper('a4', 'portrait');
 

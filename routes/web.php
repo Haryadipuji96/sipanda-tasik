@@ -24,17 +24,24 @@ Route::middleware(['auth'])->group(function () {
 });
 
 
-// ROUTE UNTUK DOSEN - PDF
-// ==========================================
-
-// Route untuk PDF Semua Data Dosen (dari index)
-Route::get('/dosen/preview.pdf', [DosenController::class, 'previewAllPdf'])->name('dosen.preview.pdf');
-Route::get('/dosen/download-all-pdf', [DosenController::class, 'downloadAllPdf'])->name('dosen.download-all.pdf');
-Route::get('/dosen/export-excel', [DosenController::class, 'exportExcel'])->name('dosen.export.excel');
-
-// Route untuk PDF Single Dosen (dari show)
-Route::get('/dosen/{id}/preview-pdf', [DosenController::class, 'previewPdfSingle'])->name('dosen.preview-single.pdf');
-Route::get('/dosen/{id}/download-pdf', [DosenController::class, 'downloadPdfSingle'])->name('dosen.download-single.pdf');
+Route::prefix('dosen')->group(function () {
+    Route::get('/', [DosenController::class, 'index'])->name('dosen.index');
+    Route::get('/create', [DosenController::class, 'create'])->name('dosen.create');
+    Route::post('/store', [DosenController::class, 'store'])->name('dosen.store');
+    Route::get('/{id}', [DosenController::class, 'show'])->name('dosen.show');
+    Route::put('/{id}', [DosenController::class, 'update'])->name('dosen.update');
+    Route::delete('/{id}', [DosenController::class, 'destroy'])->name('dosen.destroy');
+    Route::delete('/delete-selected', [DosenController::class, 'deleteSelected'])->name('dosen.deleteSelected');
+    
+    // Export Routes
+    Route::get('/export/excel', [DosenController::class, 'exportExcel'])->name('dosen.export.excel');
+    Route::get('/preview/pdf', [DosenController::class, 'previewAllPdf'])->name('dosen.preview.pdf');
+    Route::get('/download/pdf', [DosenController::class, 'downloadAllPdf'])->name('dosen.download-all.pdf');
+    
+    // PDF Single Routes - HARUS SEBELUM ROUTE {id}
+    Route::get('/{id}/preview-pdf', [DosenController::class, 'previewPdfSingle'])->name('dosen.preview-single.pdf');
+    Route::get('/{id}/download-pdf', [DosenController::class, 'downloadPdfSingle'])->name('dosen.download-single.pdf');
+});
 
 // ==========================================
 // ROUTE UNTUK TENAGA PENDIDIK

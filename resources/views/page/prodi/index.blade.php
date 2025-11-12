@@ -133,8 +133,24 @@
 
                                                 <div class="mb-4">
                                                     <label class="block font-medium mb-1">Jenjang</label>
-                                                    <input type="text" name="jenjang" value="{{ $p->jenjang }}"
-                                                        class="w-full border rounded px-3 py-2">
+                                                    <select name="jenjang" class="w-full border rounded px-3 py-2">
+                                                        <option value="">-- Pilih Jenjang --</option>
+                                                        <option value="S1"
+                                                            {{ $p->jenjang == 'S1' ? 'selected' : '' }}>S1</option>
+                                                        <option value="S2"
+                                                            {{ $p->jenjang == 'S2' ? 'selected' : '' }}>S2</option>
+                                                        <option value="S3"
+                                                            {{ $p->jenjang == 'S3' ? 'selected' : '' }}>S3</option>
+                                                        <option value="D3"
+                                                            {{ $p->jenjang == 'D3' ? 'selected' : '' }}>D3</option>
+                                                        <option value="D4"
+                                                            {{ $p->jenjang == 'D4' ? 'selected' : '' }}>D4</option>
+                                                        <option value="Prof"
+                                                            {{ $p->jenjang == 'Prof' ? 'selected' : '' }}>Prof</option>
+                                                        <option value="Lainnya"
+                                                            {{ $p->jenjang == 'Lainnya' ? 'selected' : '' }}>Lainnya
+                                                        </option>
+                                                    </select>
                                                 </div>
 
                                                 <div class="mb-4">

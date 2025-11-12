@@ -21,22 +21,6 @@
                             <span class="font-semibold text-xl text-gray-800">Sistem Akademik</span>
                         </div>
                     </div>
-                    <div class="flex items-center">
-                        <div class="ml-3 relative">
-                            <div class="flex items-center space-x-4">
-                                <a href="#" class="text-gray-600 hover:text-gray-900">
-                                    <i class="fas fa-bell"></i>
-                                </a>
-                                <div class="flex items-center">
-                                    <div
-                                        class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium">
-                                        U
-                                    </div>
-                                    <span class="ml-2 text-gray-700 hidden sm:block">User</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </header>
@@ -91,9 +75,16 @@
 
                         <div class="mb-4">
                             <label class="block font-medium mb-1 text-sm sm:text-base">Jenjang</label>
-                            <input type="text" name="jenjang"
-                                class="w-full border rounded px-3 py-2 text-sm sm:text-base"
-                                placeholder="S1, S2, D3, dll">
+                            <select name="jenjang" class="w-full border rounded px-3 py-2 text-sm sm:text-base">
+                                <option value="">-- Pilih Jenjang --</option>
+                                <option value="S1">S1</option>
+                                <option value="S2">S2</option>
+                                <option value="S3">S3</option>
+                                <option value="D3">D3</option>
+                                <option value="D4">D4</option>
+                                <option value="Prof">Prof</option>
+                                <option value="Lainnya">Lainnya</option>
+                            </select>
                         </div>
 
                         <div class="mb-6">

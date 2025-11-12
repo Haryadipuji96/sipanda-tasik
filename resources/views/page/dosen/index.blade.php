@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="title">Data dosen</x-slot>
+    <x-slot name="title">Data Dosen</x-slot>
     <style>
         .cssbuttons-io-button {
             display: flex;
@@ -64,6 +64,29 @@
                 box-shadow: none;
             }
         }
+
+        /* Badge untuk status file upload */
+        .file-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .file-uploaded {
+            background-color: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .file-missing {
+            background-color: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
     </style>
 
     <div class="p-6">
@@ -80,10 +103,9 @@
             @endcanSuperadmin
         </div>
 
-        <x-search-bar route="dosen.index" placeholder="Cari nama / prodi / jabatan..." />
+        <x-search-bar route="dosen.index" placeholder="Cari nama / prodi / jabatan / NUPTK..." />
 
-        <!-- GANTI bagian button export di view dosen (setelah button Hapus Terpilih) -->
-
+        <!-- Action Buttons -->
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2 mb-4">
             @canSuperadmin
             <!-- Button Hapus Terpilih -->
@@ -97,7 +119,7 @@
             <!-- Export Buttons -->
             <div class="order-1 sm:order-2 flex gap-2">
                 <!-- Button Preview PDF -->
-                <a href="{{ route('dosen.preview.pdf', ['search' => request('search')]) }}" target="_blank"
+                <a href="{{ route('dosen.preview.pdf', ['search' => request('search')]) }}"
                     class="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm rounded-full font-medium text-white bg-orange-600 hover:bg-orange-700 transition text-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
@@ -134,10 +156,12 @@
                         </th>
                         @endcanSuperadmin
                         <th rowspan="3" class="px-4 py-2 border text-center w-12">No</th>
-                        <th rowspan="3" class="border px-4 py-2">Nama</th>
+                        <th rowspan="3" class="border px-4 py-2">Nama Lengkap</th>
+                        <th rowspan="3" class="border px-4 py-2">Gelar</th>
                         <th rowspan="3" class="border px-4 py-2">Prodi</th>
                         <th rowspan="3" class="border px-4 py-2">Tempat/Tgl Lahir</th>
                         <th rowspan="3" class="border px-4 py-2">NIDN</th>
+                        <th rowspan="3" class="border px-4 py-2">NUPTK</th>
                         <th colspan="3" class="border px-4 py-2 text-center">PENDIDIKAN</th>
                         <th rowspan="3" class="border px-4 py-2">Jabatan</th>
                         <th rowspan="3" class="border px-4 py-2">TMT Kerja</th>
@@ -146,6 +170,7 @@
                         <th colspan="2" class="border px-4 py-2 text-center">Masa Kerja Gol</th>
                         <th colspan="2" class="border px-4 py-2 text-center">No SK & JaFung</th>
                         <th colspan="2" class="border px-4 py-2 text-center">Status</th>
+                        <th rowspan="3" class="border px-4 py-2 text-center">File Upload</th>
                         <th rowspan="3" class="border px-4 py-2 text-center">Aksi</th>
                     </tr>
                     <tr>
@@ -176,6 +201,24 @@
                             e($text),
                         );
                     }
+
+                    function getFileBadge($file)
+                    {
+                        if ($file) {
+                            return '<span class="file-badge file-uploaded">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                ADA
+                            </span>';
+                        }
+                        return '<span class="file-badge file-missing">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            TIDAK ADA
+                        </span>';
+                    }
                 @endphp
                 <tbody>
                     @forelse ($dosen as $index => $d)
@@ -194,13 +237,41 @@
                                     @endcanSuperadmin
                                     <td class="border px-3 py-2 text-center" rowspan="{{ $maxRows }}">
                                         {{ $index + $dosen->firstItem() }}</td>
-                                    <td class="border px-4 py-2" rowspan="{{ $maxRows }}">{!! highlight($d->nama, request('search')) !!}
+                                    <td class="border px-4 py-2" rowspan="{{ $maxRows }}">
+                                        <div class="font-medium">{!! highlight($d->nama, request('search')) !!}</div>
+                                        @if ($d->gelar_depan || $d->gelar_belakang)
+                                            <div class="text-xs text-gray-500 mt-1">
+                                                {{ $d->gelar_depan }} {{ $d->nama }}
+                                                {{ $d->gelar_belakang ? ', ' . $d->gelar_belakang : '' }}
+                                            </div>
+                                        @endif
                                     </td>
-                                    <td class="border px-4 py-2" rowspan="{{ $maxRows }}">{!! highlight($d->prodi->nama_prodi ?? '-', request('search')) !!}
+                                    <td class="border px-4 py-2 text-center" rowspan="{{ $maxRows }}">
+                                        @if ($d->gelar_depan || $d->gelar_belakang)
+                                            <div class="text-sm">
+                                                @if ($d->gelar_depan)
+                                                    <span
+                                                        class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">{{ $d->gelar_depan }}</span>
+                                                @endif
+                                                @if ($d->gelar_belakang)
+                                                    <span
+                                                        class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs mt-1 block">{{ $d->gelar_belakang }}</span>
+                                                @endif
+                                            </div>
+                                        @else
+                                            <span class="text-gray-400 text-xs">-</span>
+                                        @endif
+                                    </td>
+                                    <td class="border px-4 py-2" rowspan="{{ $maxRows }}">
+                                        {!! highlight($d->prodi->nama_prodi ?? '-', request('search')) !!}
                                     </td>
                                     <td class="border px-4 py-2" rowspan="{{ $maxRows }}">
                                         {{ $d->tempat_tanggal_lahir }}</td>
-                                    <td class="border px-4 py-2" rowspan="{{ $maxRows }}">{{ $d->nik ?? '-' }}
+                                    <td class="border px-4 py-2 text-center" rowspan="{{ $maxRows }}">
+                                        {{ $d->nik ?? '-' }}
+                                    </td>
+                                    <td class="border px-4 py-2 text-center" rowspan="{{ $maxRows }}">
+                                        {{ $d->nuptk ?? '-' }}
                                     </td>
                                 @endif
 
@@ -250,9 +321,35 @@
                                             {{ $d->inpasing }}
                                         </span>
                                     </td>
+                                    <td class="border px-2 py-1 text-center" rowspan="{{ $maxRows }}">
+                                        <div class="flex flex-col gap-1 items-center">
+                                            <!-- KTP -->
+                                            <div class="flex items-center gap-1">
+                                                <span class="text-xs text-gray-600 w-8 text-left">KTP:</span>
+                                                {!! getFileBadge($d->file_ktp) !!}
+                                            </div>
+
+                                            <!-- Sertifikasi -->
+                                            @if ($d->sertifikasi == 'SUDAH')
+                                                <div class="flex items-center gap-1">
+                                                    <span class="text-xs text-gray-600 w-8 text-left">Sertif:</span>
+                                                    {!! getFileBadge($d->file_sertifikasi) !!}
+                                                </div>
+                                            @endif
+
+                                            <!-- Inpasing -->
+                                            @if ($d->inpasing == 'SUDAH')
+                                                <div class="flex items-center gap-1">
+                                                    <span class="text-xs text-gray-600 w-8 text-left">Inpas:</span>
+                                                    {!! getFileBadge($d->file_inpasing) !!}
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </td>
                                     <td class="border px-3 py-2 text-center" rowspan="{{ $maxRows }}">
                                         @canSuperadmin
                                         <div class="flex items-center justify-center gap-2">
+                                            <!-- Detail Button -->
                                             <a href="{{ route('dosen.show', $d->id) }}"
                                                 class="p-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full transition"
                                                 title="Detail">
@@ -266,6 +363,7 @@
                                                 </svg>
                                             </a>
 
+                                            <!-- Edit Button with Modal -->
                                             <button @click="openModal = true"
                                                 class="p-2 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-full transition"
                                                 title="Edit">
@@ -277,6 +375,7 @@
                                                 </svg>
                                             </button>
 
+                                            <!-- Delete Button -->
                                             <form action="{{ route('dosen.destroy', $d->id) }}" method="POST"
                                                 class="inline delete-form">
                                                 @csrf
@@ -299,13 +398,13 @@
                                         <div x-show="openModal" x-cloak
                                             class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
                                             <div @click.away="openModal = false"
-                                                class="relative bg-white rounded-xl shadow-xl w-full max-w-4xl p-6 mx-4 overflow-y-auto max-h-[90vh]"
-                                                x-data="formPendidikanEdit({{ json_encode($d->pendidikan_array ?? []) }})">
+                                                class="relative bg-white rounded-xl shadow-xl w-full max-w-6xl p-6 mx-4 overflow-y-auto max-h-[90vh]"
+                                                x-data="formDosenEdit({{ json_encode($d->pendidikan_array ?? []) }}, '{{ $d->sertifikasi }}', '{{ $d->inpasing }}')">
                                                 <button @click="openModal = false"
                                                     class="absolute top-3 right-3 text-gray-400 hover:text-gray-600">✕</button>
                                                 <h1
                                                     class="text-xl font-semibold mb-5 text-gray-800 border-b pb-2 text-start">
-                                                    Edit Data Dosen
+                                                    Edit Data Dosen - {{ $d->nama }}
                                                 </h1>
 
                                                 <form action="{{ route('dosen.update', $d->id) }}" method="POST"
@@ -330,17 +429,38 @@
                                                         </select>
                                                     </div>
 
-                                                    <!-- Nama -->
+                                                    <!-- Gelar Depan & Nama -->
+                                                    <div class="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                        <div>
+                                                            <label class="block font-medium mb-1 text-start">Gelar
+                                                                Depan</label>
+                                                            <input type="text" name="gelar_depan"
+                                                                value="{{ $d->gelar_depan }}"
+                                                                class="w-full border rounded px-3 py-2"
+                                                                placeholder="Dr.">
+                                                        </div>
+                                                        <div class="md:col-span-2">
+                                                            <label class="block font-medium mb-1 text-start">Nama
+                                                                Lengkap
+                                                                <span class="text-red-500">*</span></label>
+                                                            <input type="text" name="nama"
+                                                                value="{{ $d->nama }}"
+                                                                class="w-full border rounded px-3 py-2" required>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Gelar Belakang -->
                                                     <div class="mb-4">
-                                                        <label class="block font-medium mb-1 text-start">Nama Lengkap
-                                                            <span class="text-red-500">*</span></label>
-                                                        <input type="text" name="nama"
-                                                            value="{{ $d->nama }}"
-                                                            class="w-full border rounded px-3 py-2" required>
+                                                        <label class="block font-medium mb-1 text-start">Gelar
+                                                            Belakang</label>
+                                                        <input type="text" name="gelar_belakang"
+                                                            value="{{ $d->gelar_belakang }}"
+                                                            class="w-full border rounded px-3 py-2"
+                                                            placeholder="M.Pd., M.Kom.">
                                                     </div>
 
                                                     <!-- Tempat & Tanggal Lahir -->
-                                                    <div class="mb-4 grid grid-cols-2 gap-4">
+                                                    <div class="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                                                         <div>
                                                             <label class="block font-medium mb-1 text-start">Tempat
                                                                 Lahir</label>
@@ -357,22 +477,49 @@
                                                         </div>
                                                     </div>
 
-                                                    <!-- NIDN -->
-                                                    <div class="mb-4">
-                                                        <label class="block font-medium mb-1 text-start">NIDN</label>
-                                                        <input type="text" name="nik"
-                                                            value="{{ $d->nik }}"
-                                                            class="w-full border rounded px-3 py-2">
+                                                    <!-- NIDN & NUPTK -->
+                                                    <div class="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                        <div>
+                                                            <label
+                                                                class="block font-medium mb-1 text-start">NIDN</label>
+                                                            <input type="text" name="nik"
+                                                                value="{{ $d->nik }}"
+                                                                class="w-full border rounded px-3 py-2">
+                                                        </div>
+                                                        <div>
+                                                            <label
+                                                                class="block font-medium mb-1 text-start">NUPTK</label>
+                                                            <input type="text" name="nuptk"
+                                                                value="{{ $d->nuptk }}"
+                                                                class="w-full border rounded px-3 py-2">
+                                                        </div>
                                                     </div>
 
                                                     <!-- Pendidikan Terakhir -->
-                                                    <div class="mb-4">
+                                                    <div class="mb-4" x-data="{ pendidikanTerakhir: '{{ $d->pendidikan_terakhir ?? '' }}' }">
                                                         <label class="block font-medium mb-1 text-start">Pendidikan
                                                             Terakhir</label>
-                                                        <input type="text" name="pendidikan_terakhir"
-                                                            value="{{ $d->pendidikan_terakhir }}"
-                                                            class="w-full border rounded px-3 py-2"
-                                                            placeholder="Contoh: S2 Pendidikan">
+                                                        <select name="pendidikan_terakhir"
+                                                            x-model="pendidikanTerakhir"
+                                                            class="w-full border rounded px-3 py-2 mb-2">
+                                                            <option value="">-- Pilih Pendidikan Terakhir --
+                                                            </option>
+                                                            <option value="D3">D3</option>
+                                                            <option value="D4">D4</option>
+                                                            <option value="S1">S1</option>
+                                                            <option value="S2">S2</option>
+                                                            <option value="S3">S3</option>
+                                                            <option value="Prof">Prof</option>
+                                                            <option value="Lainnya">Lainnya</option>
+                                                        </select>
+
+                                                        <!-- Input untuk pilihan lainnya -->
+                                                        <div x-show="pendidikanTerakhir === 'Lainnya'" x-transition>
+                                                            <input type="text" name="pendidikan_lainnya"
+                                                                value="{{ $d->pendidikan_lainnya ?? '' }}"
+                                                                class="w-full border rounded px-3 py-2"
+                                                                placeholder="Masukkan pendidikan lainnya">
+                                                        </div>
                                                     </div>
 
                                                     <!-- Riwayat Pendidikan -->
@@ -392,11 +539,19 @@
                                                                 <div>
                                                                     <label
                                                                         class="text-xs text-gray-600">Jenjang</label>
-                                                                    <input type="text"
-                                                                        :name="'pendidikan[' + index + '][jenjang]'"
+                                                                    <select :name="'pendidikan[' + index + '][jenjang]'"
                                                                         x-model="item.jenjang"
-                                                                        class="w-full border rounded px-2 py-1 text-sm"
-                                                                        placeholder="S1">
+                                                                        class="w-full border rounded px-2 py-1 text-sm">
+                                                                        <option value="">-- Pilih Jenjang --
+                                                                        </option>
+                                                                        <option value="D3">D3 - Diploma 3</option>
+                                                                        <option value="D4">D4 - Diploma 4</option>
+                                                                        <option value="S1">S1 - Sarjana</option>
+                                                                        <option value="S2">S2 - Magister</option>
+                                                                        <option value="S3">S3 - Doktor</option>
+                                                                        <option value="Prof">Prof - Profesor</option>
+                                                                        <option value="Lainnya">Lainnya</option>
+                                                                    </select>
                                                                 </div>
                                                                 <div>
                                                                     <label
@@ -455,7 +610,7 @@
                                                     </div>
 
                                                     <!-- Masa Kerja -->
-                                                    <div class="mb-4 grid grid-cols-2 gap-4">
+                                                    <div class="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                                                         <div>
                                                             <label class="block font-medium mb-1 text-start">Masa Kerja
                                                                 (Tahun)</label>
@@ -475,7 +630,7 @@
                                                     </div>
 
                                                     <!-- Golongan -->
-                                                    <div class="mb-4 grid grid-cols-2 gap-4">
+                                                    <div class="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                                                         <div>
                                                             <label
                                                                 class="block font-medium mb-1 text-start">Pangkat/Golongan</label>
@@ -495,7 +650,7 @@
                                                     </div>
 
                                                     <!-- Masa Kerja Golongan -->
-                                                    <div class="mb-4 grid grid-cols-2 gap-4">
+                                                    <div class="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                                                         <div>
                                                             <label class="block font-medium mb-1 text-start">Masa Kerja
                                                                 Golongan (Tahun)</label>
@@ -515,7 +670,7 @@
                                                     </div>
 
                                                     <!-- No SK & JaFung -->
-                                                    <div class="mb-4 grid grid-cols-2 gap-4">
+                                                    <div class="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                                                         <div>
                                                             <label class="block font-medium mb-1 text-start">No
                                                                 SK</label>
@@ -535,64 +690,288 @@
                                                     </div>
 
                                                     <!-- Sertifikasi & Inpasing -->
-                                                    <div class="mb-4 grid grid-cols-2 gap-4">
+                                                    <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                                                         <div>
                                                             <label
                                                                 class="block font-medium mb-1 text-start">Sertifikasi
                                                                 <span class="text-red-500">*</span></label>
-                                                            <select name="sertifikasi"
+                                                            <select name="sertifikasi" x-model="sertifikasi"
                                                                 class="w-full border rounded px-3 py-2" required>
-                                                                <option value="BELUM"
-                                                                    {{ $d->sertifikasi == 'BELUM' ? 'selected' : '' }}>
-                                                                    BELUM</option>
-                                                                <option value="SUDAH"
-                                                                    {{ $d->sertifikasi == 'SUDAH' ? 'selected' : '' }}>
-                                                                    SUDAH</option>
+                                                                <option value="BELUM">BELUM</option>
+                                                                <option value="SUDAH">SUDAH</option>
                                                             </select>
+
+                                                            <!-- Upload Sertifikasi -->
+                                                            <div x-show="sertifikasi === 'SUDAH'" x-transition
+                                                                class="mt-2">
+                                                                <label
+                                                                    class="block font-medium mb-1 text-sm text-gray-700">Upload
+                                                                    Sertifikasi</label>
+                                                                @if ($d->file_sertifikasi)
+                                                                    <div class="mb-2">
+                                                                        <p class="text-sm text-green-600">File saat
+                                                                            ini: {{ $d->file_sertifikasi }}</p>
+                                                                        <p class="text-xs text-gray-500">Upload file
+                                                                            baru untuk mengganti</p>
+                                                                    </div>
+                                                                @endif
+                                                                <input type="file" name="file_sertifikasi"
+                                                                    class="w-full border rounded px-3 py-2 text-sm">
+                                                                <p class="text-gray-500 text-xs mt-1">Format: PDF, JPG,
+                                                                    PNG | Maks: 2MB</p>
+                                                            </div>
                                                         </div>
                                                         <div>
                                                             <label class="block font-medium mb-1 text-start">Inpasing
                                                                 <span class="text-red-500">*</span></label>
-                                                            <select name="inpasing"
+                                                            <select name="inpasing" x-model="inpasing"
                                                                 class="w-full border rounded px-3 py-2" required>
-                                                                <option value="BELUM"
-                                                                    {{ $d->inpasing == 'BELUM' ? 'selected' : '' }}>
-                                                                    BELUM</option>
-                                                                <option value="SUDAH"
-                                                                    {{ $d->inpasing == 'SUDAH' ? 'selected' : '' }}>
-                                                                    SUDAH</option>
+                                                                <option value="BELUM">BELUM</option>
+                                                                <option value="SUDAH">SUDAH</option>
                                                             </select>
+
+                                                            <!-- Upload Inpasing -->
+                                                            <div x-show="inpasing === 'SUDAH'" x-transition
+                                                                class="mt-2">
+                                                                <label
+                                                                    class="block font-medium mb-1 text-sm text-gray-700">Upload
+                                                                    Inpasing</label>
+                                                                @if ($d->file_inpasing)
+                                                                    <div class="mb-2">
+                                                                        <p class="text-sm text-green-600">File saat
+                                                                            ini: {{ $d->file_inpasing }}</p>
+                                                                        <p class="text-xs text-gray-500">Upload file
+                                                                            baru untuk mengganti</p>
+                                                                    </div>
+                                                                @endif
+                                                                <input type="file" name="file_inpasing"
+                                                                    class="w-full border rounded px-3 py-2 text-sm">
+                                                                <p class="text-gray-500 text-xs mt-1">Format: PDF, JPG,
+                                                                    PNG | Maks: 2MB</p>
+                                                            </div>
                                                         </div>
                                                     </div>
 
-                                                    <!-- File Dokumen -->
-                                                    <div class="grid w-full items-start gap-1.5 mb-4 text-start">
-                                                        <label
-                                                            class="text-sm text-gray-400 font-medium leading-none">File
-                                                            Dokumen Saat Ini</label>
-                                                        @if ($d->file_dokumen)
-                                                            <a href="{{ asset('dokumen_dosen/' . $d->file_dokumen) }}"
-                                                                target="_blank" class="text-blue-600 hover:underline">
-                                                                {{ $d->file_dokumen }}
-                                                            </a>
-                                                            <p class="text-gray-500 text-xs mt-1">
-                                                                Upload file baru untuk mengganti yang lama.
-                                                            </p>
-                                                        @else
-                                                            <p class="text-gray-500 italic text-sm">Belum ada file.</p>
-                                                        @endif
+                                                    <!-- Upload Berkas Dosen -->
+                                                    <div class="mb-6 border-t pt-6">
+                                                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Upload
+                                                            Berkas Dosen</h3>
 
-                                                        <input type="file" name="file_dokumen" id="file_dokumen"
-                                                            class="flex w-full rounded-md border border-blue-300 bg-white text-sm text-gray-400 file:border-0 file:bg-blue-600 file:text-white file:text-sm file:font-medium"
-                                                            accept=".pdf,.doc,.docx,.jpg,.png" />
-                                                        <p class="text-gray-500 text-xs mt-1">
-                                                            Format diizinkan: <b>PDF, DOC, DOCX, JPG, PNG</b> | Maksimal
-                                                            <b>2MB</b>
-                                                        </p>
+                                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                            <!-- Kolom 1 -->
+                                                            <div class="space-y-4">
+                                                                <!-- KTP -->
+                                                                <div>
+                                                                    <label
+                                                                        class="block font-medium mb-1 text-sm text-gray-700">Upload
+                                                                        KTP</label>
+                                                                    @if ($d->file_ktp)
+                                                                        <p class="text-sm text-green-600 mb-1">File:
+                                                                            {{ $d->file_ktp }}</p>
+                                                                    @endif
+                                                                    <input type="file" name="file_ktp"
+                                                                        class="w-full border rounded px-3 py-2 text-sm">
+                                                                </div>
+
+                                                                <!-- Ijazah S1 -->
+                                                                <div>
+                                                                    <label
+                                                                        class="block font-medium mb-1 text-sm text-gray-700">Upload
+                                                                        Ijazah S1</label>
+                                                                    @if ($d->file_ijazah_s1)
+                                                                        <p class="text-sm text-green-600 mb-1">File:
+                                                                            {{ $d->file_ijazah_s1 }}</p>
+                                                                    @endif
+                                                                    <input type="file" name="file_ijazah_s1"
+                                                                        class="w-full border rounded px-3 py-2 text-sm">
+                                                                </div>
+
+                                                                <!-- Transkrip S1 -->
+                                                                <div>
+                                                                    <label
+                                                                        class="block font-medium mb-1 text-sm text-gray-700">Upload
+                                                                        Transkrip S1</label>
+                                                                    @if ($d->file_transkrip_s1)
+                                                                        <p class="text-sm text-green-600 mb-1">File:
+                                                                            {{ $d->file_transkrip_s1 }}</p>
+                                                                    @endif
+                                                                    <input type="file" name="file_transkrip_s1"
+                                                                        class="w-full border rounded px-3 py-2 text-sm">
+                                                                </div>
+
+                                                                <!-- Ijazah S2 -->
+                                                                <div>
+                                                                    <label
+                                                                        class="block font-medium mb-1 text-sm text-gray-700">Upload
+                                                                        Ijazah S2</label>
+                                                                    @if ($d->file_ijazah_s2)
+                                                                        <p class="text-sm text-green-600 mb-1">File:
+                                                                            {{ $d->file_ijazah_s2 }}</p>
+                                                                    @endif
+                                                                    <input type="file" name="file_ijazah_s2"
+                                                                        class="w-full border rounded px-3 py-2 text-sm">
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Kolom 2 -->
+                                                            <div class="space-y-4">
+                                                                <!-- Transkrip S2 -->
+                                                                <div>
+                                                                    <label
+                                                                        class="block font-medium mb-1 text-sm text-gray-700">Upload
+                                                                        Transkrip S2</label>
+                                                                    @if ($d->file_transkrip_s2)
+                                                                        <p class="text-sm text-green-600 mb-1">File:
+                                                                            {{ $d->file_transkrip_s2 }}</p>
+                                                                    @endif
+                                                                    <input type="file" name="file_transkrip_s2"
+                                                                        class="w-full border rounded px-3 py-2 text-sm">
+                                                                </div>
+
+                                                                <!-- Ijazah S3 -->
+                                                                <div>
+                                                                    <label
+                                                                        class="block font-medium mb-1 text-sm text-gray-700">Upload
+                                                                        Ijazah S3</label>
+                                                                    @if ($d->file_ijazah_s3)
+                                                                        <p class="text-sm text-green-600 mb-1">File:
+                                                                            {{ $d->file_ijazah_s3 }}</p>
+                                                                    @endif
+                                                                    <input type="file" name="file_ijazah_s3"
+                                                                        class="w-full border rounded px-3 py-2 text-sm">
+                                                                </div>
+
+                                                                <!-- Transkrip S3 -->
+                                                                <div>
+                                                                    <label
+                                                                        class="block font-medium mb-1 text-sm text-gray-700">Upload
+                                                                        Transkrip S3</label>
+                                                                    @if ($d->file_transkrip_s3)
+                                                                        <p class="text-sm text-green-600 mb-1">File:
+                                                                            {{ $d->file_transkrip_s3 }}</p>
+                                                                    @endif
+                                                                    <input type="file" name="file_transkrip_s3"
+                                                                        class="w-full border rounded px-3 py-2 text-sm">
+                                                                </div>
+
+                                                                <!-- Jafung -->
+                                                                <div>
+                                                                    <label
+                                                                        class="block font-medium mb-1 text-sm text-gray-700">Upload
+                                                                        Jafung</label>
+                                                                    @if ($d->file_jafung)
+                                                                        <p class="text-sm text-green-600 mb-1">File:
+                                                                            {{ $d->file_jafung }}</p>
+                                                                    @endif
+                                                                    <input type="file" name="file_jafung"
+                                                                        class="w-full border rounded px-3 py-2 text-sm">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Baris 2 -->
+                                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                                                            <!-- KK -->
+                                                            <div>
+                                                                <label
+                                                                    class="block font-medium mb-1 text-sm text-gray-700">Upload
+                                                                    KK</label>
+                                                                @if ($d->file_kk)
+                                                                    <p class="text-sm text-green-600 mb-1">File:
+                                                                        {{ $d->file_kk }}</p>
+                                                                @endif
+                                                                <input type="file" name="file_kk"
+                                                                    class="w-full border rounded px-3 py-2 text-sm">
+                                                            </div>
+
+                                                            <!-- Perjanjian Kerja -->
+                                                            <div>
+                                                                <label
+                                                                    class="block font-medium mb-1 text-sm text-gray-700">Upload
+                                                                    Perjanjian Kerja</label>
+                                                                @if ($d->file_perjanjian_kerja)
+                                                                    <p class="text-sm text-green-600 mb-1">File:
+                                                                        {{ $d->file_perjanjian_kerja }}</p>
+                                                                @endif
+                                                                <input type="file" name="file_perjanjian_kerja"
+                                                                    class="w-full border rounded px-3 py-2 text-sm">
+                                                            </div>
+
+                                                            <!-- SK Pengangkatan -->
+                                                            <div>
+                                                                <label
+                                                                    class="block font-medium mb-1 text-sm text-gray-700">Upload
+                                                                    SK Pengangkatan</label>
+                                                                @if ($d->file_sk_pengangkatan)
+                                                                    <p class="text-sm text-green-600 mb-1">File:
+                                                                        {{ $d->file_sk_pengangkatan }}</p>
+                                                                @endif
+                                                                <input type="file" name="file_sk_pengangkatan"
+                                                                    class="w-full border rounded px-3 py-2 text-sm">
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Baris 3 -->
+                                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                                                            <!-- Surat Pernyataan -->
+                                                            <div>
+                                                                <label
+                                                                    class="block font-medium mb-1 text-sm text-gray-700">Upload
+                                                                    Surat Pernyataan</label>
+                                                                @if ($d->file_surat_pernyataan)
+                                                                    <p class="text-sm text-green-600 mb-1">File:
+                                                                        {{ $d->file_surat_pernyataan }}</p>
+                                                                @endif
+                                                                <input type="file" name="file_surat_pernyataan"
+                                                                    class="w-full border rounded px-3 py-2 text-sm">
+                                                            </div>
+
+                                                            <!-- SKTP -->
+                                                            <div>
+                                                                <label
+                                                                    class="block font-medium mb-1 text-sm text-gray-700">Upload
+                                                                    SKTP</label>
+                                                                @if ($d->file_sktp)
+                                                                    <p class="text-sm text-green-600 mb-1">File:
+                                                                        {{ $d->file_sktp }}</p>
+                                                                @endif
+                                                                <input type="file" name="file_sktp"
+                                                                    class="w-full border rounded px-3 py-2 text-sm">
+                                                            </div>
+
+                                                            <!-- Surat Tugas -->
+                                                            <div>
+                                                                <label
+                                                                    class="block font-medium mb-1 text-sm text-gray-700">Upload
+                                                                    Surat Tugas</label>
+                                                                @if ($d->file_surat_tugas)
+                                                                    <p class="text-sm text-green-600 mb-1">File:
+                                                                        {{ $d->file_surat_tugas }}</p>
+                                                                @endif
+                                                                <input type="file" name="file_surat_tugas"
+                                                                    class="w-full border rounded px-3 py-2 text-sm">
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Baris 4 -->
+                                                        <div class="mt-4">
+                                                            <!-- SK Aktif -->
+                                                            <div>
+                                                                <label
+                                                                    class="block font-medium mb-1 text-sm text-gray-700">Upload
+                                                                    SK Aktif Tridharma</label>
+                                                                @if ($d->file_sk_aktif)
+                                                                    <p class="text-sm text-green-600 mb-1">File:
+                                                                        {{ $d->file_sk_aktif }}</p>
+                                                                @endif
+                                                                <input type="file" name="file_sk_aktif"
+                                                                    class="w-full border rounded px-3 py-2 text-sm">
+                                                            </div>
+                                                        </div>
                                                     </div>
 
                                                     <!-- Tombol Aksi -->
-                                                    <div class="flex justify-end space-x-2">
+                                                    <div class="flex justify-end space-x-2 mt-6">
                                                         <button type="button" @click="openModal = false"
                                                             class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">Batal</button>
                                                         <button type="submit"
@@ -607,7 +986,7 @@
                         @endfor
                     @empty
                         <tr>
-                            <td colspan="23" class="text-center py-3 text-gray-600">Belum ada data dosen.</td>
+                            <td colspan="25" class="text-center py-3 text-gray-600">Belum ada data dosen.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -709,7 +1088,7 @@
         });
     </script>
     <script>
-        function formPendidikanEdit(existingData) {
+        function formDosenEdit(existingData, sertifikasiValue, inpasingValue) {
             return {
                 pendidikan: existingData.length ? existingData : [{
                     jenjang: '',
@@ -717,6 +1096,8 @@
                     tahun_lulus: '',
                     universitas: ''
                 }],
+                sertifikasi: sertifikasiValue,
+                inpasing: inpasingValue,
                 addPendidikan() {
                     this.pendidikan.push({
                         jenjang: '',
