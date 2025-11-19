@@ -142,16 +142,35 @@
                             </button>
 
                             <div x-show="open" x-transition x-cloak @click.away="open = false"
-                                class="absolute left-0 mt-2 w-48 bg-white text-gray-700 rounded-lg shadow-lg z-50 border border-gray-200">
+                                class="absolute left-0 mt-2 w-56 bg-white text-gray-700 rounded-lg shadow-lg z-50 border border-gray-200">
                                 @canSuperadmin
                                 <a href="{{ route('fakultas.index') }}"
-                                    class="block px-4 py-2 text-sm hover:bg-blue-500 hover:text-white rounded">Fakultas</a>
+                                    class="flex items-center px-4 py-2 text-sm hover:bg-blue-500 hover:text-white rounded transition">
+                                    <i class="fas fa-university w-4 h-4 mr-3"></i>
+                                    Fakultas
+                                </a>
                                 <a href="{{ route('prodi.index') }}"
-                                    class="block px-4 py-2 text-sm hover:bg-blue-500 hover:text-white rounded">Program
-                                    Studi</a>
+                                    class="flex items-center px-4 py-2 text-sm hover:bg-blue-500 hover:text-white rounded transition">
+                                    <i class="fas fa-graduation-cap w-4 h-4 mr-3"></i>
+                                    Program Studi
+                                </a>
+                                {{-- <a href="{{ route('ruangan.index') }}"
+       class="flex items-center px-4 py-2 text-sm hover:bg-blue-500 hover:text-white rounded transition">
+        <i class="fas fa-door-open w-4 h-4 mr-3"></i>
+        Kelola Ruangan
+    </a> --}}
                                 <a href="{{ route('kategori-arsip.index') }}"
-                                    class="block px-4 py-2 text-sm hover:bg-blue-500 hover:text-white rounded">Kategori
-                                    Arsip</a>
+                                    class="flex items-center px-4 py-2 text-sm hover:bg-blue-500 hover:text-white rounded transition">
+                                    <i class="fas fa-folder w-4 h-4 mr-3"></i>
+                                    Kategori Arsip
+                                </a>
+
+                                <!-- Menu Dokumen Mahasiswa -->
+                                <a href="{{ route('dokumen-mahasiswa.index') }}"
+                                    class="flex items-center px-4 py-2 text-sm hover:bg-blue-500 hover:text-white rounded transition">
+                                    <i class="fas fa-file-alt w-4 h-4 mr-3"></i>
+                                    Dokumen Mahasiswa
+                                </a>
                                 @endcanSuperadmin
                             </div>
                         </div>
@@ -161,10 +180,15 @@
                             {{ __('Data Arsip') }}
                         </x-nav-link>
 
-                        <x-nav-link :href="route('sarpras.index')" :active="request()->routeIs('sarpras.*')"
+                        <x-nav-link :href="route('ruangan.index')" :active="request()->routeIs('ruangan.*')"
                             class="text-white px-3 py-2 rounded-md font-medium transition-colors hover:bg-blue-500 hover:text-white">
                             {{ __('Data Sarpras') }}
                         </x-nav-link>
+
+                        {{-- <x-nav-link :href="route('sarpras.index')" :active="request()->routeIs('sarpras.*')"
+                            class="text-white px-3 py-2 rounded-md font-medium transition-colors hover:bg-blue-500 hover:text-white">
+                            {{ __('Data Sarpras') }}
+                        </x-nav-link> --}}
 
                         <x-nav-link :href="route('tenaga-pendidik.index')" :active="request()->routeIs('tenaga-pendidik.*')"
                             class="text-white px-3 py-2 rounded-md font-medium transition-colors hover:bg-blue-500 hover:text-white">
@@ -288,7 +312,8 @@
                     <div class="flex items-center space-x-3 py-3">
                         <div
                             class="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-sm">
-                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                             </svg>
@@ -360,8 +385,18 @@
                                 <span class="text-gray-700">Kategori Arsip</span>
                             </div>
                         </x-responsive-nav-link>
+                        <!-- Dokumen Mahasiswa Mobile -->
+                        <x-responsive-nav-link :href="route('dokumen-mahasiswa.index')" class="group">
+                            <div class="flex items-center space-x-3 py-3">
+                                <div
+                                    class="w-10 h-10 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg flex items-center justify-center shadow-sm">
+                                    <i class="fas fa-file-alt text-white text-lg"></i>
+                                </div>
+                                <span class="font-medium text-gray-800">Dokumen Mahasiswa</span>
+                            </div>
+                        </x-responsive-nav-link>
                         @endcanSuperadmin
-                        
+
                     </div>
                 </div>
 
@@ -380,7 +415,8 @@
                     </div>
                 </x-responsive-nav-link>
 
-                <x-responsive-nav-link :href="route('sarpras.index')" class="group">
+
+                <x-responsive-nav-link :href="route('ruangan.index')" class="group">
                     <div class="flex items-center space-x-3 py-3">
                         <div
                             class="w-10 h-10 bg-gradient-to-r from-teal-500 to-teal-600 rounded-lg flex items-center justify-center shadow-sm">
@@ -393,6 +429,20 @@
                         <span class="font-medium text-gray-800">Data Sarpras</span>
                     </div>
                 </x-responsive-nav-link>
+
+                {{-- <x-responsive-nav-link :href="route('sarpras.index')" class="group">
+                    <div class="flex items-center space-x-3 py-3">
+                        <div
+                            class="w-10 h-10 bg-gradient-to-r from-teal-500 to-teal-600 rounded-lg flex items-center justify-center shadow-sm">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            </svg>
+                        </div>
+                        <span class="font-medium text-gray-800">Data Sarpras</span>
+                    </div>
+                </x-responsive-nav-link> --}}
 
                 <x-responsive-nav-link :href="route('tenaga-pendidik.index')" class="group">
                     <div class="flex items-center space-x-3 py-3">

@@ -26,7 +26,7 @@ class ArsipExport implements FromCollection, WithHeadings, WithMapping, WithStyl
      */
     public function collection()
     {
-        $query = Arsip::with(['kategori', 'prodi.fakultas']);
+        $query = Arsip::with(['kategori']);
 
         // Filter berdasarkan pencarian jika ada
         if (!empty($this->search)) {
@@ -37,9 +37,6 @@ class ArsipExport implements FromCollection, WithHeadings, WithMapping, WithStyl
                   ->orWhere('keterangan', 'like', "%{$search}%")
                   ->orWhereHas('kategori', function($q) use ($search) {
                       $q->where('nama_kategori', 'like', "%{$search}%");
-                  })
-                  ->orWhereHas('prodi', function($q) use ($search) {
-                      $q->where('nama_prodi', 'like', "%{$search}%");
                   });
             });
         }
@@ -59,8 +56,6 @@ class ArsipExport implements FromCollection, WithHeadings, WithMapping, WithStyl
             'Tanggal Dokumen',
             'Tahun',
             'Kategori',
-            'Program Studi',
-            'Fakultas',
             'Keterangan',
             'File Dokumen'
         ];
@@ -81,8 +76,6 @@ class ArsipExport implements FromCollection, WithHeadings, WithMapping, WithStyl
             $arsip->tanggal_dokumen ? \Carbon\Carbon::parse($arsip->tanggal_dokumen)->format('d-m-Y') : '-',
             $arsip->tahun ?? '-',
             $arsip->kategori->nama_kategori ?? '-',
-            $arsip->prodi->nama_prodi ?? '-',
-            $arsip->prodi->fakultas->nama_fakultas ?? '-',
             $arsip->keterangan ?? '-',
             $arsip->file_dokumen ?? '-'
         ];
@@ -95,15 +88,13 @@ class ArsipExport implements FromCollection, WithHeadings, WithMapping, WithStyl
     {
         return [
             'A' => 5,   // No
-            'B' => 35,  // Judul
+            'B' => 40,  // Judul
             'C' => 20,  // Nomor
             'D' => 15,  // Tanggal
             'E' => 8,   // Tahun
             'F' => 20,  // Kategori
-            'G' => 25,  // Prodi
-            'H' => 25,  // Fakultas
-            'I' => 30,  // Keterangan
-            'J' => 25,  // File
+            'G' => 35,  // Keterangan
+            'H' => 25,  // File
         ];
     }
 

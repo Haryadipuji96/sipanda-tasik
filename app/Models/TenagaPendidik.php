@@ -23,6 +23,7 @@ class TenagaPendidik extends Model
         'golongan_history',
         'nip',
         'status_kepegawaian',
+        'jabatan_struktural',
         'pendidikan_terakhir',
         'jenis_kelamin',
         'no_hp',
@@ -30,22 +31,33 @@ class TenagaPendidik extends Model
         'alamat',
         'keterangan',
         'file',
+        'file_ktp',
+        'file_ijazah_s1',
+        'file_transkrip_s1',
+        'file_ijazah_s2',
+        'file_transkrip_s2',
+        'file_ijazah_s3',
+        'file_transkrip_s3',
+        'file_kk',
+        'file_perjanjian_kerja',
+        'file_sk',
+        'file_surat_tugas',
     ];
 
     protected $casts = [
         'tanggal_lahir' => 'date',
         'tmt_kerja' => 'date',
-        'golongan_history' => 'array', // otomatis decode JSON
+        'golongan_history' => 'array',
     ];
 
-    // Relasi ke tabel prodi
+    // Relasi ke tabel prodi - TETAP tapi nullable
     public function prodi()
     {
         return $this->belongsTo(Prodi::class, 'id_prodi', 'id');
     }
 
     // Nama lengkap dengan gelar
-    public function getNamaLengkapAttribute()
+    public function getNamaLengkapAttribute(): string
     {
         $nama = [];
         if ($this->gelar_depan) $nama[] = $this->gelar_depan;
@@ -54,14 +66,66 @@ class TenagaPendidik extends Model
         return implode(' ', $nama);
     }
 
-    // Ambil golongan sebagai array
-    public function getGolonganArrayAttribute()
+    // DAFTAR JABATAN STRUKTURAL SESUAI STRUKTUR ORGANISASI
+    public static function getJabatanStrukturalOptions(): array
     {
-        return is_array($this->golongan_history) ? $this->golongan_history : json_decode($this->golongan_history, true) ?? [];
+        return [
+            'Rektor IAIT',
+            'Wakil Rektor Bid. Akademik',
+            'Wakil Rektor Bid. Adm. & Umum',
+            'Wakil Rektor Bid. Kemahasiswaan, Alumni & Kerjasama',
+            'Kepala SPI',
+            'Dekan Fakultas Tarbiyah',
+            'Plt. Dekan Fakultas Syariah & Hukum',
+            'Dekan Fakultas Ekonomi & Bisnis Islam',
+            'Direktur Pascasarjana',
+            'Kepala Biro',
+            'Kepala Bagian Akademik & Kemahasiswaan, Ketatausahaan, Kerjasama & Hubungan Masyarakat',
+            'Kepala Bagian Umum (Sarana Prasarana, Organisasi, Hukum, Kepegawaian)',
+            'Kepala Bagian Keuangan & Perencanaan',
+            'Kepala Sub. Bagian Akademik',
+            'Plt. Kepala Sub. Bagian Kemahasiswaan',
+            'Kepala Sub. Bagian Organisasi, Hukum, Kepegawaian',
+            'Plt. Kepala Sub. Bagian Ketatausahaan, Kerjasama & Hubungan Masyarakat',
+            'Kepala Sub. Bagian Sarana Prasarana',
+            'Kepala Sub. Bagian Keuangan',
+            'Ketua Prodi PAI',
+            'Plt. Sekretaris Prodi PAI',
+            'Ketua Prodi HKI',
+            'Ketua Prodi EKSYAR',
+            'Ketua Prodi PGMI',
+            'Ketua Prodi MPI',
+            'Ketua Prodi HTN',
+            'Ketua Prodi PIAUD',
+            'Ketua Prodi PAI Pascasarjana',
+            'Ketua Prodi BKPI',
+            'Kepala Lembaga Penelitian & Pengabdian kepada Masyarakat (LPPM)',
+            'Kepala Lembaga Penjaminan Mutu',
+            'Plt. Kepala Perpustakaan & Kearsipan',
+            'Sekretaris Perpustakaan & Kearsipan',
+            'Kepala Pusat Pengembangan Bahasa',
+            'Sekretaris Pusat Pengembangan Bahasa',
+            'Plt. Kepala Pusat Teknologi & Informasi',
+        ];
+    }
+
+    // PERBAIKAN: Fix type hinting untuk golongan array
+    public function getGolonganArrayAttribute(): array
+    {
+        if (empty($this->golongan_history)) {
+            return [];
+        }
+
+        if (is_array($this->golongan_history)) {
+            return $this->golongan_history;
+        }
+
+        $decoded = json_decode($this->golongan_history, true);
+        return is_array($decoded) ? $decoded : [];
     }
 
     // Golongan terakhir
-    public function getGolonganTerakhirAttribute()
+    public function getGolonganTerakhirAttribute(): string
     {
         $history = $this->golongan_array;
         if (empty($history)) {
@@ -73,7 +137,7 @@ class TenagaPendidik extends Model
     }
 
     // Tempat & Tanggal Lahir
-    public function getTempatTanggalLahirAttribute()
+    public function getTempatTanggalLahirAttribute(): string
     {
         if ($this->tempat_lahir && $this->tanggal_lahir) {
             return $this->tempat_lahir . ', ' . $this->tanggal_lahir->format('d/m/Y');
@@ -82,13 +146,13 @@ class TenagaPendidik extends Model
     }
 
     // Status label (untuk status_kepegawaian)
-    public function getStatusKepegawaianLabelAttribute()
+    public function getStatusKepegawaianLabelAttribute(): string
     {
         return $this->status_kepegawaian ?? '-';
     }
 
     // Jenis kelamin label
-    public function getJenisKelaminLabelAttribute()
+    public function getJenisKelaminLabelAttribute(): string
     {
         return $this->jenis_kelamin ? ucfirst($this->jenis_kelamin) : '-';
     }

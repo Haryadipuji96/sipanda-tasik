@@ -91,13 +91,12 @@
 
         /* Lebar Kolom */
         .col-no { width: 3%; text-align: center; }
-        .col-judul { width: 20%; }
+        .col-judul { width: 25%; }
         .col-nomor { width: 12%; }
         .col-tanggal { width: 8%; text-align: center; }
         .col-tahun { width: 5%; text-align: center; }
-        .col-kategori { width: 12%; }
-        .col-prodi { width: 15%; }
-        .col-keterangan { width: 15%; }
+        .col-kategori { width: 15%; }
+        .col-keterangan { width: 25%; }
         .col-file { width: 10%; }
 
         tr { page-break-inside: avoid; }
@@ -145,7 +144,7 @@
     </h3>
 
     {{-- Info Filter --}}
-    @if(request()->has('search') || request()->has('kategori') || request()->has('prodi') || request()->has('tahun'))
+    @if(request()->has('search') || request()->has('kategori') || request()->has('tahun'))
     <div style="margin-bottom: 15px; padding: 8px; background-color: #f0f9ff; border: 1px solid #bae6fd; border-radius: 4px; font-size: 9px;">
         <strong>Filter yang diterapkan:</strong>
         <div style="margin-top: 4px;">
@@ -157,11 +156,6 @@
             @if(request('kategori'))
             <span style="background-color: #dbeafe; color: #1e40af; padding: 2px 6px; border-radius: 10px; margin-right: 5px; font-size: 8px;">
                 Kategori: {{ request('kategori') }}
-            </span>
-            @endif
-            @if(request('prodi'))
-            <span style="background-color: #dbeafe; color: #1e40af; padding: 2px 6px; border-radius: 10px; margin-right: 5px; font-size: 8px;">
-                Prodi: {{ request('prodi') }}
             </span>
             @endif
             @if(request('tahun'))
@@ -182,9 +176,7 @@
                 <th class="col-tanggal">Tanggal</th>
                 <th class="col-tahun">Tahun</th>
                 <th class="col-kategori">Kategori</th>
-                <th class="col-prodi">Program Studi</th>
                 <th class="col-keterangan">Keterangan</th>
-               
             </tr>
         </thead>
         <tbody>
@@ -198,12 +190,11 @@
                     </td>
                     <td class="col-tahun">{{ $a->tahun ?? '-' }}</td>
                     <td class="col-kategori">{{ $a->kategori->nama_kategori ?? '-' }}</td>
-                    <td class="col-prodi">{{ $a->prodi->nama_prodi ?? '-' }}</td>
                     <td class="col-keterangan">{{ $a->keterangan ?? '-' }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="9" style="text-align:center; padding:15px; font-style: italic;">
+                    <td colspan="7" style="text-align:center; padding:15px; font-style: italic;">
                         Tidak ada data arsip ditemukan.
                     </td>
                 </tr>

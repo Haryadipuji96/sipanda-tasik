@@ -31,14 +31,15 @@ class TenagaPendidikExport implements FromCollection, WithHeadings, WithMapping,
         // Filter berdasarkan pencarian jika ada
         if (!empty($this->search)) {
             $search = $this->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('nama_tendik', 'like', "%{$search}%")
-                  ->orWhere('nip', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('status_kepegawaian', 'like', "%{$search}%")
-                  ->orWhereHas('prodi', function($q) use ($search) {
-                      $q->where('nama_prodi', 'like', "%{$search}%");
-                  });
+                    ->orWhere('nip', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('jabatan_struktural', 'like', "%{$search}%") // TAMBAH INI
+                    ->orWhere('status_kepegawaian', 'like', "%{$search}%")
+                    ->orWhereHas('prodi', function ($q) use ($search) {
+                        $q->where('nama_prodi', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -53,6 +54,7 @@ class TenagaPendidikExport implements FromCollection, WithHeadings, WithMapping,
         return [
             'No',
             'Nama Tenaga Pendidik',
+            'Posisi/Jabatan Struktural',
             'Gelar Depan',
             'Gelar Belakang',
             'Program Studi',
@@ -83,15 +85,23 @@ class TenagaPendidikExport implements FromCollection, WithHeadings, WithMapping,
         // Format riwayat golongan
         $riwayatGolongan = '';
         if (!empty($tendik->golongan_history)) {
-            $golonganArray = json_decode($tendik->golongan_history, true);
-            foreach ($golonganArray as $index => $gol) {
-                $riwayatGolongan .= ($index + 1) . ". " . ($gol['golongan'] ?? '-') . " (" . ($gol['tahun'] ?? '-') . ")\n";
+            $golonganArray = is_array($tendik->golongan_history) 
+                ? $tendik->golongan_history 
+                : json_decode($tendik->golongan_history, true);
+            
+            if (is_array($golonganArray)) {
+                foreach ($golonganArray as $index => $gol) {
+                    if (!empty($gol['tahun']) || !empty($gol['golongan'])) {
+                        $riwayatGolongan .= ($index + 1) . ". " . ($gol['golongan'] ?? '-') . " (" . ($gol['tahun'] ?? '-') . ")\n";
+                    }
+                }
             }
         }
 
         return [
             $no,
             $tendik->nama_tendik,
+            $tendik->jabatan_struktural ?? '-',
             $tendik->gelar_depan ?? '-',
             $tendik->gelar_belakang ?? '-',
             $tendik->prodi->nama_prodi ?? '-',
@@ -118,8 +128,8 @@ class TenagaPendidikExport implements FromCollection, WithHeadings, WithMapping,
     {
         $labels = [
             'PNS' => 'PNS',
-            'Honorer' => 'Honorer',
-            'Kontrak' => 'Kontrak'
+            'Non PNS Tetap' => 'Non PNS Tetap',
+            'Non PNS Tidak Tetap' => 'Non PNS Tidak Tetap'
         ];
 
         return $labels[$status] ?? $status;
@@ -146,32 +156,37 @@ class TenagaPendidikExport implements FromCollection, WithHeadings, WithMapping,
         return [
             'A' => 5,   // No
             'B' => 25,  // Nama Tenaga Pendidik
-            'C' => 12,  // Gelar Depan
-            'D' => 12,  // Gelar Belakang
-            'E' => 20,  // Program Studi
-            'F' => 20,  // Fakultas
-            'G' => 15,  // NIP
-            'H' => 15,  // Status Kepegawaian
-            'I' => 12,  // Jenis Kelamin
-            'J' => 15,  // Tempat Lahir
-            'K' => 12,  // Tanggal Lahir
-            'L' => 12,  // TMT Kerja
-            'M' => 20,  // Pendidikan Terakhir
-            'N' => 25,  // Email
-            'O' => 15,  // No HP
-            'P' => 30,  // Alamat
-            'Q' => 25,  // Riwayat Golongan
-            'R' => 30,  // Keterangan
+            'C' => 25,  // Posisi/Jabatan Struktural
+            'D' => 12,  // Gelar Depan
+            'E' => 12,  // Gelar Belakang
+            'F' => 20,  // Program Studi
+            'G' => 20,  // Fakultas
+            'H' => 15,  // NIP
+            'I' => 15,  // Status Kepegawaian
+            'J' => 12,  // Jenis Kelamin
+            'K' => 15,  // Tempat Lahir
+            'L' => 12,  // Tanggal Lahir
+            'M' => 12,  // TMT Kerja
+            'N' => 20,  // Pendidikan Terakhir
+            'O' => 25,  // Email
+            'P' => 15,  // No HP
+            'Q' => 30,  // Alamat
+            'R' => 25,  // Riwayat Golongan
+            'S' => 30,  // Keterangan
         ];
     }
 
     /**
-     * Styling untuk Excel
+     * Styling untuk Excel - PERBAIKAN DI SINI
      */
     public function styles(Worksheet $sheet)
     {
-        // Style untuk header (baris 1)
-        $sheet->getStyle('A1:R1')->applyFromArray([
+        // Dapatkan jumlah baris
+        $highestRow = $sheet->getHighestRow();
+        $highestColumn = $sheet->getHighestColumn();
+
+        // Style untuk header (baris 1) - PERBAIKAN RANGE MENJADI A1:S1
+        $sheet->getStyle('A1:S1')->applyFromArray([
             'font' => [
                 'bold' => true, 
                 'size' => 11,
@@ -194,20 +209,28 @@ class TenagaPendidikExport implements FromCollection, WithHeadings, WithMapping,
             ],
         ]);
 
-        // Style untuk data
-        $sheet->getStyle('A2:R' . ($sheet->getHighestRow()))
+        // Style untuk data - PERBAIKAN RANGE MENJADI A2:S
+        $sheet->getStyle('A2:S' . $highestRow)
               ->getAlignment()
               ->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP)
               ->setWrapText(true);
 
-        // Border untuk semua data
-        $sheet->getStyle('A1:R' . ($sheet->getHighestRow()))
+        // Border untuk semua data - PERBAIKAN RANGE MENJADI A1:S
+        $sheet->getStyle('A1:S' . $highestRow)
               ->getBorders()
               ->getAllBorders()
               ->setBorderStyle(Border::BORDER_THIN);
 
-        // Auto filter
-        $sheet->setAutoFilter('A1:R' . ($sheet->getHighestRow()));
+        // Auto filter - PERBAIKAN RANGE MENJADI A1:S
+        $sheet->setAutoFilter('A1:S' . $highestRow);
+
+        // Set wrap text untuk kolom tertentu yang butuh
+        $sheet->getStyle('R2:R' . $highestRow)
+              ->getAlignment()
+              ->setWrapText(true);
+        $sheet->getStyle('S2:S' . $highestRow)
+              ->getAlignment()
+              ->setWrapText(true);
 
         return [
             1 => [

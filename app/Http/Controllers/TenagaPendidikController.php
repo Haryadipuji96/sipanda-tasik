@@ -19,6 +19,7 @@ class TenagaPendidikController extends Controller
             $query->where('nama_tendik', 'like', "%{$search}%")
                 ->orWhere('nip', 'like', "%{$search}%")
                 ->orWhere('email', 'like', "%{$search}%")
+                ->orWhere('jabatan_struktural', 'like', "%{$search}%") // TAMBAHAN PENCARIAN
                 ->orWhereHas('prodi', function ($q) use ($search) {
                     $q->where('nama_prodi', 'like', "%{$search}%");
                 });
@@ -33,13 +34,14 @@ class TenagaPendidikController extends Controller
     public function create()
     {
         $prodi = Prodi::with('fakultas')->get();
-        return view('page.tenaga_pendidik.create', compact('prodi'));
+        $jabatanOptions = TenagaPendidik::getJabatanStrukturalOptions(); // OPTION BARU
+        return view('page.tenaga_pendidik.create', compact('prodi', 'jabatanOptions'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'id_prodi' => 'required|exists:prodi,id',
+            'id_prodi' => 'nullable|exists:prodi,id', // UBAH MENJADI NULLABLE
             'nama_tendik' => 'required|string|max:255',
             'gelar_depan' => 'nullable|string|max:50',
             'gelar_belakang' => 'nullable|string|max:50',
@@ -47,7 +49,8 @@ class TenagaPendidikController extends Controller
             'tanggal_lahir' => 'nullable|date',
             'tmt_kerja' => 'nullable|date',
             'nip' => 'nullable|string|max:50|unique:tenaga_pendidik,nip',
-            'status_kepegawaian' => 'required|in:PNS,Honorer,Kontrak',
+            'status_kepegawaian' => 'required|in:PNS,Non PNS Tetap,Non PNS Tidak Tetap', // UBAH OPTION
+            'jabatan_struktural' => 'nullable|string|max:255', // VALIDASI BARU
             'pendidikan_terakhir' => 'nullable|string|max:100',
             'jenis_kelamin' => 'required|in:laki-laki,perempuan',
             'no_hp' => 'nullable|string|unique:tenaga_pendidik,no_hp',
@@ -55,9 +58,35 @@ class TenagaPendidikController extends Controller
             'alamat' => 'nullable|string|max:255',
             'keterangan' => 'nullable|string',
             'file' => 'nullable|file|mimes:pdf,jpg,png,doc,docx|max:2048',
+            // VALIDASI UPLOAD BERKAS BARU
+            'file_ktp' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_ijazah_s1' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_transkrip_s1' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_ijazah_s2' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_transkrip_s2' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_ijazah_s3' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_transkrip_s3' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_kk' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_perjanjian_kerja' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_sk' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_surat_tugas' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
         ]);
 
-        $data = $request->except(['file', 'golongan']);
+        $data = $request->except([
+            'file',
+            'golongan',
+            'file_ktp',
+            'file_ijazah_s1',
+            'file_transkrip_s1',
+            'file_ijazah_s2',
+            'file_transkrip_s2',
+            'file_ijazah_s3',
+            'file_transkrip_s3',
+            'file_kk',
+            'file_perjanjian_kerja',
+            'file_sk',
+            'file_surat_tugas'
+        ]);
 
         // Handle golongan history dinamis
         if ($request->filled('golongan') && is_array($request->golongan)) {
@@ -71,7 +100,7 @@ class TenagaPendidikController extends Controller
             $data['golongan_history'] = null;
         }
 
-        // Handle file upload
+        // Handle file upload utama
         if ($request->hasFile('file')) {
             $file = $request->file('file');
             $filename = now()->format('YmdHis') . '-Tendik.' . $file->getClientOriginalExtension();
@@ -79,11 +108,36 @@ class TenagaPendidikController extends Controller
             $data['file'] = $filename;
         }
 
+        // Handle upload berkas baru
+        $berkasFields = [
+            'file_ktp',
+            'file_ijazah_s1',
+            'file_transkrip_s1',
+            'file_ijazah_s2',
+            'file_transkrip_s2',
+            'file_ijazah_s3',
+            'file_transkrip_s3',
+            'file_kk',
+            'file_perjanjian_kerja',
+            'file_sk',
+            'file_surat_tugas'
+        ];
+
+        foreach ($berkasFields as $field) {
+            if ($request->hasFile($field)) {
+                $file = $request->file($field);
+                $filename = now()->format('YmdHis') . '-' . $field . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('dokumen_tendik'), $filename);
+                $data[$field] = $filename;
+            }
+        }
+
         TenagaPendidik::create($data);
 
         return redirect()->route('tenaga-pendidik.index')->with('success', 'Data berhasil ditambahkan.');
     }
 
+    // Method show() TETAP SAMA
     public function show($id)
     {
         $tenagaPendidik = TenagaPendidik::with('prodi.fakultas')->findOrFail($id);
@@ -94,7 +148,8 @@ class TenagaPendidikController extends Controller
     {
         $tenagaPendidik = TenagaPendidik::findOrFail($id);
         $prodi = Prodi::with('fakultas')->get();
-        return view('page.tenaga_pendidik.edit', compact('tenagaPendidik', 'prodi'));
+        $jabatanOptions = TenagaPendidik::getJabatanStrukturalOptions(); // OPTION BARU
+        return view('page.tenaga_pendidik.edit', compact('tenagaPendidik', 'prodi', 'jabatanOptions'));
     }
 
     public function update(Request $request, $id)
@@ -102,7 +157,7 @@ class TenagaPendidikController extends Controller
         $tenagaPendidik = TenagaPendidik::findOrFail($id);
 
         $request->validate([
-            'id_prodi' => 'required|exists:prodi,id',
+            'id_prodi' => 'nullable|exists:prodi,id', // UBAH MENJADI NULLABLE
             'nama_tendik' => 'required|string|max:255',
             'gelar_depan' => 'nullable|string|max:50',
             'gelar_belakang' => 'nullable|string|max:50',
@@ -110,7 +165,8 @@ class TenagaPendidikController extends Controller
             'tanggal_lahir' => 'nullable|date',
             'tmt_kerja' => 'nullable|date',
             'nip' => 'nullable|string|max:50|unique:tenaga_pendidik,nip,' . $tenagaPendidik->id,
-            'status_kepegawaian' => 'required|in:PNS,Honorer,Kontrak',
+            'status_kepegawaian' => 'required|in:PNS,Non PNS Tetap,Non PNS Tidak Tetap', // UBAH OPTION
+            'jabatan_struktural' => 'nullable|string|max:255', // VALIDASI BARU
             'pendidikan_terakhir' => 'nullable|string|max:100',
             'jenis_kelamin' => 'required|in:laki-laki,perempuan',
             'no_hp' => 'nullable|string|unique:tenaga_pendidik,no_hp,' . $tenagaPendidik->id,
@@ -118,9 +174,35 @@ class TenagaPendidikController extends Controller
             'alamat' => 'nullable|string|max:255',
             'keterangan' => 'nullable|string',
             'file' => 'nullable|file|mimes:pdf,jpg,png,doc,docx|max:2048',
+            // VALIDASI UPLOAD BERKAS BARU
+            'file_ktp' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_ijazah_s1' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_transkrip_s1' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_ijazah_s2' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_transkrip_s2' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_ijazah_s3' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_transkrip_s3' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_kk' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_perjanjian_kerja' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_sk' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'file_surat_tugas' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
         ]);
 
-        $data = $request->except(['file', 'golongan']);
+        $data = $request->except([
+            'file',
+            'golongan',
+            'file_ktp',
+            'file_ijazah_s1',
+            'file_transkrip_s1',
+            'file_ijazah_s2',
+            'file_transkrip_s2',
+            'file_ijazah_s3',
+            'file_transkrip_s3',
+            'file_kk',
+            'file_perjanjian_kerja',
+            'file_sk',
+            'file_surat_tugas'
+        ]);
 
         // Handle golongan history dinamis
         if ($request->filled('golongan') && is_array($request->golongan)) {
@@ -134,7 +216,7 @@ class TenagaPendidikController extends Controller
             $data['golongan_history'] = null;
         }
 
-        // Handle file upload
+        // Handle file upload utama
         if ($request->hasFile('file')) {
             if ($tenagaPendidik->file && file_exists(public_path('dokumen_tendik/' . $tenagaPendidik->file))) {
                 unlink(public_path('dokumen_tendik/' . $tenagaPendidik->file));
@@ -146,17 +228,70 @@ class TenagaPendidikController extends Controller
             $data['file'] = $filename;
         }
 
+        // Handle upload berkas baru
+        $berkasFields = [
+            'file_ktp',
+            'file_ijazah_s1',
+            'file_transkrip_s1',
+            'file_ijazah_s2',
+            'file_transkrip_s2',
+            'file_ijazah_s3',
+            'file_transkrip_s3',
+            'file_kk',
+            'file_perjanjian_kerja',
+            'file_sk',
+            'file_surat_tugas'
+        ];
+
+        foreach ($berkasFields as $field) {
+            if ($request->hasFile($field)) {
+                // Hapus file lama jika ada
+                if ($tenagaPendidik->$field && file_exists(public_path('dokumen_tendik/' . $tenagaPendidik->$field))) {
+                    unlink(public_path('dokumen_tendik/' . $tenagaPendidik->$field));
+                }
+
+                $file = $request->file($field);
+                $filename = now()->format('YmdHis') . '-' . $field . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('dokumen_tendik'), $filename);
+                $data[$field] = $filename;
+            }
+        }
+
         $tenagaPendidik->update($data);
 
         return redirect()->route('tenaga-pendidik.index')->with('success', 'Data berhasil diperbarui.');
     }
 
+    // Method destroy() dan lainnya TETAP SAMA...
+    // Hanya perlu menambahkan penghapusan file berkas baru
     public function destroy($id)
     {
         $tenagaPendidik = TenagaPendidik::findOrFail($id);
 
+        // Hapus file utama
         if ($tenagaPendidik->file && file_exists(public_path('dokumen_tendik/' . $tenagaPendidik->file))) {
             unlink(public_path('dokumen_tendik/' . $tenagaPendidik->file));
+        }
+
+        // Hapus file berkas baru
+        $berkasFields = [
+            'file_ktp',
+            'file_ijazah_s1',
+            'file_transkrip_s1',
+            'file_ijazah_s2',
+            'file_transkrip_s2',
+            'file_ijazah_s3',
+            'file_transkrip_s3',
+            'file_kk',
+            'file_perjanjian_kerja',
+            'file_sk',
+            'file_surat_tugas'
+        ];
+
+        foreach ($berkasFields as $field) {
+            if ($tenagaPendidik->$field && file_exists(public_path('dokumen_tendik/' . $tenagaPendidik->$field))) {
+                unlink(public_path('dokumen_tendik/' . $tenagaPendidik->$field));
+            }
         }
 
         $tenagaPendidik->delete();

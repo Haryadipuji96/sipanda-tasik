@@ -23,7 +23,7 @@
         </div>
 
         <!-- Info Filter -->
-        @if(request()->has('search') || request()->has('kategori') || request()->has('prodi') || request()->has('tahun'))
+        @if(request()->has('search') || request()->has('kategori') || request()->has('tahun'))
         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
             <h3 class="font-semibold text-blue-800 mb-2">Filter yang diterapkan:</h3>
             <div class="flex flex-wrap gap-2">
@@ -35,11 +35,6 @@
                 @if(request('kategori'))
                 <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
                     Kategori: {{ request('kategori') }}
-                </span>
-                @endif
-                @if(request('prodi'))
-                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
-                    Prodi: {{ request('prodi') }}
                 </span>
                 @endif
                 @if(request('tahun'))
@@ -62,7 +57,6 @@
                         <th class="border border-gray-300 px-3 py-2">Tanggal</th>
                         <th class="border border-gray-300 px-3 py-2">Tahun</th>
                         <th class="border border-gray-300 px-3 py-2">Kategori</th>
-                        <th class="border border-gray-300 px-3 py-2">Program Studi</th>
                         <th class="border border-gray-300 px-3 py-2">Keterangan</th>
                         <th class="border border-gray-300 px-3 py-2">File</th>
                     </tr>
@@ -78,9 +72,8 @@
                             </td>
                             <td class="border border-gray-300 px-3 py-2 text-center">{{ $a->tahun ?? '-' }}</td>
                             <td class="border border-gray-300 px-3 py-2">{{ $a->kategori->nama_kategori ?? '-' }}</td>
-                            <td class="border border-gray-300 px-3 py-2">{{ $a->prodi->nama_prodi ?? '-' }}</td>
                             <td class="border border-gray-300 px-3 py-2">{{ $a->keterangan ?? '-' }}</td>
-                            <td class="border border-gray-300 px-3 py-2">
+                            <td class="border border-gray-300 px-3 py-2 text-center">
                                 @if($a->file_dokumen)
                                 <span class="px-2 py-1 rounded text-xs font-semibold bg-green-100 text-green-800">
                                     Ada File
@@ -94,7 +87,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="text-center py-4 text-gray-500">
+                            <td colspan="8" class="text-center py-4 text-gray-500">
                                 Tidak ada data arsip.
                             </td>
                         </tr>
@@ -138,10 +131,6 @@
                             <p class="font-medium text-gray-800">{{ $a->kategori->nama_kategori ?? '-' }}</p>
                         </div>
                         <div>
-                            <p class="text-gray-500 text-xs mb-1">Program Studi</p>
-                            <p class="font-medium text-gray-800">{{ $a->prodi->nama_prodi ?? '-' }}</p>
-                        </div>
-                        <div>
                             <p class="text-gray-500 text-xs mb-1">Tanggal</p>
                             <p class="font-medium text-gray-800">
                                 {{ $a->tanggal_dokumen ? \Carbon\Carbon::parse($a->tanggal_dokumen)->format('d/m/Y') : '-' }}
@@ -150,6 +139,16 @@
                         <div>
                             <p class="text-gray-500 text-xs mb-1">Tahun</p>
                             <p class="font-medium text-gray-800">{{ $a->tahun ?? '-' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 text-xs mb-1">Status File</p>
+                            <p class="font-medium text-gray-800">
+                                @if($a->file_dokumen)
+                                    Tersedia
+                                @else
+                                    Tidak Ada
+                                @endif
+                            </p>
                         </div>
                     </div>
 
@@ -195,8 +194,8 @@
                     <p class="text-gray-600">Kategori</p>
                 </div>
                 <div class="text-center">
-                    <p class="text-2xl font-bold text-orange-600">{{ $arsip->unique('prodi_id')->count() }}</p>
-                    <p class="text-gray-600">Program Studi</p>
+                    <p class="text-2xl font-bold text-orange-600">{{ $arsip->whereNotNull('tahun')->unique('tahun')->count() }}</p>
+                    <p class="text-gray-600">Tahun Berbeda</p>
                 </div>
             </div>
             

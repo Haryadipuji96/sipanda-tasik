@@ -6,10 +6,10 @@
     <style>
         body {
             font-family: "Times New Roman", serif;
-            font-size: 11px;
+            font-size: 10px;
             color: #000;
-            margin: 40px;
-            line-height: 1.4;
+            margin: 30px;
+            line-height: 1.3;
         }
 
         /* === KOP SURAT === */
@@ -19,8 +19,8 @@
             justify-content: center;
             position: relative;
             border-bottom: 2px solid #000;
-            margin-bottom: 10px;
-            padding-bottom: 5px;
+            margin-bottom: 8px;
+            padding-bottom: 4px;
         }
 
         .kop::after {
@@ -37,8 +37,8 @@
             position: absolute;
             left: 0;
             top: 0;
-            width: 75px;
-            height: 75px;
+            width: 65px;
+            height: 65px;
         }
 
         .kop-text {
@@ -48,31 +48,31 @@
 
         .kop-text h1 {
             margin: 0;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
             text-transform: uppercase;
         }
 
         .kop-text h2 {
-            margin: 2px 0;
-            font-size: 13px;
+            margin: 1px 0;
+            font-size: 11px;
             font-weight: bold;
         }
 
         .kop-text p {
             margin: 1px 0;
-            font-size: 10px;
+            font-size: 9px;
         }
 
         /* === INFORMASI DOKUMEN === */
         .document-info {
             text-align: center;
-            margin-top: 15px;
-            margin-bottom: 15px;
+            margin-top: 12px;
+            margin-bottom: 12px;
         }
 
         .document-info strong {
-            font-size: 11px;
+            font-size: 10px;
             text-transform: uppercase;
         }
 
@@ -80,18 +80,19 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 10px;
+            font-size: 8px;
         }
 
         th, td {
             border: 1px solid #000;
-            padding: 5px 6px;
+            padding: 4px 5px;
             vertical-align: top;
         }
 
         th {
             text-align: center;
             font-weight: bold;
+            background-color: #f0f0f0;
         }
 
         .text-center {
@@ -100,20 +101,50 @@
 
         /* === FOOTER === */
         .footer {
-            margin-top: 25px;
+            margin-top: 20px;
             text-align: center;
-            font-size: 9px;
+            font-size: 8px;
             border-top: 1px solid #000;
-            padding-top: 5px;
+            padding-top: 4px;
         }
 
         .no-data {
             text-align: center;
             border: 1px solid #000;
-            padding: 40px;
+            padding: 30px;
             font-style: italic;
-            font-size: 12px;
-            margin-top: 20px;
+            font-size: 11px;
+            margin-top: 15px;
+        }
+
+        .summary {
+            margin-bottom: 8px;
+            padding: 6px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            font-size: 9px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            text-align: center;
+        }
+
+        .summary-item {
+            padding: 4px;
+        }
+
+        .summary-number {
+            font-weight: bold;
+            font-size: 11px;
+            display: block;
+        }
+
+        .summary-label {
+            font-size: 8px;
+            color: #666;
         }
     </style>
 </head>
@@ -138,25 +169,43 @@
 
     @if(isset($tenaga) && $tenaga->count() > 0)
     
-    <p style="text-align:center; font-size:10px; margin-bottom:8px;">
-        <strong>Total Data: {{ $tenaga->count() }} Tenaga Pendidik</strong>
-    </p>
+    <!-- SUMMARY STATISTIK -->
+    <div class="summary">
+        <div class="summary-grid">
+            <div class="summary-item">
+                <span class="summary-number">{{ $tenaga->count() }}</span>
+                <span class="summary-label">TOTAL TENAGA</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-number">{{ $tenaga->where('status_kepegawaian', 'PNS')->count() }}</span>
+                <span class="summary-label">PNS</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-number">{{ $tenaga->where('status_kepegawaian', 'Non PNS Tetap')->count() }}</span>
+                <span class="summary-label">NON PNS TETAP</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-number">{{ $tenaga->where('status_kepegawaian', 'Non PNS Tidak Tetap')->count() }}</span>
+                <span class="summary-label">NON PNS TIDAK TETAP</span>
+            </div>
+        </div>
+    </div>
 
     <table>
         <thead>
             <tr>
                 <th width="3%">NO</th>
-                <th width="17%">NAMA LENGKAP</th>
-                <th width="10%">NIP</th>
-                <th width="8%">STATUS</th>
+                <th width="15%">NAMA LENGKAP</th>
+                <th width="12%">POSISI/JABATAN</th>
+                <th width="8%">NIP</th>
+                <th width="10%">STATUS</th>
                 <th width="4%">JK</th>
-                <th width="13%">PROGRAM STUDI</th>
-                <th width="13%">FAKULTAS</th>
-                <th width="10%">TEMPAT LAHIR</th>
-                <th width="8%">TGL LAHIR</th>
-                <th width="8%">TMT KERJA</th>
-                <th width="13%">PENDIDIKAN</th>
-                <th width="12%">EMAIL</th>
+                <th width="10%">PROGRAM STUDI</th>
+                <th width="10%">FAKULTAS</th>
+                <th width="8%">TEMPAT LAHIR</th>
+                <th width="6%">TGL LAHIR</th>
+                <th width="6%">TMT KERJA</th>
+                <th width="8%">PENDIDIKAN</th>
             </tr>
         </thead>
         <tbody>
@@ -170,16 +219,26 @@
                         {{ $tendik->gelar_belakang ? ', ' . $tendik->gelar_belakang : '' }}
                     </strong>
                 </td>
-                <td>{{ $tendik->nip ?? '-' }}</td>
-                <td class="text-center">{{ $tendik->status_kepegawaian }}</td>
+                <td>{{ $tendik->jabatan_struktural ?? 'Umum' }}</td>
+                <td class="text-center">{{ $tendik->nip ?? '-' }}</td>
+                <td class="text-center">
+                    @if($tendik->status_kepegawaian == 'PNS')
+                        PNS
+                    @elseif($tendik->status_kepegawaian == 'Non PNS Tetap')
+                        NON PNS TETAP
+                    @elseif($tendik->status_kepegawaian == 'Non PNS Tidak Tetap')
+                        NON PNS TDK TETAP
+                    @else
+                        {{ $tendik->status_kepegawaian }}
+                    @endif
+                </td>
                 <td class="text-center">{{ $tendik->jenis_kelamin == 'laki-laki' ? 'L' : 'P' }}</td>
                 <td>{{ $tendik->prodi->nama_prodi ?? 'Umum' }}</td>
                 <td>{{ $tendik->prodi->fakultas->nama_fakultas ?? '-' }}</td>
                 <td>{{ $tendik->tempat_lahir ?? '-' }}</td>
                 <td class="text-center">{{ $tendik->tanggal_lahir ? \Carbon\Carbon::parse($tendik->tanggal_lahir)->format('d-m-Y') : '-' }}</td>
                 <td class="text-center">{{ $tendik->tmt_kerja ? \Carbon\Carbon::parse($tendik->tmt_kerja)->format('d-m-Y') : '-' }}</td>
-                <td>{{ $tendik->pendidikan_terakhir ?? '-' }}</td>
-                <td>{{ $tendik->email ?? '-' }}</td>
+                <td class="text-center">{{ $tendik->pendidikan_terakhir ?? '-' }}</td>
             </tr>
             @endforeach
         </tbody>
@@ -187,7 +246,7 @@
 
     <div class="footer">
         <strong>DOKUMEN RESMI - INSTITUT AGAMA ISLAM TASIKMALAYA</strong><br>
-        Sistem Informasi Akademik | Hal. 1
+        Sistem Informasi Akademik | Hal. 1 | Total: {{ $tenaga->count() }} Data
     </div>
 
     @else

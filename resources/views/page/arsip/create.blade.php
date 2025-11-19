@@ -9,35 +9,6 @@
 </head>
 <body class="bg-gray-50">
     <div class="min-h-screen">
-        <!-- Header/Navbar -->
-        <header class="bg-white shadow-sm">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 flex items-center">
-                            <i class="fas fa-archive text-blue-600 text-xl mr-2"></i>
-                            <span class="font-semibold text-xl text-gray-800">Sistem Arsip</span>
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <div class="ml-3 relative">
-                            <div class="flex items-center space-x-4">
-                                <a href="#" class="text-gray-600 hover:text-gray-900">
-                                    <i class="fas fa-bell"></i>
-                                </a>
-                                <div class="flex items-center">
-                                    <div class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium">
-                                        U
-                                    </div>
-                                    <span class="ml-2 text-gray-700 hidden sm:block">User</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header>
-
         <!-- Main Content -->
         <div class="py-6">
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -88,18 +59,6 @@
                             </select>
                         </div>
 
-                        {{-- 🔹 Program Studi --}}
-                        <div class="mb-4">
-                            <label class="block font-medium mb-1 text-sm sm:text-base">Program Studi (Opsional)</label>
-                            <select name="id_prodi" class="w-full border rounded px-3 py-2 text-sm sm:text-base">
-                                <option value="">-- Pilih Program Studi --</option>
-                                @foreach ($prodi as $p)
-                                    <option value="{{ $p->id }}" {{ old('id_prodi') == $p->id ? 'selected' : '' }}>
-                                        {{ $p->nama_prodi }} ({{ $p->fakultas->nama_fakultas }})
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
 
                         {{-- 🔹 Judul Dokumen --}}
                         <div class="mb-4">

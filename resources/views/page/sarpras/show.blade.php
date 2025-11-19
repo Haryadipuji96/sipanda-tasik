@@ -1,5 +1,5 @@
-<x-app-layout>
-     <x-slot name="title">{{ $sarpras->nama_barang ?? 'Detail Sarpras' }}</x-slot>
+{{-- <x-app-layout>
+    <x-slot name="title">{{ $sarpras->nama_barang ?? 'Detail Sarpras' }}</x-slot>
     <div class="py-6 px-6">
         <div class="max-w-6xl mx-auto">
             <!-- Header -->
@@ -15,7 +15,7 @@
                     <div class="flex justify-between items-center">
                         <h2 class="text-xl font-semibold text-white">{{ $sarpras->nama_barang }}</h2>
                         <span class="bg-green-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full">
-                            {{ $sarpras->kategori }}
+                            {{ $sarpras->kategori_barang }}
                         </span>
                     </div>
                 </div>
@@ -25,7 +25,7 @@
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <!-- Kolom Kiri -->
                         <div class="space-y-4">
-                            <h3 class="text-lg font-semibold text-gray-800 border-b pb-2">Informasi Utama</h3>
+                            <h3 class="text-lg font-semibold text-gray-800 border-b pb-2">Informasi Lokasi</h3>
 
                             <table class="w-full text-sm">
                                 <tbody class="divide-y divide-gray-200">
@@ -38,8 +38,57 @@
                                                     <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
                                                     {{ $sarpras->prodi->nama_prodi }}
                                                     <span class="text-gray-500 text-xs ml-2">
-                                                        ({{ $sarpras->prodi->fakultas->nama_fakultas }})
+                                                        ({{ $sarpras->prodi->fakultas->nama_fakultas ?? '-' }})
                                                     </span>
+                                                </span>
+                                            @else
+                                                <span class="text-gray-400">Unit Umum</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3 px-4 font-medium text-gray-700 bg-gray-50">Ruangan</td>
+                                        <td class="py-3 px-4">
+                                            <div class="font-medium">{{ $sarpras->nama_ruangan }}</div>
+                                            <div class="text-xs text-gray-500">{{ $sarpras->kategori_ruangan }}</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3 px-4 font-medium text-gray-700 bg-gray-50">Kategori Barang</td>
+                                        <td class="py-3 px-4">{{ $sarpras->kategori_barang }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3 px-4 font-medium text-gray-700 bg-gray-50">Merk Barang</td>
+                                        <td class="py-3 px-4">
+                                            {{ $sarpras->merk_barang ?? '-' }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Kolom Kanan -->
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-semibold text-gray-800 border-b pb-2">Informasi Barang</h3>
+
+                            <table class="w-full text-sm">
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="py-3 px-4 font-medium text-gray-700 bg-gray-50 w-1/3">Jumlah Barang
+                                        </td>
+                                        <td class="py-3 px-4">
+                                            <span
+                                                class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
+                                                {{ $sarpras->jumlah }} {{ $sarpras->satuan }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3 px-4 font-medium text-gray-700 bg-gray-50">Harga Barang</td>
+                                        <td class="py-3 px-4">
+                                            @if ($sarpras->harga)
+                                                <span class="font-semibold text-green-600">
+                                                    Rp {{ number_format($sarpras->harga, 0, ',', '.') }}
                                                 </span>
                                             @else
                                                 <span class="text-gray-400">-</span>
@@ -47,29 +96,17 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="py-3 px-4 font-medium text-gray-700 bg-gray-50">Kategori</td>
-                                        <td class="py-3 px-4">{{ $sarpras->kategori }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="py-3 px-4 font-medium text-gray-700 bg-gray-50">Jumlah Barang</td>
-                                        <td class="py-3 px-4">
-                                            <span
-                                                class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
-                                                {{ $sarpras->jumlah }} unit
-                                            </span>
-                                        </td>
-                                    </tr>
-                                    <tr>
                                         <td class="py-3 px-4 font-medium text-gray-700 bg-gray-50">Kondisi</td>
                                         <td class="py-3 px-4">
                                             @php
-                                                $kondisiColor =
-                                                    [
-                                                        'Baik' => 'bg-green-100 text-green-800',
-                                                        'Rusak Ringan' => 'bg-yellow-100 text-yellow-800',
-                                                        'Rusak Berat' => 'bg-red-100 text-red-800',
-                                                        'Perbaikan' => 'bg-orange-100 text-orange-800',
-                                                    ][$sarpras->kondisi] ?? 'bg-gray-100 text-gray-800';
+                                                $kondisiColor = match ($sarpras->kondisi) {
+                                                    'Baik Sekali' => 'bg-green-100 text-green-800',
+                                                    'Baik' => 'bg-green-100 text-green-800',
+                                                    'Cukup' => 'bg-yellow-100 text-yellow-800',
+                                                    'Rusak Ringan' => 'bg-orange-100 text-orange-800',
+                                                    'Rusak Berat' => 'bg-red-100 text-red-800',
+                                                    default => 'bg-gray-100 text-gray-800',
+                                                };
                                             @endphp
                                             <span class="px-2 py-1 rounded text-xs font-medium {{ $kondisiColor }}">
                                                 {{ $sarpras->kondisi }}
@@ -95,10 +132,13 @@
                                 </tbody>
                             </table>
                         </div>
+                    </div>
 
-                        <!-- Kolom Kanan -->
+                    <!-- Baris Kedua -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+                        <!-- Kolom Kiri -->
                         <div class="space-y-4">
-                            <h3 class="text-lg font-semibold text-gray-800 border-b pb-2">Informasi Tambahan</h3>
+                            <h3 class="text-lg font-semibold text-gray-800 border-b pb-2">Informasi Teknis</h3>
 
                             <table class="w-full text-sm">
                                 <tbody class="divide-y divide-gray-200">
@@ -111,12 +151,12 @@
                                         <td class="py-3 px-4 font-medium text-gray-700 bg-gray-50">Sumber Barang</td>
                                         <td class="py-3 px-4">
                                             @php
-                                                $sumberColor =
-                                                    [
-                                                        'HIBAH' => 'bg-purple-100 text-purple-800',
-                                                        'LEMBAGA' => 'bg-indigo-100 text-indigo-800',
-                                                        'YAYASAN' => 'bg-pink-100 text-pink-800',
-                                                    ][$sarpras->sumber] ?? 'bg-gray-100 text-gray-800';
+                                                $sumberColor = match ($sarpras->sumber) {
+                                                    'HIBAH' => 'bg-purple-100 text-purple-800',
+                                                    'LEMBAGA' => 'bg-indigo-100 text-indigo-800',
+                                                    'YAYASAN' => 'bg-pink-100 text-pink-800',
+                                                    default => 'bg-gray-100 text-gray-800',
+                                                };
                                             @endphp
                                             <span class="px-2 py-1 rounded text-xs font-medium {{ $sumberColor }}">
                                                 {{ $sarpras->sumber }}
@@ -149,18 +189,31 @@
                                         <td class="py-3 px-4 font-medium text-gray-700 bg-gray-50">File Dokumen</td>
                                         <td class="py-3 px-4">
                                             @if ($sarpras->file_dokumen)
-                                                <a href="{{ asset('dokumen_sarpras/' . $sarpras->file_dokumen) }}"
-                                                    target="_blank"
-                                                    class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium hover:bg-green-200 transition-colors">
-                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                                                        </path>
-                                                    </svg>
-                                                    Lihat Dokumen
-                                                </a>
+                                                @php
+                                                    $filePath = public_path(
+                                                        'dokumen_sarpras/' . $sarpras->file_dokumen,
+                                                    );
+                                                @endphp
+
+                                                @if (file_exists($filePath))
+                                                    <a href="{{ asset('dokumen_sarpras/' . $sarpras->file_dokumen) }}"
+                                                        target="_blank"
+                                                        class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium hover:bg-green-200 transition-colors">
+                                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                                            </path>
+                                                        </svg>
+                                                        Lihat Dokumen
+                                                    </a>
+                                                    <p class="text-xs text-gray-500 mt-1">{{ $sarpras->file_dokumen }}
+                                                    </p>
+                                                @else
+                                                    <span class="text-red-500 text-sm">File tidak ditemukan:
+                                                        {{ $sarpras->file_dokumen }}</span>
+                                                @endif
                                             @else
                                                 <span class="text-gray-400">Tidak ada file</span>
                                             @endif
@@ -169,36 +222,45 @@
                                 </tbody>
                             </table>
                         </div>
-                    </div>
 
-                    <!-- Spesifikasi -->
-                    <div class="mt-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-3">Spesifikasi Barang</h3>
-                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                            <p class="text-gray-700 leading-relaxed">{{ $sarpras->spesifikasi }}</p>
-                        </div>
-                    </div>
-
-                    <!-- Keterangan -->
-                    @if ($sarpras->keterangan)
-                        <div class="mt-4">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-3">Keterangan</h3>
-                            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                                <p class="text-gray-700 leading-relaxed">{{ $sarpras->keterangan }}</p>
+                        <!-- Kolom Kanan - Spesifikasi -->
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-semibold text-gray-800 border-b pb-2">Spesifikasi Barang</h3>
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                <p class="text-gray-700 leading-relaxed">{{ $sarpras->spesifikasi }}</p>
                             </div>
+
+                            <!-- Keterangan -->
+                            @if ($sarpras->keterangan)
+                                <h3 class="text-lg font-semibold text-gray-800 border-b pb-2">Keterangan</h3>
+                                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                                    <p class="text-gray-700 leading-relaxed">{{ $sarpras->keterangan }}</p>
+                                </div>
+                            @endif
                         </div>
-                    @endif
+                    </div>
                 </div>
 
-                <!-- Card Footer -->
+                <!-- Di dalam card footer, tambahkan button -->
                 <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
                     <div class="flex justify-between items-center">
                         <div class="text-sm text-gray-500">
-                            Terakhir diperbarui:
-                            {{ optional($sarpras->tanggal_pengadaan ? \Carbon\Carbon::parse($sarpras->tanggal_pengadaan) : null)->format('d F Y') }}
-
+                            Data dibuat: {{ $sarpras->created_at->format('d F Y H:i') }}
+                            @if ($sarpras->updated_at != $sarpras->created_at)
+                                | Diperbarui: {{ $sarpras->updated_at->format('d F Y H:i') }}
+                            @endif
                         </div>
                         <div class="flex space-x-3">
+                            <a href="{{ route('sarpras.ruangan.pdf', $sarpras->ruangan_id) }}"
+                                class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded text-sm flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                Download PDF Ruangan
+                            </a>
+
                             <a href="{{ route('sarpras.index') }}"
                                 class="text-sm text-blue-600 hover:text-blue-800 transition flex items-center space-x-1">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
@@ -206,7 +268,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M15 19l-7-7 7-7" />
                                 </svg>
-                                <span>Kembali</span>
+                                <span>Kembali ke Daftar</span>
                             </a>
                         </div>
                     </div>
@@ -214,4 +276,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</x-app-layout> --}}

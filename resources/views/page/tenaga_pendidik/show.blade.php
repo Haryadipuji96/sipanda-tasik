@@ -121,6 +121,26 @@
                     </div>
                 </div>
 
+                <!-- Tambahkan setelah section Data Pribadi -->
+                <div class="mb-6">
+                    <h2 class="text-lg font-semibold text-gray-700 mb-3 flex items-center">
+                        <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-medium">🏢 Posisi
+                            & Jabatan</span>
+                    </h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm border">
+                            <tr class="bg-gray-50">
+                                <td class="border px-4 py-3 font-medium w-1/4">Posisi/Jabatan Struktural</td>
+                                <td class="border px-4 py-3">{{ $tenagaPendidik->jabatan_struktural ?? '-' }}</td>
+                            </tr>
+                            <tr>
+                                <td class="border px-4 py-3 font-medium bg-gray-50">Program Studi</td>
+                                <td class="border px-4 py-3">{{ $tenagaPendidik->prodi->nama_prodi ?? '-' }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
                 <!-- KONTAK DAN ALAMAT -->
                 <div class="mb-6">
                     <h2 class="text-lg font-semibold text-gray-700 mb-3 flex items-center">
@@ -218,6 +238,60 @@
                         </table>
                     </div>
                 </div>
+
+                <!-- Tambahkan section untuk berkas yang diupload -->
+                @if ($tenagaPendidik->file_ktp || $tenagaPendidik->file_ijazah_s1 || $tenagaPendidik->file_kk)
+                    <div class="mb-6">
+                        <h2 class="text-lg font-semibold text-gray-700 mb-3 flex items-center">
+                            <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">📎
+                                Berkas Terlampir</span>
+                        </h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            @php
+                                $berkas = [
+                                    'file_ktp' => 'KTP',
+                                    'file_kk' => 'Kartu Keluarga (KK)',
+                                    'file_ijazah_s1' => 'Ijazah S1',
+                                    'file_transkrip_s1' => 'Transkrip Nilai S1',
+                                    'file_ijazah_s2' => 'Ijazah S2',
+                                    'file_transkrip_s2' => 'Transkrip Nilai S2',
+                                    'file_ijazah_s3' => 'Ijazah S3',
+                                    'file_transkrip_s3' => 'Transkrip Nilai S3',
+                                    'file_perjanjian_kerja' => 'Perjanjian Kerja',
+                                    'file_sk' => 'Surat Keputusan (SK)',
+                                    'file_surat_tugas' => 'Surat Tugas',
+                                ];
+                            @endphp
+
+                            @foreach ($berkas as $field => $label)
+                                @if ($tenagaPendidik->$field)
+                                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-3">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500"
+                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                </svg>
+                                                <div>
+                                                    <p class="font-medium text-gray-800 text-sm">{{ $label }}
+                                                    </p>
+                                                    <p class="text-xs text-gray-600">{{ $tenagaPendidik->$field }}</p>
+                                                </div>
+                                            </div>
+                                            <a href="{{ asset('dokumen_tendik/' . $tenagaPendidik->$field) }}"
+                                                target="_blank"
+                                                class="inline-flex items-center px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition">
+                                                Lihat
+                                            </a>
+                                        </div>
+                                    </div>
+                                @endif
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
 
                 <!-- DOKUMEN -->
                 @if ($tenagaPendidik->file)

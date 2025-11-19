@@ -4,33 +4,27 @@ namespace App\Http\Controllers;
 
 use App\Models\Arsip;
 use App\Models\KategoriArsip;
-use App\Models\Prodi;
 use Illuminate\Http\Request;
 // 👇 TAMBAHKAN 3 BARIS INI
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ArsipExport;
 
-
 class ArsipController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Arsip::with(['kategori', 'prodi'])->oldest();
+        $query = Arsip::with(['kategori'])->oldest();
 
         if ($search = $request->search) {
             $query->where('judul_dokumen', 'like', "%{$search}%")
                 ->orWhereHas('kategori', function ($q) use ($search) {
                     $q->where('nama_kategori', 'like', "%{$search}%");
-                })
-                ->orWhereHas('prodi', function ($q) use ($search) {
-                    $q->where('nama_prodi', 'like', "%{$search}%");
                 });
         }
 
         $arsip = $query->paginate(15);
         $kategori = KategoriArsip::all();
-        $prodi = Prodi::with('fakultas')->get();
 
         if ($request->ajax()) {
             // return data JSON untuk live search
@@ -39,27 +33,24 @@ class ArsipController extends Controller
                     'id' => $item->id,
                     'judul_dokumen' => $item->judul_dokumen,
                     'kategori' => $item->kategori->nama_kategori ?? null,
-                    'prodi' => $item->prodi->nama_prodi ?? null,
                 ];
             });
             return response()->json($results);
         }
 
-        return view('page.arsip.index', compact('arsip', 'kategori', 'prodi'));
+        return view('page.arsip.index', compact('arsip', 'kategori'));
     }
 
     public function create()
     {
         $kategori = KategoriArsip::all();
-        $prodi = Prodi::with('fakultas')->get();
-        return view('page.arsip.create', compact('kategori', 'prodi'));
+        return view('page.arsip.create', compact('kategori'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'id_kategori' => 'required|exists:kategori_arsip,id',
-            'id_prodi' => 'required|exists:prodi,id',
             'judul_dokumen' => 'required|string|max:255',
             'nomor_dokumen' => 'nullable|string|max:100',
             'tanggal_dokumen' => 'nullable|date',
@@ -89,7 +80,6 @@ class ArsipController extends Controller
 
         $request->validate([
             'id_kategori' => 'required|exists:kategori_arsip,id',
-            'id_prodi' => 'required|exists:prodi,id',
             'judul_dokumen' => 'required|string|max:255',
             'nomor_dokumen' => 'nullable|string|max:100',
             'tanggal_dokumen' => 'nullable|date',
@@ -161,7 +151,7 @@ class ArsipController extends Controller
      */
     public function previewAllPdf(Request $request)
     {
-        $query = Arsip::with(['kategori', 'prodi.fakultas']);
+        $query = Arsip::with(['kategori']);
 
         // Filter berdasarkan pencarian jika ada
         if ($request->has('search') && $request->search != '') {
@@ -170,9 +160,6 @@ class ArsipController extends Controller
                 $q->where('judul_dokumen', 'like', "%{$search}%")
                     ->orWhere('nomor_dokumen', 'like', "%{$search}%")
                     ->orWhere('keterangan', 'like', "%{$search}%")
-                    ->orWhereHas('prodi', function ($q) use ($search) {
-                        $q->where('nama_prodi', 'like', "%{$search}%");
-                    })
                     ->orWhereHas('kategori', function ($q) use ($search) {
                         $q->where('nama_kategori', 'like', "%{$search}%");
                     });
@@ -183,13 +170,6 @@ class ArsipController extends Controller
         if ($request->has('kategori') && $request->kategori != '') {
             $query->whereHas('kategori', function ($q) use ($request) {
                 $q->where('nama_kategori', $request->kategori);
-            });
-        }
-
-        // Filter berdasarkan prodi jika ada
-        if ($request->has('prodi') && $request->prodi != '') {
-            $query->whereHas('prodi', function ($q) use ($request) {
-                $q->where('nama_prodi', $request->prodi);
             });
         }
 
@@ -199,10 +179,9 @@ class ArsipController extends Controller
         }
 
         $arsip = $query->orderBy('judul_dokumen')->get();
-        $prodi = Prodi::with('fakultas')->get();
         $kategori = KategoriArsip::all();
 
-        return view('page.arsip.laporan.preview', compact('arsip', 'prodi', 'kategori'));
+        return view('page.arsip.laporan.preview', compact('arsip', 'kategori'));
     }
 
     /**
@@ -210,7 +189,7 @@ class ArsipController extends Controller
      */
     public function downloadAllPdf(Request $request)
     {
-        $query = Arsip::with(['kategori', 'prodi.fakultas']);
+        $query = Arsip::with(['kategori']);
 
         // Filter berdasarkan pencarian jika ada
         if ($request->has('search') && $request->search != '') {
@@ -219,9 +198,6 @@ class ArsipController extends Controller
                 $q->where('judul_dokumen', 'like', "%{$search}%")
                     ->orWhere('nomor_dokumen', 'like', "%{$search}%")
                     ->orWhere('keterangan', 'like', "%{$search}%")
-                    ->orWhereHas('prodi', function ($q) use ($search) {
-                        $q->where('nama_prodi', 'like', "%{$search}%");
-                    })
                     ->orWhereHas('kategori', function ($q) use ($search) {
                         $q->where('nama_kategori', 'like', "%{$search}%");
                     });
@@ -232,13 +208,6 @@ class ArsipController extends Controller
         if ($request->has('kategori') && $request->kategori != '') {
             $query->whereHas('kategori', function ($q) use ($request) {
                 $q->where('nama_kategori', $request->kategori);
-            });
-        }
-
-        // Filter berdasarkan prodi jika ada
-        if ($request->has('prodi') && $request->prodi != '') {
-            $query->whereHas('prodi', function ($q) use ($request) {
-                $q->where('nama_prodi', $request->prodi);
             });
         }
 

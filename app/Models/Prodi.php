@@ -22,6 +22,20 @@ class Prodi extends Model
     // Relasi ke fakultas
     public function fakultas()
     {
-        return $this->belongsTo(Fakultas::class, 'id_fakultas', 'id');
+        return $this->belongsTo(Fakultas::class, 'id_fakultas');
     }
+
+    // Relasi ke ruangan
+    public function ruangan()
+    {
+        return $this->hasMany(Ruangan::class, 'id_prodi');
+    }
+
+    // Relasi ke sarpras
+    public function sarpras()
+    {
+        return $this->hasMany(DataSarpras::class, 'id_prodi');
+    }
+
+    
 }

@@ -13,7 +13,6 @@ class Arsip extends Model
     protected $primaryKey = 'id';
     protected $fillable = [
         'id_kategori',
-        'id_prodi',
         'judul_dokumen',
         'nomor_dokumen',
         'tanggal_dokumen',
@@ -25,11 +24,6 @@ class Arsip extends Model
     public function kategori()
     {
         return $this->belongsTo(KategoriArsip::class, 'id_kategori', 'id');
-    }
-
-    public function prodi()
-    {
-        return $this->belongsTo(Prodi::class, 'id_prodi', 'id');
     }
 
 }

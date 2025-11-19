@@ -11,8 +11,10 @@ use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 
-class SarprasExport implements FromCollection, WithHeadings, WithMapping, WithStyles, WithColumnWidths
+class SarprasExport implements FromCollection, WithHeadings, WithMapping, WithStyles, WithColumnWidths, WithColumnFormatting
 {
     protected $search;
     protected $kondisi;
@@ -28,17 +30,21 @@ class SarprasExport implements FromCollection, WithHeadings, WithMapping, WithSt
      */
     public function collection()
     {
-        $query = DataSarpras::with('prodi.fakultas');
+        $query = DataSarpras::with(['prodi.fakultas', 'ruangan']);
 
         // Filter berdasarkan pencarian jika ada
         if (!empty($this->search)) {
             $search = $this->search;
             $query->where(function($q) use ($search) {
                 $q->where('nama_barang', 'like', "%{$search}%")
-                  ->orWhere('kategori', 'like', "%{$search}%")
+                  ->orWhere('kategori_barang', 'like', "%{$search}%")
+                  ->orWhere('merk_barang', 'like', "%{$search}%")
                   ->orWhere('kode_seri', 'like', "%{$search}%")
                   ->orWhereHas('prodi', function($q) use ($search) {
                       $q->where('nama_prodi', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('ruangan', function($q) use ($search) {
+                      $q->where('nama_ruangan', 'like', "%{$search}%");
                   });
             });
         }
@@ -60,9 +66,14 @@ class SarprasExport implements FromCollection, WithHeadings, WithMapping, WithSt
             'No',
             'Program Studi',
             'Fakultas',
+            'Ruangan',
+            'Kategori Ruangan',
             'Nama Barang',
-            'Kategori',
+            'Kategori Barang',
+            'Merk Barang',
             'Jumlah',
+            'Satuan',
+            'Harga (Rp)',
             'Kondisi',
             'Tanggal Pengadaan',
             'Spesifikasi',
@@ -83,48 +94,34 @@ class SarprasExport implements FromCollection, WithHeadings, WithMapping, WithSt
 
         return [
             $no,
-            $sarpras->prodi->nama_prodi ?? 'Umum',
+            $sarpras->prodi->nama_prodi ?? 'Unit Umum',
             $sarpras->prodi->fakultas->nama_fakultas ?? '-',
+            $sarpras->nama_ruangan,
+            $sarpras->kategori_ruangan,
             $sarpras->nama_barang,
-            $sarpras->kategori,
+            $sarpras->kategori_barang,
+            $sarpras->merk_barang ?? '-',
             $sarpras->jumlah,
-            $this->getKondisiLabel($sarpras->kondisi),
+            $sarpras->satuan,
+            $sarpras->harga ?: 0,
+            $sarpras->kondisi,
             $sarpras->tanggal_pengadaan ? \Carbon\Carbon::parse($sarpras->tanggal_pengadaan)->format('d-m-Y') : '-',
             $sarpras->spesifikasi,
             $sarpras->kode_seri,
-            $this->getSumberLabel($sarpras->sumber),
+            $sarpras->sumber,
             $sarpras->keterangan ?? '-',
             $sarpras->lokasi_lain ?? '-'
         ];
     }
 
     /**
-     * Konversi nilai kondisi ke label yang lebih readable
+     * Format kolom
      */
-    private function getKondisiLabel($kondisi)
+    public function columnFormats(): array
     {
-        $labels = [
-            'baik' => 'Baik',
-            'rusak_ringan' => 'Rusak Ringan',
-            'rusak_berat' => 'Rusak Berat',
-            'perbaikan' => 'Dalam Perbaikan'
+        return [
+            'K' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Format harga
         ];
-
-        return $labels[$kondisi] ?? $kondisi;
-    }
-
-    /**
-     * Konversi nilai sumber ke label yang lebih readable
-     */
-    private function getSumberLabel($sumber)
-    {
-        $labels = [
-            'HIBAH' => 'Hibah',
-            'LEMBAGA' => 'Lembaga',
-            'YAYASAN' => 'Yayasan'
-        ];
-
-        return $labels[$sumber] ?? $sumber;
     }
 
     /**
@@ -136,16 +133,21 @@ class SarprasExport implements FromCollection, WithHeadings, WithMapping, WithSt
             'A' => 5,   // No
             'B' => 20,  // Program Studi
             'C' => 20,  // Fakultas
-            'D' => 30,  // Nama Barang
-            'E' => 15,  // Kategori
-            'F' => 8,   // Jumlah
-            'G' => 12,  // Kondisi
-            'H' => 15,  // Tanggal Pengadaan
-            'I' => 40,  // Spesifikasi
-            'J' => 20,  // Kode Seri
-            'K' => 12,  // Sumber
-            'L' => 25,  // Keterangan
-            'M' => 20,  // Lokasi Lain
+            'D' => 20,  // Ruangan
+            'E' => 15,  // Kategori Ruangan
+            'F' => 25,  // Nama Barang
+            'G' => 15,  // Kategori Barang
+            'H' => 15,  // Merk Barang
+            'I' => 8,   // Jumlah
+            'J' => 8,   // Satuan
+            'K' => 15,  // Harga
+            'L' => 12,  // Kondisi
+            'M' => 15,  // Tanggal Pengadaan
+            'N' => 40,  // Spesifikasi
+            'O' => 20,  // Kode Seri
+            'P' => 12,  // Sumber
+            'Q' => 25,  // Keterangan
+            'R' => 20,  // Lokasi Lain
         ];
     }
 
@@ -155,7 +157,7 @@ class SarprasExport implements FromCollection, WithHeadings, WithMapping, WithSt
     public function styles(Worksheet $sheet)
     {
         // Style untuk header (baris 1)
-        $sheet->getStyle('A1:M1')->applyFromArray([
+        $sheet->getStyle('A1:R1')->applyFromArray([
             'font' => [
                 'bold' => true, 
                 'size' => 11,
@@ -179,19 +181,37 @@ class SarprasExport implements FromCollection, WithHeadings, WithMapping, WithSt
         ]);
 
         // Style untuk data
-        $sheet->getStyle('A2:M' . ($sheet->getHighestRow()))
+        $sheet->getStyle('A2:R' . ($sheet->getHighestRow()))
               ->getAlignment()
               ->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP)
               ->setWrapText(true);
 
+        // Style khusus untuk kolom harga (rata kanan)
+        $sheet->getStyle('K2:K' . ($sheet->getHighestRow()))
+              ->getAlignment()
+              ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+
+        // Style khusus untuk kolom jumlah (rata tengah)
+        $sheet->getStyle('I2:I' . ($sheet->getHighestRow()))
+              ->getAlignment()
+              ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+        // Style khusus untuk kolom kondisi (rata tengah)
+        $sheet->getStyle('L2:L' . ($sheet->getHighestRow()))
+              ->getAlignment()
+              ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
         // Border untuk semua data
-        $sheet->getStyle('A1:M' . ($sheet->getHighestRow()))
+        $sheet->getStyle('A1:R' . ($sheet->getHighestRow()))
               ->getBorders()
               ->getAllBorders()
               ->setBorderStyle(Border::BORDER_THIN);
 
         // Auto filter
-        $sheet->setAutoFilter('A1:M' . ($sheet->getHighestRow()));
+        $sheet->setAutoFilter('A1:R' . ($sheet->getHighestRow()));
+
+        // Freeze panes (header tetap terlihat saat scroll)
+        $sheet->freezePane('A2');
 
         return [
             1 => [

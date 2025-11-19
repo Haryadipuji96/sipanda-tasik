@@ -120,32 +120,24 @@
             margin: 3px 0;
         }
 
-        /* === STATUS BADGE === */
-        .status-badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 10pt;
-            font-weight: bold;
-            text-align: center;
+        /* === BERKAS LIST === */
+        .berkas-list {
+            margin: 10px 0;
+            padding-left: 20px;
         }
 
-        .status-pns {
-            background-color: #d4edda;
+        .berkas-item {
+            margin-bottom: 5px;
+            font-size: 11pt;
+        }
+
+        .berkas-ada {
             color: #155724;
-            border: 1px solid #c3e6cb;
         }
 
-        .status-honorer {
-            background-color: #fff3cd;
+        .berkas-tidak-ada {
             color: #856404;
-            border: 1px solid #ffeaa7;
-        }
-
-        .status-kontrak {
-            background-color: #cce7ff;
-            color: #004085;
-            border: 1px solid #b3d7ff;
+            font-style: italic;
         }
     </style>
 </head>
@@ -179,30 +171,16 @@
             </td>
         </tr>
         <tr>
+            <td>Posisi/Jabatan Struktural</td>
+            <td>{{ $tenagaPendidik->jabatan_struktural ?? '-' }}</td>
+        </tr>
+        <tr>
             <td>Program Studi</td>
             <td>{{ $tenagaPendidik->prodi->nama_prodi ?? '-' }}</td>
         </tr>
         <tr>
             <td>Status Kepegawaian</td>
-            <td class="text-center">
-                @if (isset($isPdf) && $isPdf)
-                    {{-- Versi PDF: hanya teks biasa (hitam putih) --}}
-                    {{ $tenagaPendidik->status_kepegawaian ?? '-' }}
-                @else
-                    {{-- Versi web: badge hitam putih --}}
-                    @if ($tenagaPendidik->status_kepegawaian == 'PNS')
-                        <span class="status-badge">PNS</span>
-                    @elseif($tenagaPendidik->status_kepegawaian == 'Honorer')
-                        <span class="status-badge">HONORER</span>
-                    @elseif($tenagaPendidik->status_kepegawaian == 'Kontrak')
-                        <span class="status-badge">KONTRAK</span>
-                    @else
-                        -
-                    @endif
-                @endif
-            </td>
-
-
+            <td>{{ $tenagaPendidik->status_kepegawaian ?? '-' }}</td>
         </tr>
         <tr>
             <td>Jenis Kelamin</td>
@@ -231,6 +209,10 @@
         <tr>
             <td>NIP/NIK</td>
             <td>{{ $tenagaPendidik->nip ?? '-' }}</td>
+        </tr>
+        <tr>
+            <td>Pendidikan Terakhir</td>
+            <td>{{ $tenagaPendidik->pendidikan_terakhir ?? '-' }}</td>
         </tr>
     </table>
 
@@ -287,6 +269,38 @@
             @endforelse
         </tbody>
     </table>
+
+    <!-- BERKAS DOKUMEN -->
+    <div class="section-title">BERKAS DOKUMEN</div>
+    <div class="berkas-list">
+        @php
+            $berkasFields = [
+                'file_ktp' => 'KTP',
+                'file_kk' => 'Kartu Keluarga (KK)',
+                'file_ijazah_s1' => 'Ijazah S1',
+                'file_transkrip_s1' => 'Transkrip Nilai S1',
+                'file_ijazah_s2' => 'Ijazah S2',
+                'file_transkrip_s2' => 'Transkrip Nilai S2',
+                'file_ijazah_s3' => 'Ijazah S3',
+                'file_transkrip_s3' => 'Transkrip Nilai S3',
+                'file_perjanjian_kerja' => 'Perjanjian Kerja',
+                'file_sk' => 'Surat Keputusan (SK)',
+                'file_surat_tugas' => 'Surat Tugas',
+                'file' => 'Dokumen Lainnya'
+            ];
+        @endphp
+        
+        @foreach($berkasFields as $field => $label)
+            <div class="berkas-item {{ $tenagaPendidik->$field ? 'berkas-ada' : 'berkas-tidak-ada' }}">
+                • {{ $label }}: 
+                @if($tenagaPendidik->$field)
+                    <strong>Tersedia</strong>
+                @else
+                    <em>Belum diupload</em>
+                @endif
+            </div>
+        @endforeach
+    </div>
 
     <!-- KETERANGAN -->
     @if ($tenagaPendidik->keterangan)

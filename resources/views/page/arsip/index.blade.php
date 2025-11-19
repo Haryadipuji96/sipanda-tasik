@@ -86,7 +86,7 @@
             @endcanSuperadmin
         </div>
 
-        <x-search-bar route="arsip.index" placeholder="Cari judul / kategori / prodi..." />
+        <x-search-bar route="arsip.index" placeholder="Cari judul / kategori..." />
 
 
         <!-- Letakkan setelah button "Hapus Terpilih" dan sebelum tabel -->
@@ -103,7 +103,7 @@
             <!-- Export Buttons -->
             <div class="order-1 sm:order-2 flex gap-2">
                 <!-- Button Preview PDF -->
-                <a href="{{ route('arsip.preview-all.pdf', request()->query()) }}" target="_blank"
+                <a href="{{ route('arsip.preview-all.pdf', request()->query()) }}"
                     class="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm rounded-full font-medium text-white bg-orange-600 hover:bg-orange-700 transition text-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
@@ -146,7 +146,7 @@
                         <th class="border px-3 py-2 text-left">Tanggal</th>
                         <th class="border px-3 py-2 text-left">Tahun</th>
                         <th class="border px-3 py-2 text-left">Kategori</th>
-                        <th class="border px-3 py-2 text-left">Program Studi</th>
+                       
                         <th class="border px-3 py-2 text-left">Keterangan</th>
                         <th class="border px-3 py-2 text-center">File</th>
                         <th class="border px-3 py-2 text-center w-32">Aksi</th>
@@ -183,7 +183,7 @@
                             </td>
                             <td class="border px-3 py-2 text-center">{{ $a->tahun ?? '-' }}</td>
                             <td class="border px-3 py-2">{!! highlight($a->kategori->nama_kategori ?? '-', request('search')) !!}</td>
-                            <td class="border px- 3py-2">{!! highlight($a->prodi->nama_prodi ?? '-', request('search')) !!}</td>
+                            
                             <td class="border px-3 py-2">{{ $a->keterangan ?? '-' }}</td>
 
                             <td class="border px-4 py-2 text-center">
@@ -266,25 +266,7 @@
                                                         </select>
                                                     </div>
 
-                                                    {{-- Prodi --}}
-                                                    <div class="mb-4">
-                                                        <label class="block font-medium mb-1 text-start">Program
-                                                            Studi</label>
-                                                        <select name="id_prodi"
-                                                            class="w-full border rounded px-3 py-2">
-                                                            <option value="">-- Pilih Prodi --</option>
-                                                            @foreach ($prodi as $p)
-                                                                <option value="{{ $p->id }}"
-                                                                    {{ $p->id == $a->id_prodi ? 'selected' : '' }}>
-                                                                    {{ $p->nama_prodi }}
-                                                                    ({{ $p->fakultas->nama_fakultas }})
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-
-
-
+                                                
                                                     {{-- Judul --}}
                                                     <div class="mb-4">
                                                         <label class="block font-medium mb-1 text-start">Judul

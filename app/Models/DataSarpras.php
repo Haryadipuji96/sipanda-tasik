@@ -9,14 +9,15 @@ class DataSarpras extends Model
 {
     use HasFactory;
 
-    protected $table = 'data_sarpras';
-    protected $primaryKey = 'id';
-
     protected $fillable = [
         'id_prodi',
+        'ruangan_id', // Ubah dari 'ruangan_id' menjadi 'id_ruangan' untuk konsistensi
+        'nama_ruangan',
         'nama_barang',
-        'kategori',
+        'merk_barang',
         'jumlah',
+        'satuan',
+        'kategori_barang',
         'kondisi',
         'tanggal_pengadaan',
         'spesifikasi',
@@ -25,10 +26,21 @@ class DataSarpras extends Model
         'keterangan',
         'file_dokumen',
         'lokasi_lain',
+        'harga', 
+    ];
+
+    protected $casts = [
+        'tanggal_pengadaan' => 'date',
+        'jumlah' => 'integer'
     ];
 
     public function prodi()
     {
-        return $this->belongsTo(Prodi::class, 'id_prodi', 'id');
+        return $this->belongsTo(Prodi::class, 'id_prodi');
+    }
+
+    public function ruangan()
+    {
+        return $this->belongsTo(Ruangan::class, 'ruangan_id'); // Sesuaikan dengan kolom di database
     }
 }
