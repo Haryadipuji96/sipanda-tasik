@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Permission;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 
+
 class RegisteredUserController extends Controller
 {
     /**
@@ -19,8 +21,13 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        $users = User::latest()->paginate(10);
-        return view('auth.register', compact('users'));
+        if (!Auth::user()->canCrud('users')) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $users = User::with('permissions')->latest()->paginate(10);
+        $permissions = Permission::all();
+        return view('auth.register', compact('users', 'permissions'));
     }
 
     /**
@@ -28,11 +35,17 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        if (!Auth::user()->canCrud('users')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'role' => ['required', 'string', 'in:superadmin,admin'],
+            'role' => ['required', 'string', 'in:superadmin,admin,user'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'permissions' => ['nullable', 'array'],
+            'permissions.*' => ['exists:permissions,id'],
         ]);
 
         $user = User::create([
@@ -42,9 +55,13 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        // Attach permissions untuk admin
+        if ($request->role === 'admin' && $request->has('permissions')) {
+            $user->permissions()->sync($request->permissions);
+        }
+
         event(new Registered($user));
 
-        // Tidak auto login, tetap di halaman register
         return redirect()->route('register')->with('success', 'Pengguna berhasil ditambahkan!');
     }
 
@@ -53,15 +70,25 @@ class RegisteredUserController extends Controller
      */
     public function update(Request $request, User $user): RedirectResponse
     {
+        if (!Auth::user()->canCrud('users')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email,' . $user->id],
-            'role' => ['required', 'string', 'in:superadmin,admin'],
+            'role' => ['required', 'string', 'in:superadmin,admin,user'],
         ];
 
         // Only validate password if provided
         if ($request->filled('password')) {
             $rules['password'] = ['required', 'confirmed', Rules\Password::defaults()];
+        }
+
+        // Validasi permissions hanya untuk role admin
+        if ($request->role === 'admin') {
+            $rules['permissions'] = ['required', 'array', 'min:1'];
+            $rules['permissions.*'] = ['exists:permissions,id'];
         }
 
         $validated = $request->validate($rules);
@@ -76,6 +103,14 @@ class RegisteredUserController extends Controller
 
         $user->save();
 
+        // Update permissions untuk admin
+        if ($request->role === 'admin') {
+            $user->permissions()->sync($request->permissions);
+        } else {
+            // Hapus permissions jika role bukan admin
+            $user->permissions()->detach();
+        }
+
         return redirect()->route('register')->with('success', 'Pengguna berhasil diupdate!');
     }
 
@@ -84,6 +119,10 @@ class RegisteredUserController extends Controller
      */
     public function destroy(User $user): RedirectResponse
     {
+        if (!Auth::user()->canCrud('users')) {
+            abort(403, 'Unauthorized action.');
+        }
+        
         // Prevent deleting own account
         if (Auth::id() === $user->id) {
             return redirect()->route('register')->with('error', 'Anda tidak dapat menghapus akun sendiri!');

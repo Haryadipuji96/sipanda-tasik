@@ -8,11 +8,16 @@ use App\Models\Prodi;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Auth;
 
 class TenagaPendidikController extends Controller
 {
     public function index(Request $request)
     {
+        if (!Auth::user()->hasPermission('tenaga-pendidik')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $query = TenagaPendidik::with('prodi.fakultas')->oldest();
 
         if ($search = $request->search) {
@@ -33,6 +38,15 @@ class TenagaPendidikController extends Controller
 
     public function create()
     {
+         if (!Auth::user()->canCrud('tenaga-pendidik')) {
+            abort(403, 'Unauthorized action.');
+        }
+
+
+        if (!Auth::user()->canCrud('tenaga-pendidik')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $prodi = Prodi::with('fakultas')->get();
         $jabatanOptions = TenagaPendidik::getJabatanStrukturalOptions(); // OPTION BARU
         return view('page.tenaga_pendidik.create', compact('prodi', 'jabatanOptions'));
@@ -40,6 +54,15 @@ class TenagaPendidikController extends Controller
 
     public function store(Request $request)
     {
+         if (!Auth::user()->canCrud('tenaga-pendidik')) {
+            abort(403, 'Unauthorized action.');
+        }
+
+
+        if (!Auth::user()->canCrud('tenaga-pendidik')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $request->validate([
             'id_prodi' => 'nullable|exists:prodi,id', // UBAH MENJADI NULLABLE
             'nama_tendik' => 'required|string|max:255',
@@ -146,6 +169,15 @@ class TenagaPendidikController extends Controller
 
     public function edit($id)
     {
+         if (!Auth::user()->canCrud('tenaga-pendidik')) {
+            abort(403, 'Unauthorized action.');
+        }
+
+
+        if (!Auth::user()->canCrud('tenaga-pendidik')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $tenagaPendidik = TenagaPendidik::findOrFail($id);
         $prodi = Prodi::with('fakultas')->get();
         $jabatanOptions = TenagaPendidik::getJabatanStrukturalOptions(); // OPTION BARU
@@ -154,6 +186,15 @@ class TenagaPendidikController extends Controller
 
     public function update(Request $request, $id)
     {
+         if (!Auth::user()->canCrud('tenaga-pendidik')) {
+            abort(403, 'Unauthorized action.');
+        }
+
+
+        if (!Auth::user()->canCrud('tenaga-pendidik')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $tenagaPendidik = TenagaPendidik::findOrFail($id);
 
         $request->validate([
@@ -266,6 +307,15 @@ class TenagaPendidikController extends Controller
     // Hanya perlu menambahkan penghapusan file berkas baru
     public function destroy($id)
     {
+         if (!Auth::user()->canCrud('tenaga-pendidik')) {
+            abort(403, 'Unauthorized action.');
+        }
+
+
+        if (!Auth::user()->canCrud('tenaga-pendidik')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $tenagaPendidik = TenagaPendidik::findOrFail($id);
 
         // Hapus file utama
@@ -301,6 +351,11 @@ class TenagaPendidikController extends Controller
 
     public function deleteSelected(Request $request)
     {
+         if (!Auth::user()->canCrud('tenaga-pendidik')) {
+            abort(403, 'Unauthorized action.');
+        }
+
+
         $ids = $request->selected_tendik;
 
         if ($ids) {
@@ -318,6 +373,7 @@ class TenagaPendidikController extends Controller
         return redirect()->route('tenaga-pendidik.index')->with('success', 'Data tenaga pendidik terpilih berhasil dihapus.');
     }
 
+    // DI CONTROLLER - PERBAIKI METHOD INI
     public function previewAllPdf(Request $request)
     {
         $query = TenagaPendidik::with('prodi.fakultas');
@@ -329,6 +385,7 @@ class TenagaPendidikController extends Controller
                 $q->where('nama_tendik', 'like', "%{$search}%")
                     ->orWhere('nip', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('jabatan_struktural', 'like', "%{$search}%")
                     ->orWhereHas('prodi', function ($q) use ($search) {
                         $q->where('nama_prodi', 'like', "%{$search}%");
                     });
@@ -348,7 +405,7 @@ class TenagaPendidikController extends Controller
         $tenaga = $query->orderBy('nama_tendik')->get();
         $prodi = Prodi::with('fakultas')->get();
 
-        // Gunakan file preview-all-pdf.blade.php yang baru
+        // PERBAIKAN: Gunakan file preview.blade.php yang sudah ada
         return view('page.tenaga_pendidik.laporan.preview', compact('tenaga', 'prodi'));
     }
 
@@ -366,6 +423,7 @@ class TenagaPendidikController extends Controller
                 $q->where('nama_tendik', 'like', "%{$search}%")
                     ->orWhere('nip', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('jabatan_struktural', 'like', "%{$search}%")
                     ->orWhereHas('prodi', function ($q) use ($search) {
                         $q->where('nama_prodi', 'like', "%{$search}%");
                     });
@@ -374,12 +432,13 @@ class TenagaPendidikController extends Controller
 
         $tenaga = $query->orderBy('nama_tendik')->get();
 
-        // PERBAIKAN: Hapus spasi dari nama view
+        // PERBAIKAN: Gunakan view yang benar - pdf-all.blade.php
         $pdf = Pdf::loadView('page.tenaga_pendidik.pdf-all', compact('tenaga'))
             ->setPaper('a4', 'landscape');
 
         return $pdf->download('Data_Tenaga_Pendidik_' . date('Y-m-d_His') . '.pdf');
     }
+
 
     /**
      * Export ke Excel - Download data tendik dalam format Excel
@@ -405,6 +464,7 @@ class TenagaPendidikController extends Controller
     {
         $tenagaPendidik = TenagaPendidik::with('prodi.fakultas')->findOrFail($id);
 
+        // PERBAIKAN: Gunakan view yang benar - pdf.blade.php
         $pdf = Pdf::loadView('page.tenaga_pendidik.pdf', compact('tenagaPendidik'))
             ->setPaper('a4', 'portrait');
 
@@ -418,6 +478,7 @@ class TenagaPendidikController extends Controller
     {
         $tenagaPendidik = TenagaPendidik::with('prodi.fakultas')->findOrFail($id);
 
+        // PERBAIKAN: Gunakan view yang benar - pdf.blade.php
         $pdf = Pdf::loadView('page.tenaga_pendidik.pdf', compact('tenagaPendidik'))
             ->setPaper('a4', 'portrait');
 

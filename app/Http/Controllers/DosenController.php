@@ -8,11 +8,16 @@ use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\DosenExport;
+use Illuminate\Support\Facades\Auth;
 
 class DosenController extends Controller
 {
     public function index(Request $request)
     {
+        if (!Auth::user()->hasPermission('dosen')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $query = Dosen::with('prodi.fakultas');
 
         if ($search = $request->search) {
@@ -37,12 +42,20 @@ class DosenController extends Controller
 
     public function create()
     {
+         if (!Auth::user()->canCrud('dosen')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $prodi = Prodi::with('fakultas')->get();
         return view('page.dosen.create', compact('prodi'));
     }
 
     public function store(Request $request)
     {
+         if (!Auth::user()->canCrud('dosen')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $request->validate([
             'id_prodi' => 'required|exists:prodi,id',
             'gelar_depan' => 'nullable|string|max:50',
@@ -153,12 +166,20 @@ class DosenController extends Controller
 
     public function show($id)
     {
+       if (!Auth::user()->hasPermission('dosen')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $dosen = Dosen::with('prodi.fakultas')->findOrFail($id);
         return view('page.dosen.show', compact('dosen'));
     }
 
     public function update(Request $request, $id)
     {
+         if (!Auth::user()->canCrud('dosen')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $dosen = Dosen::findOrFail($id);
 
         $request->validate([
@@ -278,6 +299,10 @@ class DosenController extends Controller
 
     public function destroy($id)
     {
+         if (!Auth::user()->canCrud('dosen')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $dosen = Dosen::findOrFail($id);
 
         // Hapus semua file yang terkait
@@ -315,6 +340,10 @@ class DosenController extends Controller
 
     public function deleteSelected(Request $request)
     {
+         if (!Auth::user()->canCrud('dosen')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $ids = $request->selected_dosen;
         if ($ids) {
             $dosens = Dosen::whereIn('id', $ids)->get();

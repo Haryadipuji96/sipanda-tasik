@@ -101,31 +101,6 @@
                     </div>
                 </div>
 
-                <!-- Informasi Dokumen -->
-                <div class="info-box">
-                    <div class="flex items-start">
-                        <i class="fas fa-info-circle text-blue-500 mt-1 mr-3"></i>
-                        <div>
-                            <h4 class="font-medium text-blue-800 mb-1">Informasi Dokumen</h4>
-                            <p class="text-blue-700 text-sm">
-                                <strong>Status Verifikasi:</strong> 
-                                @php
-                                    $verifikasiColor = match($dokumen->status_verifikasi) {
-                                        'Terverifikasi' => 'text-green-600',
-                                        'Menunggu' => 'text-yellow-600',
-                                        'Ditolak' => 'text-red-600',
-                                    };
-                                @endphp
-                                <span class="{{ $verifikasiColor }} font-medium">{{ $dokumen->status_verifikasi }}</span>
-                                
-                                @if($dokumen->tanggal_verifikasi)
-                                    | <strong>Tanggal Verifikasi:</strong> {{ $dokumen->tanggal_verifikasi->format('d F Y') }}
-                                @endif
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Form -->
                 <form action="{{ route('dokumen-mahasiswa.update', $dokumen->id) }}" method="POST" enctype="multipart/form-data" id="dokumenForm">
                     @csrf

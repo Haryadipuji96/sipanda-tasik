@@ -3,94 +3,59 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use Illuminate\Auth\Events\Registered;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 
-class RegisteredUserController extends Controller
+class NewPasswordController extends Controller
 {
     /**
-     * Display the registration view with users list.
+     * Display the password reset view.
      */
-    public function create(): View
+    public function create(Request $request): View
     {
-        $users = User::latest()->paginate(10);
-        return view('auth.register', compact('users'));
+        return view('auth.reset-password', ['request' => $request]);
     }
 
     /**
-     * Handle an incoming registration request.
+     * Handle an incoming new password request.
+     *
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'role' => ['required', 'string', 'in:superadmin,admin'],
+            'token' => 'required',
+            'email' => 'required|email',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'role' => $request->role,
-            'password' => Hash::make($request->password),
-        ]);
+        // Here we will attempt to reset the user's password. If it is successful we
+        // will update the password on an actual user model and persist it to the
+        // database. Otherwise we will parse the error and return the response.
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user) use ($request) {
+                $user->forceFill([
+                    'password' => Hash::make($request->password),
+                    'remember_token' => Str::random(60),
+                ])->save();
 
-        event(new Registered($user));
+                event(new PasswordReset($user));
+            }
+        );
 
-        // Tidak auto login, tetap di halaman register
-        return redirect()->route('register')->with('success', 'Pengguna berhasil ditambahkan!');
-    }
-
-    /**
-     * Update the specified user.
-     */
-    public function update(Request $request, User $user): RedirectResponse
-    {
-        $rules = [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email,' . $user->id],
-            'role' => ['required', 'string', 'in:superadmin,admin'],
-        ];
-
-        // Only validate password if provided
-        if ($request->filled('password')) {
-            $rules['password'] = ['required', 'confirmed', Rules\Password::defaults()];
-        }
-
-        $validated = $request->validate($rules);
-
-        $user->name = $validated['name'];
-        $user->email = $validated['email'];
-        $user->role = $validated['role'];
-
-        if ($request->filled('password')) {
-            $user->password = Hash::make($validated['password']);
-        }
-
-        $user->save();
-
-        return redirect()->route('register')->with('success', 'Pengguna berhasil diupdate!');
-    }
-
-    /**
-     * Remove the specified user from storage.
-     */
-    public function destroy(User $user): RedirectResponse
-    {
-        // Prevent deleting own account
-        if (Auth::id() === $user->id) {
-            return redirect()->route('register')->with('error', 'Anda tidak dapat menghapus akun sendiri!');
-        }
-
-        $user->delete();
-
-        return redirect()->route('register')->with('success', 'Pengguna berhasil dihapus!');
+        // If the password was successfully reset, we will redirect the user back to
+        // the application's home authenticated view. If there is an error we can
+        // redirect back to where they came from with their error message.
+        return $status == Password::PASSWORD_RESET
+                    ? redirect()->route('login')->with('status', __($status))
+                    : back()->withInput($request->only('email'))
+                            ->withErrors(['email' => __($status)]);
     }
 }

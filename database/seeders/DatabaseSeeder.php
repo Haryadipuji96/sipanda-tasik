@@ -18,9 +18,9 @@ class DatabaseSeeder extends Seeder
     {
         // User default Superadmin
         User::factory()->create([
-            'name' => 'Superadmin',
-            'email' => 'superadmin@example.com',
-            'password' => Hash::make('superpassword'), // password default
+            'name' => 'Admin',
+            'email' => 'admin@gmail.com',
+            'password' => Hash::make('admin123'), // password default
             'role' => 'superadmin', // pastikan kolom role ada di tabel users
         ]);
     }

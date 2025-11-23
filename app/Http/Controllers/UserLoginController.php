@@ -5,11 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\UserLogin;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class UserLoginController extends Controller
 {
     public function index()
     {
+         if (!Auth::user()->canCrud('userlogin')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $search = request()->input('search');
 
         // Hitung ranking berdasarkan total durasi (Exclude superadmin)
@@ -58,6 +63,10 @@ class UserLoginController extends Controller
     // Method untuk menampilkan detail history per user
     public function detail($userId)
     {
+         if (!Auth::user()->canCrud('userlogin')) {
+            abort(403, 'Unauthorized action.');
+        }
+        
         $user = User::findOrFail($userId);
         
         // Pastikan bukan superadmin

@@ -5,7 +5,8 @@
             <!-- Header -->
             <div class="mb-6">
                 <h1 class="text-2xl font-bold text-gray-800">Detail Data Barang</h1>
-                <p class="text-gray-600 mt-1">Informasi lengkap mengenai barang di ruangan {{ $ruangan->nama_ruangan }}</p>
+                <p class="text-gray-600 mt-1">Informasi lengkap mengenai barang di ruangan {{ $ruangan->nama_ruangan }}
+                </p>
             </div>
 
             <!-- Card Container -->
@@ -33,16 +34,17 @@
                                         <td class="py-3 px-4 font-medium text-gray-700 bg-gray-50 w-1/3">Program Studi
                                         </td>
                                         <td class="py-3 px-4">
-                                            @if ($barang->prodi)
+                                            @if ($ruangan->tipe_ruangan == 'sarana')
+                                                <!-- DIUBAH -->
                                                 <span class="inline-flex items-center">
                                                     <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-                                                    {{ $barang->prodi->nama_prodi }}
+                                                    {{ $ruangan->prodi->nama_prodi ?? '-' }}
                                                     <span class="text-gray-500 text-xs ml-2">
-                                                        ({{ $barang->prodi->fakultas->nama_fakultas ?? '-' }})
+                                                        ({{ $ruangan->prodi->fakultas->nama_fakultas ?? '-' }})
                                                     </span>
                                                 </span>
                                             @else
-                                                <span class="text-gray-400">Unit Umum</span>
+                                                <span class="text-gray-400">Unit Prasarana</span> <!-- DIUBAH -->
                                             @endif
                                         </td>
                                     </tr>
@@ -51,10 +53,12 @@
                                         <td class="py-3 px-4">
                                             <div class="font-medium">{{ $ruangan->nama_ruangan }}</div>
                                             <div class="text-xs text-gray-500">
-                                                @if($ruangan->prodi)
-                                                    {{ $ruangan->prodi->nama_prodi }} - {{ $ruangan->prodi->fakultas->nama_fakultas ?? '-' }}
+                                                @if ($ruangan->tipe_ruangan == 'sarana')
+                                                    <!-- DIUBAH -->
+                                                    {{ $ruangan->prodi->nama_prodi ?? '-' }} -
+                                                    {{ $ruangan->prodi->fakultas->nama_fakultas ?? '-' }}
                                                 @else
-                                                    Unit Umum - {{ $ruangan->unit_umum }}
+                                                    Unit Prasarana - {{ $ruangan->unit_prasarana }} <!-- DIUBAH -->
                                                 @endif
                                             </div>
                                         </td>
@@ -196,14 +200,13 @@
                                         <td class="py-3 px-4">
                                             @if ($barang->file_dokumen)
                                                 @php
-                                                    $filePath = public_path(
-                                                        'dokumen_sarpras/' . $barang->file_dokumen,
-                                                    );
+                                                    $filePath = public_path('dokumen_sarpras/' . $barang->file_dokumen);
+                                                    $fileUrl = asset('dokumen_sarpras/' . $barang->file_dokumen);
+                                                    $fileExists = file_exists($filePath);
                                                 @endphp
 
-                                                @if (file_exists($filePath))
-                                                    <a href="{{ asset('dokumen_sarpras/' . $barang->file_dokumen) }}"
-                                                        target="_blank"
+                                                @if ($fileExists)
+                                                    <a href="{{ $fileUrl }}" target="_blank"
                                                         class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium hover:bg-green-200 transition-colors">
                                                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
                                                             viewBox="0 0 24 24">
@@ -219,6 +222,10 @@
                                                 @else
                                                     <span class="text-red-500 text-sm">File tidak ditemukan:
                                                         {{ $barang->file_dokumen }}</span>
+                                                    <br>
+                                                    <small class="text-gray-500">
+                                                        Path: public/dokumen_sarpras/{{ $barang->file_dokumen }}
+                                                    </small>
                                                 @endif
                                             @else
                                                 <span class="text-gray-400">Tidak ada file</span>

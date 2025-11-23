@@ -13,7 +13,6 @@ use App\Http\Controllers\RuanganController;
 use App\Http\Controllers\TenagaPendidikController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserLoginController;
-
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -26,7 +25,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/user-activity/{userId}/detail', [UserLoginController::class, 'detail'])->name('userlogin.detail');
 });
 
-
+// ==========================================
+// ROUTE UNTUK DOSEN
+// ==========================================
 Route::prefix('dosen')->group(function () {
     Route::get('/', [DosenController::class, 'index'])->name('dosen.index');
     Route::get('/create', [DosenController::class, 'create'])->name('dosen.create');
@@ -41,7 +42,7 @@ Route::prefix('dosen')->group(function () {
     Route::get('/preview/pdf', [DosenController::class, 'previewAllPdf'])->name('dosen.preview.pdf');
     Route::get('/download/pdf', [DosenController::class, 'downloadAllPdf'])->name('dosen.download-all.pdf');
 
-    // PDF Single Routes - HARUS SEBELUM ROUTE {id}
+    // PDF Single Routes
     Route::get('/{id}/preview-pdf', [DosenController::class, 'previewPdfSingle'])->name('dosen.preview-single.pdf');
     Route::get('/{id}/download-pdf', [DosenController::class, 'downloadPdfSingle'])->name('dosen.download-single.pdf');
 });
@@ -49,85 +50,178 @@ Route::prefix('dosen')->group(function () {
 // ==========================================
 // ROUTE UNTUK TENAGA PENDIDIK
 // ==========================================
-// Route untuk PDF Single Tendik (dari show)
-Route::get('/tenaga-pendidik/{id}/preview-pdf', [TenagaPendidikController::class, 'previewPDF'])->name('tenaga-pendidik.preview-pdf');
-Route::get('/tenaga-pendidik/{id}/download-pdf', [TenagaPendidikController::class, 'downloadPDF'])->name('tenaga-pendidik.download-pdf');
+Route::prefix('tenaga-pendidik')->group(function () {
+    Route::get('/', [TenagaPendidikController::class, 'index'])->name('tenaga-pendidik.index');
+    Route::get('/create', [TenagaPendidikController::class, 'create'])->name('tenaga-pendidik.create');
+    Route::post('/store', [TenagaPendidikController::class, 'store'])->name('tenaga-pendidik.store');
 
-// Route untuk PDF Semua Data Tendik (dari index)
-Route::get('/tenaga-pendidik/preview-all-pdf', [TenagaPendidikController::class, 'previewAllPdf'])->name('tenaga-pendidik.preview-all.pdf');
-Route::get('/tenaga-pendidik/download-all-pdf', [TenagaPendidikController::class, 'downloadAllPdf'])->name('tenaga-pendidik.download-all.pdf');
-Route::get('/tenaga-pendidik/export-excel', [TenagaPendidikController::class, 'exportExcel'])->name('tenaga-pendidik.export.excel');
+    // Export Routes - HARUS DITARUH SEBELUM DYNAMIC ROUTES
+    Route::get('/export/excel', [TenagaPendidikController::class, 'exportExcel'])->name('tenaga-pendidik.export.excel');
+    Route::get('/preview-all-pdf', [TenagaPendidikController::class, 'previewAllPdf'])->name('tenaga-pendidik.preview-all.pdf');
+    Route::get('/download-all-pdf', [TenagaPendidikController::class, 'downloadAllPdf'])->name('tenaga-pendidik.download-all.pdf');
 
+    // Dynamic routes - HARUS DITARUH DI BAWAH
+    Route::get('/{id}', [TenagaPendidikController::class, 'show'])->name('tenaga-pendidik.show');
+    Route::put('/{id}', [TenagaPendidikController::class, 'update'])->name('tenaga-pendidik.update');
+    Route::delete('/{id}', [TenagaPendidikController::class, 'destroy'])->name('tenaga-pendidik.destroy');
+    Route::get('/{id}/preview-pdf', [TenagaPendidikController::class, 'previewPDF'])->name('tenaga-pendidik.preview-pdf');
+    Route::get('/{id}/download-pdf', [TenagaPendidikController::class, 'downloadPDF'])->name('tenaga-pendidik.download-pdf');
+
+    Route::delete('/delete-selected', [TenagaPendidikController::class, 'deleteSelected'])->name('tenaga-pendidik.deleteSelected');
+});
 // ==========================================
 // ROUTE UNTUK SARPRAS
 // ==========================================
-// // Route untuk PDF per ruangan
-Route::get('/sarpras/{id}/ruangan-pdf', [DataSarprasController::class, 'ruanganPDF'])->name('sarpras.ruangan.pdf');
-// Route::get('/sarpras/laporan/preview', [DataSarprasController::class, 'previewHTML'])->name('sarpras.laporan.preview');
-Route::get('/sarpras/laporan/pdf', [DataSarprasController::class, 'laporanPDF'])->name('sarpras.laporan.pdf');
-// Route::get('/sarpras/export-excel', [DataSarprasController::class, 'exportExcel'])->name('sarpras.export.excel');
-// // routes/web.php - tambahkan ini di section sarpras
-
-// // Routes untuk tambah barang dari ruangan
-Route::get('/ruangan/{id}/tambah-barang', [DataSarprasController::class, 'createFromRuangan'])->name('ruangan.tambah-barang');
-Route::post('/ruangan/{id}/simpan-barang', [DataSarprasController::class, 'storeFromRuangan'])->name('ruangan.simpan-barang');
-
-// // Route untuk lihat detail ruangan + barangnya
-// Route::get('/ruangan/{id}/barang', [DataSarprasController::class, 'showRuangan'])->name('ruangan.show');
-// Tambahkan route baru untuk detail barang di ruangan
-Route::get('/ruangan/{ruangan}/barang/{barang}', [App\Http\Controllers\RuanganController::class, 'showBarang'])
-    ->name('ruangan.detail.show');
-// Tambahkan route untuk download PDF per ruangan
-Route::get('/ruangan/{ruangan}/pdf', [App\Http\Controllers\RuanganController::class, 'downloadPdf'])
-    ->name('ruangan.pdf');
-// Route untuk menampilkan form tambah barang
-Route::get('/ruangan/{ruangan}/tambah-barang', [App\Http\Controllers\RuanganController::class, 'tambahBarang'])
-    ->name('ruangan.tambah-barang');
-
-// Route untuk menyimpan barang baru
-Route::post('/ruangan/{ruangan}/simpan-barang', [App\Http\Controllers\RuanganController::class, 'simpanBarang'])
-    ->name('ruangan.simpan-barang');
-// Route untuk edit barang dalam ruangan
-Route::get('/ruangan/{ruangan}/barang/{barang}/edit', [App\Http\Controllers\RuanganController::class, 'editBarang'])
-    ->name('ruangan.barang.edit');
-Route::put('/ruangan/{ruangan}/barang/{barang}', [App\Http\Controllers\RuanganController::class, 'updateBarang'])
-    ->name('ruangan.barang.update');
-Route::delete('/ruangan/{ruangan}/barang/{barang}', [App\Http\Controllers\RuanganController::class, 'destroyBarang'])
-    ->name('ruangan.barang.destroy');
+// Route::prefix('sarpras')->group(function () {
+//     Route::get('/{id}/ruangan-pdf', [DataSarprasController::class, 'ruanganPDF'])->name('sarpras.ruangan.pdf');
+//     Route::get('/laporan/pdf', [DataSarprasController::class, 'laporanPDF'])->name('sarpras.laporan.pdf');
+// });
 
 // ==========================================
-// ROUTE UNTUK ARSIP (jika ada)
+// ROUTE UNTUK RUANGAN (FIXED - PERBAIKAN UTAMA)
 // ==========================================
-// Route untuk PDF Semua Data Arsip (dari index)
-Route::get('/arsip/preview-all-pdf', [ArsipController::class, 'previewAllPdf'])->name('arsip.preview-all.pdf');
-Route::get('/arsip/download-all-pdf', [ArsipController::class, 'downloadAllPdf'])->name('arsip.download-all.pdf');
-Route::get('/arsip/export-excel', [ArsipController::class, 'exportExcel'])->name('arsip.export.excel');
+Route::prefix('ruangan')->group(function () {
+    // Route utama untuk ruangan
+    Route::get('/', [RuanganController::class, 'index'])->name('ruangan.index');
+    Route::get('/create', [RuanganController::class, 'create'])->name('ruangan.create');
+    Route::post('/', [RuanganController::class, 'store'])->name('ruangan.store');
+    Route::get('/{ruangan}', [RuanganController::class, 'show'])->name('ruangan.show');
+    Route::get('/{ruangan}/edit', [RuanganController::class, 'edit'])->name('ruangan.edit');
+    Route::put('/{ruangan}', [RuanganController::class, 'update'])->name('ruangan.update');
+    Route::delete('/{ruangan}', [RuanganController::class, 'destroy'])->name('ruangan.destroy');
 
-// Route untuk PDF Single Arsip (dari show) - jika diperlukan
-Route::get('/arsip/{id}/preview-pdf', [ArsipController::class, 'previewPdfSingle'])->name('arsip.preview-single.pdf');
-Route::get('/arsip/{id}/download-pdf', [ArsipController::class, 'downloadPdfSingle'])->name('arsip.download-single.pdf');
+    // Route khusus untuk tipe ruangan - INI YANG DIPERBAIKI
+    Route::get('/create/sarana', [RuanganController::class, 'createSarana'])->name('ruangan.create.sarana');
+    Route::get('/create/prasarana', [RuanganController::class, 'createPrasarana'])->name('ruangan.create.prasarana');
+
+    // Route untuk barang dalam ruangan
+    Route::get('/{ruangan}/tambah-barang', [RuanganController::class, 'tambahBarang'])->name('ruangan.tambah-barang');
+    Route::post('/{ruangan}/simpan-barang', [RuanganController::class, 'simpanBarang'])->name('ruangan.simpan-barang');
+    Route::get('/{ruangan}/barang/{barang}', [RuanganController::class, 'showBarang'])->name('ruangan.barang.show');
+    Route::get('/{ruangan}/barang/{barang}/edit', [RuanganController::class, 'editBarang'])->name('ruangan.barang.edit');
+    Route::put('/{ruangan}/barang/{barang}', [RuanganController::class, 'updateBarang'])->name('ruangan.barang.update');
+    Route::delete('/{ruangan}/barang/{barang}', [RuanganController::class, 'destroyBarang'])->name('ruangan.barang.destroy');
+
+    // Export dan utilitas
+    Route::get('/{ruangan}/pdf', [RuanganController::class, 'downloadPdf'])->name('ruangan.pdf');
+});
 
 // ==========================================
-// ROUTE UNTUK PRODI (jika butuh export)
+// ROUTE UNTUK ARSIP
 // ==========================================
-Route::get('/prodi/export-excel', [ProdiController::class, 'exportExcel'])->name('prodi.export.excel');
-Route::get('/prodi/preview-pdf', [ProdiController::class, 'previewPdf'])->name('prodi.preview.pdf');
-Route::get('/prodi/download-pdf', [ProdiController::class, 'downloadPdf'])->name('prodi.download.pdf');
+Route::prefix('arsip')->group(function () {
+    Route::get('/', [ArsipController::class, 'index'])->name('arsip.index');
+    Route::get('/create', [ArsipController::class, 'create'])->name('arsip.create');
+    Route::post('/', [ArsipController::class, 'store'])->name('arsip.store');
+
+    Route::get('/{arsip}/edit', [ArsipController::class, 'edit'])->name('arsip.edit');
+    Route::put('/{arsip}', [ArsipController::class, 'update'])->name('arsip.update');
+    Route::delete('/{arsip}', [ArsipController::class, 'destroy'])->name('arsip.destroy');
+    Route::delete('/delete-selected', [ArsipController::class, 'deleteSelected'])->name('arsip.deleteSelected');
+
+    // Export Routes
+    Route::get('/export/excel', [ArsipController::class, 'exportExcel'])->name('arsip.export.excel');
+    Route::get('/preview-all-pdf', [ArsipController::class, 'previewAllPdf'])->name('arsip.preview-all.pdf');
+    Route::get('/download-all-pdf', [ArsipController::class, 'downloadAllPdf'])->name('arsip.download-all.pdf');
+    Route::get('/{id}/preview-pdf', [ArsipController::class, 'previewPdfSingle'])->name('arsip.preview-single.pdf');
+    Route::get('/{id}/download-pdf', [ArsipController::class, 'downloadPdfSingle'])->name('arsip.download-single.pdf');
+});
 
 // ==========================================
-// ROUTE UNTUK FAKULTAS (jika butuh export)
+// ROUTE UNTUK PRODI
 // ==========================================
-Route::get('/fakultas/export-excel', [FakultasController::class, 'exportExcel'])->name('fakultas.export.excel');
-Route::get('/fakultas/preview-pdf', [FakultasController::class, 'previewPdf'])->name('fakultas.preview.pdf');
-Route::get('/fakultas/download-pdf', [FakultasController::class, 'downloadPdf'])->name('fakultas.download.pdf');
+Route::prefix('prodi')->group(function () {
+    Route::get('/', [ProdiController::class, 'index'])->name('prodi.index');
+    Route::get('/create', [ProdiController::class, 'create'])->name('prodi.create');
+    Route::post('/', [ProdiController::class, 'store'])->name('prodi.store');
+    Route::get('/{prodi}', [ProdiController::class, 'show'])->name('prodi.show');
+    Route::get('/{prodi}/edit', [ProdiController::class, 'edit'])->name('prodi.edit');
+    Route::put('/{prodi}', [ProdiController::class, 'update'])->name('prodi.update');
+    Route::delete('/{prodi}', [ProdiController::class, 'destroy'])->name('prodi.destroy');
 
-// AJAX Routes untuk Ruangan
-// Route::get('/get-prodi/{id_fakultas}', [DataSarprasController::class, 'getProdiByFakultas'])->name('get.prodi.by.fakultas');
-// MENJADI INI:
+    // Export Routes
+    Route::get('/export/excel', [ProdiController::class, 'exportExcel'])->name('prodi.export.excel');
+    Route::get('/preview-pdf', [ProdiController::class, 'previewPdf'])->name('prodi.preview.pdf');
+    Route::get('/download-pdf', [ProdiController::class, 'downloadPdf'])->name('prodi.download.pdf');
+});
+
+// ==========================================
+// ROUTE UNTUK FAKULTAS
+// ==========================================
+Route::prefix('fakultas')->group(function () {
+    Route::get('/', [FakultasController::class, 'index'])->name('fakultas.index');
+    Route::get('/create', [FakultasController::class, 'create'])->name('fakultas.create');
+    Route::post('/', [FakultasController::class, 'store'])->name('fakultas.store');
+    Route::get('/{fakultas}', [FakultasController::class, 'show'])->name('fakultas.show');
+    Route::get('/{fakultas}/edit', [FakultasController::class, 'edit'])->name('fakultas.edit');
+    Route::put('/{fakultas}', [FakultasController::class, 'update'])->name('fakultas.update');
+    Route::delete('/{fakultas}', [FakultasController::class, 'destroy'])->name('fakultas.destroy');
+
+    // Export Routes
+    Route::get('/export/excel', [FakultasController::class, 'exportExcel'])->name('fakultas.export.excel');
+    Route::get('/preview-pdf', [FakultasController::class, 'previewPdf'])->name('fakultas.preview.pdf');
+    Route::get('/download-pdf', [FakultasController::class, 'downloadPdf'])->name('fakultas.download.pdf');
+});
+
+// ==========================================
+// ROUTE UNTUK DOKUMEN MAHASISWA
+// ==========================================
+Route::prefix('dokumen-mahasiswa')->group(function () {
+    // Route untuk import dan template harus diletakkan sebelum route dengan parameter
+    Route::get('/import', [DokumenMahasiswaController::class, 'showImportForm'])->name('dokumen-mahasiswa.import-form');
+    Route::post('/import', [DokumenMahasiswaController::class, 'import'])->name('dokumen-mahasiswa.import');
+    Route::get('/download-template', [DokumenMahasiswaController::class, 'downloadTemplate'])->name('dokumen-mahasiswa.download-template');
+    
+    // Route create harus sebelum route dengan parameter
+    Route::get('/create', [DokumenMahasiswaController::class, 'create'])->name('dokumen-mahasiswa.create');
+    Route::post('/', [DokumenMahasiswaController::class, 'store'])->name('dokumen-mahasiswa.store');
+    
+    // Route index
+    Route::get('/', [DokumenMahasiswaController::class, 'index'])->name('dokumen-mahasiswa.index');
+    
+    // Route dengan parameter - pastikan konsisten menggunakan {id} atau {dokumen_mahasiswa}
+    Route::get('/{id}', [DokumenMahasiswaController::class, 'show'])->name('dokumen-mahasiswa.show');
+    Route::get('/{id}/edit', [DokumenMahasiswaController::class, 'edit'])->name('dokumen-mahasiswa.edit');
+    Route::put('/{id}', [DokumenMahasiswaController::class, 'update'])->name('dokumen-mahasiswa.update');
+    Route::delete('/{id}', [DokumenMahasiswaController::class, 'destroy'])->name('dokumen-mahasiswa.destroy');
+    Route::post('/{id}/verifikasi', [DokumenMahasiswaController::class, 'verifikasi'])->name('dokumen-mahasiswa.verifikasi');
+});
+
+// ==========================================
+// ROUTE UNTUK KATEGORI ARSIP
+// ==========================================
+Route::prefix('kategori-arsip')->group(function () {
+    Route::get('/', [KategoriArsipController::class, 'index'])->name('kategori-arsip.index');
+    Route::get('/create', [KategoriArsipController::class, 'create'])->name('kategori-arsip.create');
+    Route::post('/', [KategoriArsipController::class, 'store'])->name('kategori-arsip.store');
+    Route::get('/{kategori_arsip}', [KategoriArsipController::class, 'show'])->name('kategori-arsip.show');
+    Route::get('/{kategori_arsip}/edit', [KategoriArsipController::class, 'edit'])->name('kategori-arsip.edit');
+    Route::put('/{kategori_arsip}', [KategoriArsipController::class, 'update'])->name('kategori-arsip.update');
+    Route::delete('/{kategori_arsip}', [KategoriArsipController::class, 'destroy'])->name('kategori-arsip.destroy');
+});
+
+// ==========================================
+// ROUTE UNTUK USERS
+// ==========================================
+Route::prefix('users')->group(function () {
+    Route::get('/', [UserController::class, 'index'])->name('users.index');
+    Route::get('/create', [UserController::class, 'create'])->name('users.create');
+    Route::post('/', [UserController::class, 'store'])->name('users.store');
+    Route::get('/{user}', [UserController::class, 'show'])->name('users.show');
+    Route::get('/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+    Route::put('/{user}', [UserController::class, 'update'])->name('users.update');
+    Route::delete('/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+});
+
+// ==========================================
+// AJAX ROUTES
+// ==========================================
 Route::get('/get-prodi/{id_fakultas}', [RuanganController::class, 'getProdiByFakultas'])->name('get.prodi.by.fakultas');
-Route::get('/ruangan/create-akademik', [RuanganController::class, 'createAkademik'])->name('ruangan.create.akademik');
-Route::get('/ruangan/create-umum', [RuanganController::class, 'createUmum'])->name('ruangan.create.umum');
+Route::get('/get-ruangan/{id_prodi}', [RuanganController::class, 'getRuanganByProdi'])->name('get.ruangan.by.prodi');
 
+// ==========================================
+// PROFILE ROUTES
+// ==========================================
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -135,28 +229,15 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::post('/dokumen-mahasiswa/{id}/verifikasi', [DokumenMahasiswaController::class, 'verifikasi'])->name('dokumen-mahasiswa.verifikasi');
-
-// Bulk Delete Routes - PASTIKAN SEMUA DI DALAM MIDDLEWARE AUTH
+// ==========================================
+// BULK DELETE ROUTES (AUTH ONLY)
+// ==========================================
 Route::middleware('auth')->group(function () {
-    // Bulk Delete Routes
-    Route::delete('dosen/delete-selected', [DosenController::class, 'deleteSelected'])->name('dosen.deleteSelected');
-    Route::delete('arsip/delete-selected', [ArsipController::class, 'deleteSelected'])->name('arsip.deleteSelected');
-    // Route::delete('sarpras/delete-selected', [DataSarprasController::class, 'deleteSelected'])->name('sarpras.deleteSelected');
-    Route::delete('tenaga-pendidik/delete-selected', [TenagaPendidikController::class, 'deleteSelected'])->name('tenaga-pendidik.deleteSelected');
-    Route::delete('ruangan/delete-selected', [RuanganController::class, 'deleteSelected'])->name('ruangan.deleteSelected');
-
-    // Resource Routes
-    Route::resource('fakultas', FakultasController::class);
-    Route::resource('prodi', ProdiController::class);
-    Route::resource('kategori-arsip', KategoriArsipController::class);
-    Route::resource('dosen', DosenController::class);
-    Route::resource('users', UserController::class);
-    Route::resource('arsip', ArsipController::class);
-    // Route::resource('sarpras', DataSarprasController::class);
-    Route::resource('tenaga-pendidik', TenagaPendidikController::class);
-    Route::resource('ruangan', RuanganController::class);
-    Route::resource('dokumen-mahasiswa', DokumenMahasiswaController::class);
+    Route::post('/ruangan/check-used-rooms', [RuanganController::class, 'checkUsedRooms'])->name('ruangan.checkUsedRooms');
+    Route::delete('/ruangan/delete-selected', [RuanganController::class, 'deleteSelected'])->name('ruangan.deleteSelected');
+    Route::delete('/dosen/delete-selected', [DosenController::class, 'deleteSelected'])->name('dosen.deleteSelected');
+    Route::delete('/arsip/delete-selected', [ArsipController::class, 'deleteSelected'])->name('arsip.deleteSelected');
+    Route::delete('/tenaga-pendidik/delete-selected', [TenagaPendidikController::class, 'deleteSelected'])->name('tenaga-pendidik.deleteSelected');
 });
 
 require __DIR__ . '/auth.php';

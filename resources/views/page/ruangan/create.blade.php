@@ -22,31 +22,31 @@
                     </a>
                 </div>
 
-                <!-- Pilihan Tipe Ruangan -->
+                <!-- Pilihan Tipe Ruangan - DIUBAH -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Ruangan Akademik -->
-                    <a href="{{ route('ruangan.create.akademik') }}"
-                        class="flex flex-col items-center p-8 border-2 border-blue-200 rounded-xl cursor-pointer hover:bg-blue-50 transition bg-blue-50 hover:border-blue-300">
-                        <div class="bg-blue-100 text-blue-600 p-4 rounded-full mb-4">
+                    <!-- Ruangan Sarana -->
+                    <a href="{{ route('ruangan.create.sarana') }}"
+                        class="flex flex-col items-center p-8 border-2 border-orange-200 rounded-xl cursor-pointer hover:bg-orange-50 transition bg-orange-50 hover:border-orange-300">
+                        <div class="bg-orange-100 text-orange-600 p-4 rounded-full mb-4">
                             <i class="fas fa-graduation-cap text-2xl"></i>
                         </div>
-                        <h3 class="text-lg font-semibold text-blue-700 mb-2">Ruangan Akademik</h3>
-                        <p class="text-blue-600 text-center text-sm">
+                        <h3 class="text-lg font-semibold text-orange-700 mb-2">Ruangan Sarana</h3>
+                        <p class="text-orange-600 text-center text-sm">
                             Ruangan terkait fakultas dan program studi<br>
                             (Kelas, Laboratorium, Ruang Dosen, dll)
                         </p>
-                        <div class="mt-4 text-blue-600">
+                        <div class="mt-4 text-orange-600">
                             <i class="fas fa-arrow-right"></i>
                         </div>
                     </a>
 
-                    <!-- Ruangan Umum -->
-                    <a href="{{ route('ruangan.create.umum') }}"
+                    <!-- Ruangan Prasarana -->
+                   <a href="{{ route('ruangan.create.prasarana') }}"
                         class="flex flex-col items-center p-8 border-2 border-green-200 rounded-xl cursor-pointer hover:bg-green-50 transition bg-green-50 hover:border-green-300">
                         <div class="bg-green-100 text-green-600 p-4 rounded-full mb-4">
                             <i class="fas fa-building text-2xl"></i>
                         </div>
-                        <h3 class="text-lg font-semibold text-green-700 mb-2">Ruangan Umum</h3>
+                        <h3 class="text-lg font-semibold text-green-700 mb-2">Ruangan Prasarana</h3>
                         <p class="text-green-600 text-center text-sm">
                             Ruangan umum institusi<br>
                             (Rektorat, Perpustakaan, Gedung Yayasan, dll)
@@ -57,15 +57,15 @@
                     </a>
                 </div>
 
-                <!-- Informasi -->
+                <!-- Informasi - DIUBAH -->
                 <div class="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
                     <div class="flex items-start">
                         <i class="fas fa-info-circle text-blue-500 mt-1 mr-3"></i>
                         <div>
-                            <h4 class="font-medium text-gray-800 mb-1">Perbedaan Ruangan Akademik dan Umum</h4>
+                            <h4 class="font-medium text-gray-800 mb-1">Perbedaan Ruangan Sarana dan Prasarana</h4>
                             <p class="text-gray-600 text-sm">
-                                • <strong>Ruangan Akademik</strong>: Terkait dengan fakultas dan program studi tertentu<br>
-                                • <strong>Ruangan Umum</strong>: Digunakan bersama oleh seluruh civitas akademika
+                                • <strong>Ruangan Sarana</strong>: Terkait dengan fakultas dan program studi tertentu<br>
+                                • <strong>Ruangan Prasarana</strong>: Digunakan bersama oleh seluruh civitas akademika
                             </p>
                         </div>
                     </div>

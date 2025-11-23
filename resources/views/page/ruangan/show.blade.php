@@ -74,31 +74,35 @@
                     <div>
                         <h1 class="text-2xl font-bold text-gray-800">{{ $ruangan->nama_ruangan }}</h1>
                         <div class="flex items-center gap-4 mt-2 text-sm text-gray-600">
-                            @if ($ruangan->prodi)
-                                <span class="badge bg-blue-100 text-blue-800">
-                                    🎓 {{ $ruangan->prodi->nama_prodi }}
+                            @if ($ruangan->tipe_ruangan == 'sarana')
+                                <!-- DIUBAH -->
+                                <span class="badge bg-orange-100 text-orange-800"> <!-- DIUBAH -->
+                                    🎓 {{ $ruangan->prodi->nama_prodi ?? '-' }}
                                 </span>
                                 <span class="badge bg-green-100 text-green-800">
-                                    🏛️ {{ $ruangan->prodi->fakultas->nama_fakultas }}
+                                    🏛️ {{ $ruangan->prodi->fakultas->nama_fakultas ?? '-' }}
                                 </span>
                             @else
                                 <span class="badge bg-gray-100 text-gray-800">
-                                    🏢 Unit Umum
+                                    🏢 Unit Prasarana - {{ $ruangan->unit_prasarana }} <!-- DIUBAH -->
                                 </span>
                             @endif
                         </div>
                     </div>
                     <div class="flex gap-2 mt-4 md:mt-0">
+                        @canCrud('ruangan')
                         <a href="{{ route('ruangan.tambah-barang', $ruangan->id) }}"
                             class="btn-action btn-primary gap-2 px-4 py-2">
                             <i class="fas fa-plus w-4 h-4"></i>
                             Tambah Barang
                         </a>
+                        @endcanCrud
                         <a href="{{ route('ruangan.pdf', $ruangan->id) }}"
                             class="btn-action btn-success gap-2 px-4 py-2">
                             <i class="fas fa-file-pdf w-4 h-4"></i>
                             Download PDF
                         </a>
+
                         <a href="{{ route('ruangan.index') }}" class="btn-action btn-secondary px-4 py-2">
                             <i class="fas fa-arrow-left w-4 h-4"></i>
                             Kembali
@@ -191,25 +195,28 @@
                                         </td>
                                         <td class="px-4 py-3 text-center">
                                             <div class="flex justify-center gap-1">
-                                                <a href="{{ route('ruangan.show', ['ruangan' => $ruangan->id, 'barang' => $barang->id]) }}"
+                                                <a href="{{ route('ruangan.barang.show', ['ruangan' => $ruangan->id, 'barang' => $barang->id]) }}"
                                                     class="btn-action btn-primary" title="Detail Barang">
                                                     <i class="fas fa-eye w-4 h-4"></i>
                                                 </a>
+                                                @canCrud('ruangan')
                                                 <!-- TAMBAH TOMBOL EDIT BARANG DI SINI -->
                                                 <a href="{{ route('ruangan.barang.edit', ['ruangan' => $ruangan->id, 'barang' => $barang->id]) }}"
                                                     class="btn-action btn-warning" title="Edit Barang">
                                                     <i class="fas fa-edit w-4 h-4"></i>
                                                 </a>
                                                 <!-- TOMBOL DELETE -->
-                                                <form action="{{ route('ruangan.barang.destroy', ['ruangan' => $ruangan->id, 'barang' => $barang->id]) }}" method="POST" class="inline">
+                                                <form
+                                                    action="{{ route('ruangan.barang.destroy', ['ruangan' => $ruangan->id, 'barang' => $barang->id]) }}"
+                                                    method="POST" class="inline">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="button"
-                                                        class="btn-action btn-danger delete-btn"
+                                                    <button type="button" class="btn-action btn-danger delete-btn"
                                                         title="Hapus Barang">
                                                         <i class="fas fa-trash w-4 h-4"></i>
                                                     </button>
                                                 </form>
+                                                @endcanCrud
                                             </div>
                                         </td>
                                     </tr>
@@ -221,11 +228,13 @@
                     <div class="p-8 text-center">
                         <i class="fas fa-box-open text-gray-400 text-6xl mb-4"></i>
                         <p class="text-gray-500 text-lg mb-4">Belum ada barang di ruangan ini</p>
+                        @canSuperadmin
                         <a href="{{ route('ruangan.tambah-barang', $ruangan->id) }}"
                             class="btn-action btn-primary gap-2 px-6 py-2">
                             <i class="fas fa-plus w-4 h-4"></i>
                             Tambah Barang Pertama
                         </a>
+                        @endcanSuperadmin
                     </div>
                 @endif
             </div>

@@ -13,8 +13,8 @@ class Ruangan extends Model
     
     protected $fillable = [
         'id_prodi',
-        'tipe_ruangan',  // tambahkan
-        'unit_umum',     // tambahkan  
+        'tipe_ruangan',  // sekarang: sarana/prasarana
+        'unit_prasarana', // renamed dari unit_umum
         'nama_ruangan', 
         'kondisi_ruangan',
         'kapasitas',
@@ -35,19 +35,24 @@ class Ruangan extends Model
         return $this->hasOneThrough(Fakultas::class, Prodi::class, 'id', 'id', 'id_prodi', 'id_fakultas');
     }
 
+     public function getRouteKeyName()
+    {
+        return 'id';
+    }
+
     public function sarpras()
     {
         return $this->hasMany(DataSarpras::class, 'ruangan_id');
     }
 
-    // Scope untuk filter tipe ruangan
-    public function scopeAkademik($query)
+    // Scope untuk filter tipe ruangan - UBAH DI SINI
+    public function scopeSarana($query)
     {
-        return $query->where('tipe_ruangan', 'akademik');
+        return $query->where('tipe_ruangan', 'sarana');
     }
 
-    public function scopeUmum($query)
+    public function scopePrasarana($query)
     {
-        return $query->where('tipe_ruangan', 'umum');
+        return $query->where('tipe_ruangan', 'prasarana');
     }
 }

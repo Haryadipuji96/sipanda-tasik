@@ -18,10 +18,6 @@ return new class extends Migration
             $table->enum('status_mahasiswa', ['Aktif', 'Lulus', 'Cuti', 'Drop Out'])->default('Aktif');
             $table->string('file_ijazah')->nullable();
             $table->string('file_transkrip')->nullable();
-            $table->enum('status_verifikasi', ['Terverifikasi', 'Menunggu', 'Ditolak'])->default('Menunggu');
-            $table->text('catatan_verifikasi')->nullable();
-            $table->foreignId('admin_verifikator_id')->nullable()->constrained('users');
-            $table->timestamp('tanggal_verifikasi')->nullable();
             $table->timestamps();
         });
     }

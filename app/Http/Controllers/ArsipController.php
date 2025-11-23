@@ -9,11 +9,17 @@ use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ArsipExport;
+use Illuminate\Support\Facades\Auth;
+
 
 class ArsipController extends Controller
 {
     public function index(Request $request)
     {
+        if (!Auth::user()->hasPermission('arsip')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $query = Arsip::with(['kategori'])->oldest();
 
         if ($search = $request->search) {
@@ -43,12 +49,20 @@ class ArsipController extends Controller
 
     public function create()
     {
+        if (!Auth::user()->canCrud('arsip')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $kategori = KategoriArsip::all();
         return view('page.arsip.create', compact('kategori'));
     }
 
     public function store(Request $request)
     {
+        if (!Auth::user()->canCrud('arsip')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $request->validate([
             'id_kategori' => 'required|exists:kategori_arsip,id',
             'judul_dokumen' => 'required|string|max:255',
@@ -76,6 +90,10 @@ class ArsipController extends Controller
 
     public function update(Request $request, $id)
     {
+        if (!Auth::user()->canCrud('arsip')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $arsip = Arsip::findOrFail($id);
 
         $request->validate([
@@ -121,6 +139,10 @@ class ArsipController extends Controller
 
     public function destroy($id)
     {
+        if (!Auth::user()->canCrud('arsip')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $arsip = Arsip::findOrFail($id);
         $arsip->delete();
         return redirect()->route('arsip.index')->with('success', 'Data arsip berhasil dihapus.');
@@ -128,6 +150,10 @@ class ArsipController extends Controller
 
     public function deleteSelected(Request $request)
     {
+        if (!Auth::user()->canCrud('arsip')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $ids = $request->selected_dosen;
         if ($ids) {
             $dosens = Arsip::whereIn('id', $ids)->get();

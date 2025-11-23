@@ -92,7 +92,7 @@
     <div class="p-6">
         <div class="flex justify-between items-center mb-4">
             <h1 class="text-xl font-semibold">Data Dosen</h1>
-            @canSuperadmin
+            @canCrud('dosen')
             <button onclick="window.location='{{ route('dosen.create') }}'" class="cssbuttons-io-button">
                 <svg height="18" width="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M0 0h24v24H0z" fill="none"></path>
@@ -100,21 +100,21 @@
                 </svg>
                 <span>Tambah</span>
             </button>
-            @endcanSuperadmin
+            @endcanCrud
         </div>
 
         <x-search-bar route="dosen.index" placeholder="Cari nama / prodi / jabatan / NUPTK..." />
 
         <!-- Action Buttons -->
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2 mb-4">
-            @canSuperadmin
+
             <!-- Button Hapus Terpilih -->
             <button id="delete-selected"
                 class="order-2 sm:order-1 px-3 py-1.5 text-sm rounded-full font-medium text-white bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-center sm:w-auto"
                 disabled>
                 <span>Hapus Terpilih</span>
             </button>
-            @endcanSuperadmin
+
 
             <!-- Export Buttons -->
             <div class="order-1 sm:order-2 flex gap-2">
@@ -150,11 +150,11 @@
             <table class="w-full border text-sm bg-white">
                 <thead class="bg-blue-500 text-white">
                     <tr>
-                        @canSuperadmin
+                        @canCrud('dosen')
                         <th class="px-4 py-2 border text-center w-12" rowspan="3">
                             <input type="checkbox" id="select-all">
                         </th>
-                        @endcanSuperadmin
+                        @endcanCrud
                         <th rowspan="3" class="px-4 py-2 border text-center w-12">No</th>
                         <th rowspan="3" class="border px-4 py-2">Nama Lengkap</th>
                         <th rowspan="3" class="border px-4 py-2">Gelar</th>
@@ -229,12 +229,12 @@
                         @for ($i = 0; $i < $maxRows; $i++)
                             <tr class="hover:bg-gray-50" x-data="{ openModal: false }">
                                 @if ($i === 0)
-                                    @canSuperadmin
+                                    @canCrud('dosen')
                                     <td class="border px-3 py-2 text-center" rowspan="{{ $maxRows }}">
                                         <input type="checkbox" class="select-item" name="selected_dosen[]"
                                             value="{{ $d->id }}">
                                     </td>
-                                    @endcanSuperadmin
+                                    @endcanCrud
                                     <td class="border px-3 py-2 text-center" rowspan="{{ $maxRows }}">
                                         {{ $index + $dosen->firstItem() }}</td>
                                     <td class="border px-4 py-2" rowspan="{{ $maxRows }}">
@@ -347,7 +347,7 @@
                                         </div>
                                     </td>
                                     <td class="border px-3 py-2 text-center" rowspan="{{ $maxRows }}">
-                                        @canSuperadmin
+
                                         <div class="flex items-center justify-center gap-2">
                                             <!-- Detail Button -->
                                             <a href="{{ route('dosen.show', $d->id) }}"
@@ -362,7 +362,7 @@
                                                         d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                 </svg>
                                             </a>
-
+                                            @canCrud('dosen')
                                             <!-- Edit Button with Modal -->
                                             <button @click="openModal = true"
                                                 class="p-2 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-full transition"
@@ -391,8 +391,9 @@
                                                     </svg>
                                                 </button>
                                             </form>
+                                            @endcanCrud
                                         </div>
-                                        @endcanSuperadmin
+
 
                                         <!-- Modal Edit -->
                                         <div x-show="openModal" x-cloak

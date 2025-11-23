@@ -1,70 +1,219 @@
 <x-app-layout>
     <x-slot name="title">Beranda</x-slot>
-    <div class="p-6 bg-gray-50 min-h-screen">
 
+    <style>
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 250px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .chart-container {
+                height: 200px;
+            }
+        }
+    </style>
+
+    <div class="p-4 sm:p-6 bg-gray-50 min-h-screen">
         <!-- Header Interaktif -->
-        <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-            <div>
-                <h1 id="greeting" class="text-3xl font-extrabold text-blue-900 flex items-center gap-4">
-                    Selamat Datang, {{ Auth::user()->name }}
-                    <span id="digitalClock" class="ml-4 text-lg font-mono text-gray-500"></span>
+        <div class="mb-6 sm:mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+            <div class="flex-1">
+                <h1 id="greeting"
+                    class="text-2xl sm:text-3xl font-extrabold text-blue-900 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                    <span>Selamat Datang, {{ Auth::user()->name }}</span>
+                    <span id="digitalClock" class="text-base sm:text-lg font-mono text-gray-500"></span>
                 </h1>
-                <p id="dailyQuote" class="text-gray-500 mt-1 text-lg">Ringkasan data terbaru di Bank Data Arsip Kampus</p>
-                <p id="currentDateTime" class="text-gray-400 mt-1 text-sm"></p>
+                <p id="dailyQuote" class="text-gray-500 mt-1 text-sm sm:text-lg">Ringkasan data terbaru di Bank Data Arsip
+                    Kampus</p>
+                <p id="currentDateTime" class="text-gray-400 mt-1 text-xs sm:text-sm"></p>
             </div>
         </div>
 
         <!-- Cards Ringkasan -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
             <div
-                class="bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-xl shadow-lg p-6 flex items-center justify-between transform hover:scale-105 transition-transform duration-300">
+                class="bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-xl shadow-lg p-4 sm:p-6 flex items-center justify-between transform hover:scale-105 transition-transform duration-300">
                 <div>
-                    <h2 class="text-lg font-semibold">Total Dosen</h2>
-                    <p class="text-3xl font-bold mt-2">{{ $totalDosen }}</p>
+                    <h2 class="text-sm sm:text-lg font-semibold">Total Dosen</h2>
+                    <p class="text-2xl sm:text-3xl font-bold mt-1 sm:mt-2">{{ $totalDosen }}</p>
                 </div>
-                <i class="fas fa-chalkboard-teacher fa-3x opacity-80"></i>
+                <i class="fas fa-chalkboard-teacher text-2xl sm:text-3xl opacity-80"></i>
             </div>
 
             <div
-                class="bg-gradient-to-r from-pink-500 to-orange-400 text-white rounded-xl shadow-lg p-6 flex items-center justify-between transform hover:scale-105 transition-transform duration-300">
+                class="bg-gradient-to-r from-pink-500 to-orange-400 text-white rounded-xl shadow-lg p-4 sm:p-6 flex items-center justify-between transform hover:scale-105 transition-transform duration-300">
                 <div>
-                    <h2 class="text-lg font-semibold">Total Tenaga Pendidik</h2>
-                    <p class="text-3xl font-bold mt-2">{{ $totalTendik }}</p>
+                    <h2 class="text-sm sm:text-lg font-semibold">Total Tenaga Pendidik</h2>
+                    <p class="text-2xl sm:text-3xl font-bold mt-1 sm:mt-2">{{ $totalTendik }}</p>
                 </div>
-                <i class="fas fa-user-tie fa-3x opacity-80"></i>
+                <i class="fas fa-user-tie text-2xl sm:text-3xl opacity-80"></i>
             </div>
 
             <div
-                class="bg-gradient-to-r from-orange-400 to-amber-300 text-white rounded-xl shadow-lg p-6 flex items-center justify-between transform hover:scale-105 transition-transform duration-300">
+                class="bg-gradient-to-r from-orange-400 to-amber-300 text-white rounded-xl shadow-lg p-4 sm:p-6 flex items-center justify-between transform hover:scale-105 transition-transform duration-300">
                 <div>
-                    <h2 class="text-lg font-semibold">Total Dokumen Arsip</h2>
-                    <p class="text-3xl font-bold mt-2">{{ $totalArsip }}</p>
+                    <h2 class="text-sm sm:text-lg font-semibold">Total Dokumen Arsip</h2>
+                    <p class="text-2xl sm:text-3xl font-bold mt-1 sm:mt-2">{{ $totalArsip }}</p>
                 </div>
-                <i class="fas fa-file-alt fa-3x opacity-80"></i>
+                <i class="fas fa-file-alt text-2xl sm:text-3xl opacity-80"></i>
             </div>
 
             <div
-                class="bg-gradient-to-r from-indigo-500 to-purple-400 text-white rounded-xl shadow-lg p-6 flex items-center justify-between transform hover:scale-105 transition-transform duration-300">
+                class="bg-gradient-to-r from-indigo-500 to-purple-400 text-white rounded-xl shadow-lg p-4 sm:p-6 flex items-center justify-between transform hover:scale-105 transition-transform duration-300">
                 <div>
-                    <h2 class="text-lg font-semibold">Total Sarpras</h2>
-                    <p class="text-3xl font-bold mt-2">{{ $totalSarpras }}</p>
+                    <h2 class="text-sm sm:text-lg font-semibold">Total Sarpras</h2>
+                    <p class="text-2xl sm:text-3xl font-bold mt-1 sm:mt-2">{{ $totalSarpras }}</p>
+                    <p class="text-xs sm:text-sm opacity-90 mt-1">{{ $totalBarang }} barang</p>
                 </div>
-                <i class="fas fa-boxes fa-3x opacity-80"></i>
+                <i class="fas fa-boxes text-2xl sm:text-3xl opacity-80"></i>
+            </div>
+        </div>
+
+        <!-- Stats Sarpras Detail -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+            <div class="bg-white rounded-lg shadow-sm border p-3 sm:p-4 text-center">
+                <div class="text-xl sm:text-2xl font-bold text-blue-600">{{ $totalRuangan }}</div>
+                <div class="text-xs sm:text-sm text-gray-600">Total Ruangan</div>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm border p-3 sm:p-4 text-center">
+                <div class="text-xl sm:text-2xl font-bold text-green-600">Rp
+                    {{ number_format($totalNilaiSarpras, 0, ',', '.') }}</div>
+                <div class="text-xs sm:text-sm text-gray-600">Total Nilai Sarpras</div>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm border p-3 sm:p-4 text-center">
+                <div class="text-xl sm:text-2xl font-bold text-purple-600">{{ $kondisiBaik }}</div>
+                <div class="text-xs sm:text-sm text-gray-600">Barang Kondisi Baik</div>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm border p-3 sm:p-4 text-center">
+                <div class="text-xl sm:text-2xl font-bold text-orange-600">{{ $kondisiRusak }}</div>
+                <div class="text-xs sm:text-sm text-gray-600">Barang Perlu Perbaikan</div>
             </div>
         </div>
 
         <!-- Grafik -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <h2 class="text-xl font-semibold mb-4">Dosen per Prodi</h2>
-                <canvas id="chartDosenPerProdi" class="rounded-lg shadow-inner p-2 bg-gray-50"></canvas>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
+            <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6">
+                <h2 class="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Dosen per Prodi</h2>
+                <div class="chart-container">
+                    <canvas id="chartDosenPerProdi"></canvas>
+                </div>
             </div>
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <h2 class="text-xl font-semibold mb-4">Dokumen per Bulan</h2>
-                <canvas id="chartArsipPerBulan" class="rounded-lg shadow-inner p-2 bg-gray-50"></canvas>
+            <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6">
+                <h2 class="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Dokumen per Bulan</h2>
+                <div class="chart-container">
+                    <canvas id="chartArsipPerBulan"></canvas>
+                </div>
             </div>
         </div>
 
+        <!-- Grafik Sarpras -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
+            <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6">
+                <h2 class="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Ruangan per Tipe</h2>
+                <div class="chart-container">
+                    <canvas id="chartRuanganPerTipe"></canvas>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6">
+                <h2 class="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Kondisi Barang</h2>
+                <div class="chart-container">
+                    <canvas id="chartKondisiBarang"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabel Ruangan Terbaru -->
+        <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6">
+            <h2 class="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Ruangan Terbaru</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-xs sm:text-sm">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-3 py-2 sm:px-4 sm:py-3 text-left font-medium text-gray-700">Nama Ruangan</th>
+                            <th class="px-3 py-2 sm:px-4 sm:py-3 text-left font-medium text-gray-700">Tipe</th>
+                            <th class="px-3 py-2 sm:px-4 sm:py-3 text-left font-medium text-gray-700">Lokasi</th>
+                            <th class="px-3 py-2 sm:px-4 sm:py-3 text-center font-medium text-gray-700">Jumlah Barang
+                            </th>
+                            <th class="px-3 py-2 sm:px-4 sm:py-3 text-center font-medium text-gray-700">Kondisi</th>
+                            <th class="px-3 py-2 sm:px-4 sm:py-3 text-center font-medium text-gray-700">Tanggal Dibuat
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        @forelse($ruanganTerbaru as $ruangan)
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-3 py-2 sm:px-4 sm:py-3 font-medium text-xs sm:text-sm">
+                                    {{ $ruangan->nama_ruangan }}</td>
+                                <td class="px-3 py-2 sm:px-4 sm:py-3">
+                                    @if ($ruangan->tipe_ruangan == 'akademik')
+                                        <span
+                                            class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">Akademik</span>
+                                    @else
+                                        <span
+                                            class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">Umum</span>
+                                    @endif
+                                </td>
+                                <td class="px-3 py-2 sm:px-4 sm:py-3">
+                                    @if ($ruangan->tipe_ruangan == 'akademik')
+                                        <div class="text-xs sm:text-sm">
+                                            <div class="font-medium">{{ $ruangan->prodi->nama_prodi ?? 'N/A' }}</div>
+                                            <div class="text-gray-500 text-xs">
+                                                {{ $ruangan->prodi->fakultas->nama_fakultas ?? 'N/A' }}</div>
+                                        </div>
+                                    @else
+                                        <div class="text-xs sm:text-sm font-medium text-green-700">
+                                            {{ $ruangan->unit_umum }}</div>
+                                    @endif
+                                </td>
+                                <td class="px-3 py-2 sm:px-4 sm:py-3 text-center">
+                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
+                                        {{ $ruangan->sarpras_count }} barang
+                                    </span>
+                                </td>
+                                <td class="px-3 py-2 sm:px-4 sm:py-3 text-center">
+                                    @php
+                                        $kondisiColor = match ($ruangan->kondisi_ruangan) {
+                                            'Baik' => 'bg-green-100 text-green-800',
+                                            'Rusak Ringan' => 'bg-yellow-100 text-yellow-800',
+                                            'Rusak Berat' => 'bg-red-100 text-red-800',
+                                            default => 'bg-gray-100 text-gray-800',
+                                        };
+                                    @endphp
+                                    <span class="px-2 py-1 text-xs rounded-full {{ $kondisiColor }}">
+                                        {{ $ruangan->kondisi_ruangan }}
+                                    </span>
+                                </td>
+                                <td class="px-3 py-2 sm:px-4 sm:py-3 text-center text-gray-500 text-xs sm:text-sm">
+                                    {{ $ruangan->created_at->format('d/m/Y') }}
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="px-4 py-6 sm:py-8 text-center text-gray-500">
+                                    <i class="fas fa-door-open text-2xl sm:text-4xl mb-2 block"></i>
+                                    Belum ada data ruangan
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+            @if ($ruanganTerbaru->count() > 0)
+                <div class="mt-3 sm:mt-4 text-center">
+                    <a href="{{ route('ruangan.index') }}"
+                        class="text-blue-600 hover:text-blue-800 text-xs sm:text-sm font-medium">
+                        Lihat Semua Ruangan →
+                    </a>
+                </div>
+            @endif
+        </div>
     </div>
 
     @push('scripts')
@@ -94,27 +243,7 @@
                 "“Setiap hari adalah kesempatan baru untuk belajar sesuatu yang baru.”",
                 "“Pendidikan membuka pikiran, memperluas pandangan, dan membentuk masa depan.”",
                 "“Tidak ada kata terlambat untuk belajar dan memperbaiki diri.”",
-                "“Guru membuka pintu, tapi kamu harus masuk sendiri.” – Pepatah Tiongkok",
-                "“Masa depan milik mereka yang mempersiapkan diri hari ini.” – Malcolm X",
-                "“Kegagalan adalah bagian dari proses menuju keberhasilan.”",
-                "“Belajarlah seolah-olah kamu akan hidup selamanya.” – Mahatma Gandhi",
-                "“Tujuan pendidikan adalah menggantikan pikiran kosong dengan pikiran terbuka.” – Malcolm Forbes",
-                "“Ilmu tanpa amal bagaikan pohon tanpa buah.” – Ali bin Abi Thalib",
-                "“Pendidikan bukan persiapan untuk hidup, pendidikan adalah kehidupan itu sendiri.” – John Dewey",
-                "“Satu jam belajar akan mengubah hari, satu hari belajar akan mengubah hidup.”",
-                "“Kampus adalah tempat menanam mimpi, bukan sekadar mencari nilai.”",
-                "“Belajar adalah investasi terbaik yang hasilnya tidak akan pernah hilang.”",
-                "“Orang berilmu tidak hanya pintar, tapi juga bijak dalam bertindak.”",
-                "“Motivasi datang dari dalam diri, bukan dari nilai di kertas.”",
-                "“Pendidikan adalah perjalanan tanpa akhir.”",
-                "“Setiap buku yang kamu baca membuka satu jendela baru di pikiranmu.”",
-                "“Keberhasilan akademik bukanlah akhir, tapi awal dari kontribusi nyata.”",
-                "“Jangan takut salah, karena dari kesalahanlah kita belajar menjadi benar.”",
-                "“Berpikir kritis adalah kunci dari kemajuan peradaban.”",
-                "“Mahasiswa sejati bukan hanya mengejar gelar, tapi juga kebenaran dan perubahan.”",
-                "“Pendidikan sejati adalah yang membebaskan, bukan yang membatasi.” – Ki Hajar Dewantara",
-                "“Dengan ilmu, kita terangkat. Dengan adab, kita dimuliakan.”",
-                "“Semakin banyak kamu tahu, semakin kamu sadar betapa banyak yang belum kamu ketahui.” – Aristoteles"
+                "“Guru membuka pintu, tapi kamu harus masuk sendiri.” – Pepatah Tiongkok"
             ];
             const today = new Date();
             const dayIndex = today.getDate() % quotes.length;
@@ -132,62 +261,230 @@
                 const dateString = now.toLocaleDateString('id-ID', options);
                 const timeString = now.toLocaleTimeString('id-ID');
                 document.getElementById('currentDateTime').innerText = `${dateString} | ${timeString}`;
-
-                // Digital clock di samping greeting
-                // document.getElementById('digitalClock').innerText = timeString;
             }
             updateDateTime();
             setInterval(updateDateTime, 1000);
 
+            // ------------------ Data dari Controller ------------------
+            const dosenPerProdi = @json($dosenPerProdi ?? []);
+            const arsipPerBulan = @json($arsipPerBulan ?? []);
+            const barangPerKategori = @json($barangPerKategori ?? []);
+            const kondisiBarang = @json($kondisiBarang ?? []);
+
+            // Function untuk membuat chart dengan responsive options
+            function createResponsiveChart(canvasId, config) {
+                const ctx = document.getElementById(canvasId).getContext('2d');
+                return new Chart(ctx, {
+                    ...config,
+                    options: {
+                        ...config.options,
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            ...config.options?.plugins,
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    boxWidth: 12,
+                                    font: {
+                                        size: window.innerWidth < 640 ? 10 : 12
+                                    }
+                                }
+                            }
+                        },
+                        scales: config.options?.scales ? {
+                            ...config.options.scales,
+                            x: {
+                                ...config.options.scales?.x,
+                                ticks: {
+                                    font: {
+                                        size: window.innerWidth < 640 ? 10 : 12
+                                    }
+                                }
+                            },
+                            y: {
+                                ...config.options.scales?.y,
+                                ticks: {
+                                    font: {
+                                        size: window.innerWidth < 640 ? 10 : 12
+                                    }
+                                }
+                            }
+                        } : {}
+                    }
+                });
+            }
+
             // ------------------ Chart Dosen Per Prodi ------------------
-            const dosenPerProdi = @json($dosenPerProdi);
-            const arsipPerBulan = @json($arsipPerBulan);
+            if (dosenPerProdi.length > 0) {
+                const dosenLabels = dosenPerProdi.map(d => d.prodi);
+                const dosenData = dosenPerProdi.map(d => d.total);
 
-            const dosenLabels = dosenPerProdi.map(d => d.prodi);
-            const dosenData = dosenPerProdi.map(d => d.total);
+                createResponsiveChart('chartDosenPerProdi', {
+                    type: 'bar',
+                    data: {
+                        labels: dosenLabels,
+                        datasets: [{
+                            label: 'Jumlah Dosen',
+                            data: dosenData,
+                            backgroundColor: [
+                                'rgba(236, 72, 153, 0.7)',
+                                'rgba(168, 85, 247, 0.7)',
+                                'rgba(251, 146, 60, 0.7)',
+                                'rgba(59, 130, 246, 0.7)',
+                                'rgba(34, 197, 94, 0.7)'
+                            ]
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            } else {
+                document.getElementById('chartDosenPerProdi').parentElement.innerHTML = `
+                    <div class="flex items-center justify-center h-48 text-gray-500">
+                        <div class="text-center">
+                            <i class="fas fa-chart-bar text-3xl mb-2"></i>
+                            <p class="text-sm">Data dosen per prodi tidak tersedia</p>
+                        </div>
+                    </div>
+                `;
+            }
 
-            new Chart(document.getElementById('chartDosenPerProdi'), {
-                type: 'bar',
-                data: {
-                    labels: dosenLabels,
-                    datasets: [{
-                        label: 'Jumlah Dosen',
-                        data: dosenData,
-                        backgroundColor: [
-                            'rgba(236, 72, 153, 0.7)', // pink
-                            'rgba(168, 85, 247, 0.7)', // purple
-                            'rgba(251, 146, 60, 0.7)', // orange
-                            'rgba(59, 130, 246, 0.7)', // blue
-                            'rgba(34, 197, 94, 0.7)' // green
-                        ]
-                    }]
-                },
-                options: {
-                    responsive: true
-                }
-            });
             // ------------------ Chart Arsip Per Bulan ------------------
-            const arsipLabels = arsipPerBulan.map(a => 'Bulan ' + a.bulan);
-            const arsipData = arsipPerBulan.map(a => a.total);
+            if (arsipPerBulan.length > 0) {
+                const arsipLabels = arsipPerBulan.map(a => a.bulan);
+                const arsipData = arsipPerBulan.map(a => a.total);
 
-            new Chart(document.getElementById('chartArsipPerBulan'), {
-                type: 'line',
-                data: {
-                    labels: arsipLabels,
-                    datasets: [{
-                        label: 'Jumlah Dokumen',
-                        data: arsipData,
-                        borderColor: 'rgba(236, 72, 153, 0.9)',
-                        backgroundColor: 'rgba(236, 72, 153, 0.15)',
-                        fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: 'rgba(236, 72, 153, 0.9)',
-                        pointBorderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true
+                createResponsiveChart('chartArsipPerBulan', {
+                    type: 'line',
+                    data: {
+                        labels: arsipLabels,
+                        datasets: [{
+                            label: 'Jumlah Dokumen',
+                            data: arsipData,
+                            borderColor: 'rgba(236, 72, 153, 0.9)',
+                            backgroundColor: 'rgba(236, 72, 153, 0.15)',
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: 'rgba(236, 72, 153, 0.9)',
+                            pointBorderWidth: 2
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            } else {
+                document.getElementById('chartArsipPerBulan').parentElement.innerHTML = `
+                    <div class="flex items-center justify-center h-48 text-gray-500">
+                        <div class="text-center">
+                            <i class="fas fa-chart-line text-3xl mb-2"></i>
+                            <p class="text-sm">Data arsip per bulan tidak tersedia</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // ------------------ Chart Ruangan Per Tipe ------------------
+            if (ruanganPerTipe && ruanganPerTipe.length > 0) {
+                const tipeLabels = ruanganPerTipe.map(r => r.tipe);
+                const tipeData = ruanganPerTipe.map(r => r.total);
+
+                const hasData = tipeData.some(total => total > 0);
+
+                if (hasData) {
+                    createResponsiveChart('chartRuanganPerTipe', {
+                        type: 'doughnut',
+                        data: {
+                            labels: tipeLabels,
+                            datasets: [{
+                                label: 'Jumlah Ruangan',
+                                data: tipeData,
+                                backgroundColor: [
+                                    'rgba(59, 130, 246, 0.8)', // Biru untuk Akademik
+                                    'rgba(16, 185, 129, 0.8)', // Hijau untuk Umum
+                                ],
+                                borderColor: [
+                                    'rgba(59, 130, 246, 1)',
+                                    'rgba(16, 185, 129, 1)',
+                                ],
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const label = context.label || '';
+                                            const value = context.raw || 0;
+                                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                            const percentage = Math.round((value / total) * 100);
+                                            return `${label}: ${value} ruangan (${percentage}%)`;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    showNoDataMessage('chartRuanganPerTipe', 'Data ruangan per tipe tidak tersedia');
                 }
+            } else {
+                showNoDataMessage('chartRuanganPerTipe', 'Data ruangan per tipe tidak tersedia');
+            }
+
+            // ------------------ Chart Kondisi Barang ------------------
+            if (kondisiBarang.length > 0) {
+                const kondisiLabels = kondisiBarang.map(k => k.kondisi);
+                const kondisiData = kondisiBarang.map(k => k.total);
+
+                createResponsiveChart('chartKondisiBarang', {
+                    type: 'pie',
+                    data: {
+                        labels: kondisiLabels,
+                        datasets: [{
+                            label: 'Jumlah Barang',
+                            data: kondisiData,
+                            backgroundColor: [
+                                'rgba(16, 185, 129, 0.8)',
+                                'rgba(245, 158, 11, 0.8)',
+                                'rgba(239, 68, 68, 0.8)',
+                                'rgba(156, 163, 175, 0.8)'
+                            ]
+                        }]
+                    }
+                });
+            } else {
+                document.getElementById('chartKondisiBarang').parentElement.innerHTML = `
+                    <div class="flex items-center justify-center h-48 text-gray-500">
+                        <div class="text-center">
+                            <i class="fas fa-chart-pie text-3xl mb-2"></i>
+                            <p class="text-sm">Data kondisi barang tidak tersedia</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Handle window resize untuk update chart
+            let resizeTimer;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(function() {
+                    // Charts akan otomatis responsive karena maintainAspectRatio: false
+                }, 250);
             });
         </script>
     @endpush

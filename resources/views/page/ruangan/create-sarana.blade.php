@@ -1,18 +1,18 @@
 <x-app-layout>
-    <x-slot name="title">Tambah Ruangan Akademik</x-slot>
+    <x-slot name="title">Tambah Ruangan Sarana</x-slot>
 
     <div class="p-6">
         <div class="max-w-4xl mx-auto">
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                <!-- Header -->
+                <!-- Header - DIUBAH -->
                 <div class="flex items-center justify-between mb-6 pb-4 border-b">
                     <div class="flex items-center space-x-3">
-                        <div class="bg-blue-100 text-blue-600 p-2 rounded-full">
+                        <div class="bg-orange-100 text-orange-600 p-2 rounded-full">
                             <i class="fas fa-graduation-cap"></i>
                         </div>
                         <div>
-                            <h1 class="text-xl font-semibold text-gray-800">Tambah Ruangan Akademik</h1>
-                            <p class="text-gray-600 text-sm">Isi form berikut untuk menambah data ruangan akademik</p>
+                            <h1 class="text-xl font-semibold text-gray-800">Tambah Ruangan Sarana</h1>
+                            <p class="text-gray-600 text-sm">Isi form berikut untuk menambah data ruangan sarana</p>
                         </div>
                     </div>
                     <a href="{{ route('ruangan.create') }}"
@@ -25,7 +25,7 @@
                 <!-- Form -->
                 <form action="{{ route('ruangan.store') }}" method="POST">
                     @csrf
-                    <input type="hidden" name="tipe_ruangan" value="akademik">
+                    <input type="hidden" name="tipe_ruangan" value="sarana"> <!-- DIUBAH -->
 
                     <!-- Fakultas -->
                     <div class="mb-4">
@@ -33,7 +33,7 @@
                             Fakultas <span class="text-red-500">*</span>
                         </label>
                         <select name="id_fakultas" id="id_fakultas"
-                            class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500" required> <!-- DIUBAH -->
                             <option value="">-- Pilih Fakultas --</option>
                             @foreach ($fakultas as $item)
                                 <option value="{{ $item->id }}"
@@ -53,7 +53,7 @@
                             Program Studi <span class="text-red-500">*</span>
                         </label>
                         <select name="id_prodi" id="id_prodi"
-                            class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required disabled>
+                            class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500" required disabled> <!-- DIUBAH -->
                             <option value="">-- Pilih Prodi --</option>
                         </select>
                         @error('id_prodi')
@@ -67,14 +67,14 @@
                             Nama Ruangan <span class="text-red-500">*</span>
                         </label>
                         <input type="text" name="nama_ruangan" value="{{ old('nama_ruangan') }}"
-                            class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500" <!-- DIUBAH -->
                             placeholder="Contoh: Lab Komputer, Ruang Kelas 101, Ruang Dosen A" required>
                         @error('nama_ruangan')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    <!-- Tombol -->
+                    <!-- Tombol - DIUBAH -->
                     <div
                         class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 pt-4 border-t">
                         <a href="{{ route('ruangan.create') }}"
@@ -82,9 +82,9 @@
                             Batal
                         </a>
                         <button type="submit"
-                            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition flex items-center justify-center">
+                            class="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2 rounded-lg transition flex items-center justify-center"> <!-- DIUBAH -->
                             <i class="fas fa-save mr-2"></i>
-                            Simpan Ruangan Akademik
+                            Simpan Ruangan Sarana <!-- DIUBAH -->
                         </button>
                     </div>
                 </form>

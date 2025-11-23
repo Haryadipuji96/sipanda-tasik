@@ -44,6 +44,7 @@
     <div class="p-6">
         <div class="flex justify-between items-center mb-4">
             <h1 class="text-xl font-semibold">Data Program Studi</h1>
+            
             <button onclick="window.location='{{ route('prodi.create') }}'" class="cssbuttons-io-button">
                 <svg height="18" width="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M0 0h24v24H0z" fill="none"></path>
@@ -101,73 +102,7 @@
                                         </button>
                                     </form>
 
-                                    <!-- Modal Edit -->
-                                    <div x-show="openModal" x-cloak
-                                        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                                        <div @click.away="openModal = false"
-                                            class="bg-white rounded-lg w-full max-w-md p-6">
-                                            <h2 class="text-lg font-semibold mb-4">Edit Program Studi</h2>
-                                            <form action="{{ route('prodi.update', $p->id) }}" method="POST">
-                                                @csrf
-                                                @method('PUT')
-
-                                                <div class="mb-4">
-                                                    <label class="block font-medium mb-1">Fakultas</label>
-                                                    <select name="id_fakultas" class="w-full border rounded px-3 py-2"
-                                                        required>
-                                                        @foreach ($fakultas as $f)
-                                                            <option value="{{ $f->id }}"
-                                                                {{ $p->id_fakultas == $f->id ? 'selected' : '' }}>
-                                                                {{ $f->nama_fakultas }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-
-                                                <div class="mb-4">
-                                                    <label class="block font-medium mb-1">Nama Program Studi</label>
-                                                    <input type="text" name="nama_prodi"
-                                                        value="{{ $p->nama_prodi }}"
-                                                        class="w-full border rounded px-3 py-2" required>
-                                                </div>
-
-                                                <div class="mb-4">
-                                                    <label class="block font-medium mb-1">Jenjang</label>
-                                                    <select name="jenjang" class="w-full border rounded px-3 py-2">
-                                                        <option value="">-- Pilih Jenjang --</option>
-                                                        <option value="S1"
-                                                            {{ $p->jenjang == 'S1' ? 'selected' : '' }}>S1</option>
-                                                        <option value="S2"
-                                                            {{ $p->jenjang == 'S2' ? 'selected' : '' }}>S2</option>
-                                                        <option value="S3"
-                                                            {{ $p->jenjang == 'S3' ? 'selected' : '' }}>S3</option>
-                                                        <option value="D3"
-                                                            {{ $p->jenjang == 'D3' ? 'selected' : '' }}>D3</option>
-                                                        <option value="D4"
-                                                            {{ $p->jenjang == 'D4' ? 'selected' : '' }}>D4</option>
-                                                        <option value="Prof"
-                                                            {{ $p->jenjang == 'Prof' ? 'selected' : '' }}>Prof</option>
-                                                        <option value="Lainnya"
-                                                            {{ $p->jenjang == 'Lainnya' ? 'selected' : '' }}>Lainnya
-                                                        </option>
-                                                    </select>
-                                                </div>
-
-                                                <div class="mb-4">
-                                                    <label class="block font-medium mb-1">Deskripsi</label>
-                                                    <textarea name="deskripsi" rows="3" class="w-full border rounded px-3 py-2">{{ $p->deskripsi }}</textarea>
-                                                </div>
-
-                                                <div class="flex justify-end space-x-2">
-                                                    <button type="button" @click="openModal = false"
-                                                        class="bg-red-500 text-white px-4 py-2 rounded">Batal</button>
-                                                    <button type="submit"
-                                                        class="bg-blue-600 text-white px-4 py-2 rounded">Update</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                    <!-- End Modal -->
+                                    
                                 </div>
                             </td>
                         </tr>

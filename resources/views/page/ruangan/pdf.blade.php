@@ -157,7 +157,7 @@
             <strong>Program Studi:</strong> {{ $prodi->nama_prodi }}<br>
             <strong>Fakultas:</strong> {{ $prodi->fakultas->nama_fakultas ?? '-' }}
         @else
-            <strong>Lokasi:</strong> Unit Umum
+            <strong>Lokasi:</strong> Unit Prasarana <!-- DIUBAH -->
         @endif
     </div>
 

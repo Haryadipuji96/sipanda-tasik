@@ -20,14 +20,9 @@ class DokumenMahasiswa extends Model
         'status_mahasiswa',
         'file_ijazah',
         'file_transkrip',
-        'status_verifikasi',
-        'catatan_verifikasi',
-        'superadmin_verifikator_id', // GANTI JADI SUPERADMIN
-        'tanggal_verifikasi'
     ];
 
     protected $casts = [
-        'tanggal_verifikasi' => 'datetime',
         'tahun_masuk' => 'integer',
         'tahun_keluar' => 'integer',
     ];
@@ -38,27 +33,27 @@ class DokumenMahasiswa extends Model
         return $this->belongsTo(Prodi::class, 'prodi_id');
     }
 
-    // Relasi ke superadmin yang memverifikasi
-    public function superadminVerifikator()
-    {
-        return $this->belongsTo(User::class, 'superadmin_verifikator_id');
-    }
+    // // Relasi ke superadmin yang memverifikasi
+    // public function superadminVerifikator()
+    // {
+    //     return $this->belongsTo(User::class, 'superadmin_verifikator_id');
+    // }
 
-    // Scope untuk filter status
-    public function scopeTerverifikasi($query)
-    {
-        return $query->where('status_verifikasi', 'Terverifikasi');
-    }
+    // // Scope untuk filter status
+    // public function scopeTerverifikasi($query)
+    // {
+    //     return $query->where('status_verifikasi', 'Terverifikasi');
+    // }
 
-    public function scopeMenunggu($query)
-    {
-        return $query->where('status_verifikasi', 'Menunggu');
-    }
+    // public function scopeMenunggu($query)
+    // {
+    //     return $query->where('status_verifikasi', 'Menunggu');
+    // }
 
-    public function scopeDitolak($query)
-    {
-        return $query->where('status_verifikasi', 'Ditolak');
-    }
+    // public function scopeDitolak($query)
+    // {
+    //     return $query->where('status_verifikasi', 'Ditolak');
+    // }
 
     // Scope untuk status mahasiswa
     public function scopeAktif($query)

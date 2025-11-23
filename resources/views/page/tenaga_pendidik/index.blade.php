@@ -70,7 +70,7 @@
         <!-- Header -->
         <div class="flex justify-between items-center mb-8">
             <h2 class="text-2xl font-semibold text-gray-800">Data Tenaga Pendidik</h2>
-            @canSuperadmin
+            @canCrud('tenaga-pendidik')
             <button onclick="window.location='{{ route('tenaga-pendidik.create') }}'" class="cssbuttons-io-button">
                 <svg height="18" width="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M0 0h24v24H0z" fill="none" />
@@ -78,21 +78,21 @@
                 </svg>
                 <span>Tambah</span>
             </button>
-            @endcanSuperadmin
+            @endcanCrud
         </div>
 
         <x-search-bar route="tenaga-pendidik.index" placeholder="Cari nama / NIP / prodi..." />
 
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2 mb-4">
-            @canSuperadmin
+
             <!-- Button Hapus Terpilih -->
             <button id="delete-selected"
                 class="order-2 sm:order-1 px-3 py-1.5 text-sm rounded-full font-medium text-white bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-center sm:w-auto"
                 disabled>
                 <span>Hapus Terpilih</span>
             </button>
-            @endcanSuperadmin
-            <!-- Export Buttons -->
+
+
             <div class="order-1 sm:order-2 flex gap-2">
                 <!-- Button Preview PDF -->
                 <a href="{{ route('tenaga-pendidik.preview-all.pdf', ['search' => request('search')]) }}"
@@ -127,11 +127,11 @@
             <table class="w-full border text-sm bg-white">
                 <thead class="bg-blue-500 text-white">
                     <tr>
-                        @canSuperadmin
+                        @canCrud('tenaga-pendidik')
                         <th rowspan="2" class="px-4 py-2 border text-center w-12">
                             <input type="checkbox" id="select-all">
                         </th>
-                        @endcanSuperadmin
+                        @endcanCrud
                         <th rowspan="2" class="px-4 py-2 border text-center w-12">No</th>
                         <th rowspan="2" class="border px-4 py-2">Nama Lengkap</th>
                         <th rowspan="2" class="border px-4 py-2">Posisi/Jabatan</th>
@@ -143,7 +143,9 @@
                         <th rowspan="2" class="border px-4 py-2">TMT Kerja</th>
                         <th rowspan="2" class="border px-4 py-2 text-center">NIP/NIK</th>
                         <th rowspan="2" class="border px-4 py-2 text-center">Keterangan</th>
+                        
                         <th rowspan="2" class="border px-4 py-2 text-center w-40">Aksi</th>
+                        
                     </tr>
                 </thead>
 
@@ -164,12 +166,12 @@
                 <tbody>
                     @forelse ($tenaga as $index => $t)
                         <tr class="hover:bg-gray-50" x-data="{ openModal: false }">
-                            @canSuperadmin
+                            @canCrud('tenaga-pendidik')
                             <td class="border px-3 py-2 text-center">
                                 <input type="checkbox" class="select-item" name="selected_tendik[]"
                                     value="{{ $t->id }}">
                             </td>
-                            @endcanSuperadmin
+                            @endcanCrud
                             <td class="border px-3 py-2 text-center">
                                 {{ $index + $tenaga->firstItem() }}
                             </td>
@@ -224,7 +226,7 @@
                                         </svg>
                                     </a>
 
-                                    @canSuperadmin
+                                    @canCrud('tenaga-pendidik')
                                     <!-- Tombol Edit -->
                                     <button @click="openModal = {{ $t->id }}"
                                         class="p-2 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-full transition"
@@ -251,7 +253,7 @@
                                             </svg>
                                         </button>
                                     </form>
-                                    @endcanSuperadmin
+                                    @endcanCrud
                                 </div>
                                 <!-- Modal Edit -->
                                 <div x-show="openModal === {{ $t->id }}" x-cloak

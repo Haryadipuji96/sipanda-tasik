@@ -88,10 +88,10 @@
                             <h4 class="font-medium text-blue-800 mb-1">Informasi Ruangan</h4>
                             <p class="text-blue-700 text-sm">
                                 <strong>Tipe:</strong> 
-                                @if($ruangan->tipe_ruangan == 'akademik')
-                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Akademik</span>
+                                @if($ruangan->tipe_ruangan == 'sarana')
+                                    <span class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs">Sarana</span>
                                 @else
-                                    <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Umum</span>
+                                    <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Prasarana</span>
                                 @endif
                                 | 
                                 <strong>Dibuat:</strong> {{ $ruangan->created_at->format('d F Y') }}
@@ -123,40 +123,40 @@
                         </div>
 
                         <!-- Form berdasarkan tipe ruangan -->
-                        @if($ruangan->tipe_ruangan == 'akademik')
-                            <!-- Form Ruangan Akademik -->
+                        @if($ruangan->tipe_ruangan == 'sarana')
+                            <!-- Form Ruangan Sarana -->
                             <div class="mb-6">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
                                     Program Studi <span class="text-red-500">*</span>
                                 </label>
-                                <select name="prodi_id" 
+                                <select name="id_prodi" 
                                         class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                                         required>
                                     <option value="">-- Pilih Program Studi --</option>
                                     @foreach($prodi as $p)
                                         <option value="{{ $p->id }}" 
-                                            {{ old('prodi_id', $ruangan->prodi_id) == $p->id ? 'selected' : '' }}>
+                                            {{ old('id_prodi', $ruangan->id_prodi) == $p->id ? 'selected' : '' }}>
                                             {{ $p->nama_prodi }} - {{ $p->fakultas->nama_fakultas }}
                                         </option>
                                     @endforeach
                                 </select>
-                                @error('prodi_id')
+                                @error('id_prodi')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
                         @else
-                            <!-- Form Ruangan Umum -->
+                            <!-- Form Ruangan Prasarana -->
                             <div class="mb-6">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    Unit Umum <span class="text-red-500">*</span>
+                                    Unit Prasarana <span class="text-red-500">*</span>
                                 </label>
                                 <input type="text" 
-                                       name="unit_umum" 
-                                       value="{{ old('unit_umum', $ruangan->unit_umum) }}"
+                                       name="unit_prasarana" 
+                                       value="{{ old('unit_prasarana', $ruangan->unit_prasarana) }}"
                                        class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                                        placeholder="Contoh: Rektorat, Perpustakaan, Gedung Yayasan"
                                        required>
-                                @error('unit_umum')
+                                @error('unit_prasarana')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
@@ -180,7 +180,8 @@
                             @enderror
                         </div>
 
-                        <!-- Keterangan -->
+                        <!-- HAPUS BAGIAN KETERANGAN - KARENA KOLOM TIDAK ADA DI DATABASE -->
+                        {{--
                         <div class="mb-6">
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 Keterangan (Opsional)
@@ -193,6 +194,7 @@
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
+                        --}}
 
                         <!-- Tombol -->
                         <div class="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t">
