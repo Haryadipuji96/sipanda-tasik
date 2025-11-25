@@ -53,7 +53,7 @@
             display: none !important;
         }
 
-        /* Animasi hamburger yang ditingkatkan */
+        /* Animasi hamburger */
         .hamburger-line {
             display: block;
             height: 2px;
@@ -89,26 +89,6 @@
         .mobile-menu {
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             transform-origin: top;
-        }
-
-        .mobile-menu-enter {
-            opacity: 0;
-            transform: scaleY(0.8) translateY(-10px);
-        }
-
-        .mobile-menu-enter-active {
-            opacity: 1;
-            transform: scaleY(1) translateY(0);
-        }
-
-        .mobile-menu-leave {
-            opacity: 1;
-            transform: scaleY(1) translateY(0);
-        }
-
-        .mobile-menu-leave-active {
-            opacity: 0;
-            transform: scaleY(0.8) translateY(-10px);
         }
 
         /* Fix z-index untuk dropdown */
@@ -177,33 +157,125 @@
             border: 6px solid transparent;
             border-bottom-color: #ef4444;
         }
+
+        /* RESPONSIVE DESIGN IMPROVEMENTS */
+        
+        /* Container responsive untuk navbar */
+        .navbar-responsive-container {
+            max-width: 1536px;
+            margin: 0 auto;
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        @media (min-width: 640px) {
+            .navbar-responsive-container {
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .navbar-responsive-container {
+                padding-left: 2rem;
+                padding-right: 2rem;
+            }
+        }
+
+        @media (min-width: 1536px) {
+            .navbar-responsive-container {
+                padding-left: 3rem;
+                padding-right: 3rem;
+            }
+        }
+
+        /* Font sizes responsive */
+        .nav-logo-text {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+        }
+
+        .nav-menu-text {
+            font-size: clamp(0.875rem, 1.5vw, 1rem);
+        }
+
+        .nav-profile-name {
+            font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+        }
+
+        .nav-profile-email {
+            font-size: clamp(0.625rem, 1.2vw, 0.75rem);
+        }
+
+        /* Menu desktop spacing untuk layar besar */
+        .nav-desktop-menu {
+            gap: clamp(0.5rem, 1.5vw, 1rem);
+        }
+
+        .nav-desktop-item {
+            padding-left: clamp(0.5rem, 1vw, 0.75rem);
+            padding-right: clamp(0.5rem, 1vw, 0.75rem);
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+
+        /* Profile section responsive */
+        .nav-profile-container {
+            gap: clamp(0.5rem, 1.5vw, 1rem);
+        }
+
+        .nav-profile-avatar {
+            width: clamp(1.5rem, 3vw, 2rem);
+            height: clamp(1.5rem, 3vw, 2rem);
+        }
+
+        /* Dropdown width responsive */
+        .nav-dropdown {
+            width: clamp(12rem, 20vw, 16rem);
+        }
+
+        /* Logo size responsive */
+        .nav-logo {
+            height: clamp(1.5rem, 4vw, 2.5rem);
+        }
+
+        /* Icon sizes responsive */
+        .nav-icon {
+            width: clamp(1rem, 2vw, 1.25rem);
+            height: clamp(1rem, 2vw, 1.25rem);
+        }
+
+        /* Navbar height responsive */
+        .nav-height {
+            height: clamp(3rem, 8vw, 4rem);
+        }
     </style>
 
     <nav class="shadow-md text-white relative z-50" x-data="{ openMaster: false, openSetting: false }">
-        <div class="max-w-8xl mx-auto px-6 sm:px-8 lg:px-12 navbar-container">
-            <div class="flex justify-between h-16 items-center">
+        <div class="navbar-responsive-container navbar-container">
+            <div class="flex justify-between items-center nav-height">
 
                 <!-- Kiri: Logo + Menu -->
-                <div class="flex items-center space-x-8">
+                <div class="flex items-center space-x-4 lg:space-x-8">
                     <a href="{{ route('dashboard') }}" class="flex items-center space-x-2">
-                        <img src="{{ asset('images/Logo-IAIT.png') }}" alt="Logo IAIT" class="h-10 w-auto">
-                        <span class="font-semibold text-lg tracking-wide">SIPANDA</span>
+                        <img src="{{ asset('images/Logo-IAIT.png') }}" alt="Logo IAIT" 
+                            class="nav-logo w-auto">
+                        <span class="font-semibold nav-logo-text tracking-wide">SIPANDA</span>
                     </a>
 
                     <!-- Menu Desktop -->
-                    <div class="hidden sm:flex space-x-4">
-                        <!-- Dashboard - Always accessible -->
+                    <div class="hidden sm:flex nav-desktop-menu">
+                        <!-- Dashboard -->
                         <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')"
-                            class="text-white px-3 py-2 rounded-md font-medium transition-colors hover:bg-blue-500 hover:text-white">
+                            class="text-white nav-desktop-item rounded-md font-medium transition-colors hover:bg-blue-500 hover:text-white nav-menu-text">
                             {{ __('Dashboard') }}
                         </x-nav-link>
 
                         <!-- Dropdown Master Data -->
                         <div class="relative dropdown-master" x-data="{ open: false }">
                             <button @click="open = !open"
-                                class="flex items-center justify-between w-full text-white px-3 py-2 rounded-md font-medium transition-colors hover:bg-blue-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-300 {{ !Auth::user()->hasPermission('fakultas') && !Auth::user()->hasPermission('prodi') && !Auth::user()->hasPermission('kategori-arsip') && !Auth::user()->hasPermission('dokumen-mahasiswa') ? 'menu-disabled-desktop tooltip' : '' }}">
+                                class="flex items-center justify-between text-white nav-desktop-item rounded-md font-medium transition-colors hover:bg-blue-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-300 {{ !Auth::user()->hasPermission('fakultas') && !Auth::user()->hasPermission('prodi') && !Auth::user()->hasPermission('kategori-arsip') && !Auth::user()->hasPermission('dokumen-mahasiswa') ? 'menu-disabled-desktop tooltip' : '' }} nav-menu-text">
                                 <span>Master Data</span>
-                                <svg class="w-4 h-4 ml-2 pointer-events-none transition-transform duration-200"
+                                <svg class="nav-icon ml-1 lg:ml-2 pointer-events-none transition-transform duration-200"
                                     :class="{ 'rotate-180': open }" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -212,60 +284,60 @@
                             </button>
 
                             <div x-show="open" x-transition x-cloak @click.away="open = false"
-                                class="absolute left-0 mt-2 w-56 bg-white text-gray-700 rounded-lg shadow-xl z-50 border border-gray-200 dropdown-content">
+                                class="absolute left-0 mt-2 nav-dropdown bg-white text-gray-700 rounded-lg shadow-xl z-50 border border-gray-200 dropdown-content">
                                 <!-- Fakultas -->
                                 @if(Auth::user()->hasPermission('fakultas'))
                                 <a href="{{ route('fakultas.index') }}"
-                                    class="flex items-center px-4 py-3 text-sm hover:bg-blue-500 hover:text-white rounded transition border-b border-gray-100 last:border-b-0">
-                                    <i class="fas fa-university w-4 h-4 mr-3"></i>
-                                    Fakultas
+                                    class="flex items-center px-3 lg:px-4 py-2 lg:py-3 hover:bg-blue-500 hover:text-white rounded transition border-b border-gray-100 last:border-b-0">
+                                    <i class="fas fa-university nav-icon mr-2 lg:mr-3"></i>
+                                    <span class="nav-menu-text">Fakultas</span>
                                 </a>
                                 @else
-                                <div class="flex items-center px-4 py-3 text-sm text-gray-400 menu-disabled">
-                                    <i class="fas fa-university w-4 h-4 mr-3"></i>
-                                    Fakultas
+                                <div class="flex items-center px-3 lg:px-4 py-2 lg:py-3 text-gray-400 menu-disabled">
+                                    <i class="fas fa-university nav-icon mr-2 lg:mr-3"></i>
+                                    <span class="nav-menu-text">Fakultas</span>
                                 </div>
                                 @endif
 
                                 <!-- Program Studi -->
                                 @if(Auth::user()->hasPermission('prodi'))
                                 <a href="{{ route('prodi.index') }}"
-                                    class="flex items-center px-4 py-3 text-sm hover:bg-blue-500 hover:text-white rounded transition border-b border-gray-100 last:border-b-0">
-                                    <i class="fas fa-graduation-cap w-4 h-4 mr-3"></i>
-                                    Program Studi
+                                    class="flex items-center px-3 lg:px-4 py-2 lg:py-3 hover:bg-blue-500 hover:text-white rounded transition border-b border-gray-100 last:border-b-0">
+                                    <i class="fas fa-graduation-cap nav-icon mr-2 lg:mr-3"></i>
+                                    <span class="nav-menu-text">Program Studi</span>
                                 </a>
                                 @else
-                                <div class="flex items-center px-4 py-3 text-sm text-gray-400 menu-disabled">
-                                    <i class="fas fa-graduation-cap w-4 h-4 mr-3"></i>
-                                    Program Studi
+                                <div class="flex items-center px-3 lg:px-4 py-2 lg:py-3 text-gray-400 menu-disabled">
+                                    <i class="fas fa-graduation-cap nav-icon mr-2 lg:mr-3"></i>
+                                    <span class="nav-menu-text">Program Studi</span>
                                 </div>
                                 @endif
 
                                 <!-- Kategori Arsip -->
                                 @if(Auth::user()->hasPermission('kategori-arsip'))
                                 <a href="{{ route('kategori-arsip.index') }}"
-                                    class="flex items-center px-4 py-3 text-sm hover:bg-blue-500 hover:text-white rounded transition border-b border-gray-100 last:border-b-0">
-                                    <i class="fas fa-folder w-4 h-4 mr-3"></i>
-                                    Kategori Arsip
+                                    class="flex items-center px-3 lg:px-4 py-2 lg:py-3 hover:bg-blue-500 hover:text-white rounded transition border-b border-gray-100 last:border-b-0">
+                                    <i class="fas fa-folder nav-icon mr-2 lg:mr-3"></i>
+                                    <span class="nav-menu-text">Kategori Arsip</span>
                                 </a>
                                 @else
-                                <div class="flex items-center px-4 py-3 text-sm text-gray-400 menu-disabled">
-                                    <i class="fas fa-folder w-4 h-4 mr-3"></i>
-                                    Kategori Arsip
+                                <div class="flex items-center px-3 lg:px-4 py-2 lg:py-3 text-gray-400 menu-disabled">
+                                    <i class="fas fa-folder nav-icon mr-2 lg:mr-3"></i>
+                                    <span class="nav-menu-text">Kategori Arsip</span>
                                 </div>
                                 @endif
 
                                 <!-- Dokumen Mahasiswa -->
                                 @if(Auth::user()->hasPermission('dokumen-mahasiswa'))
                                 <a href="{{ route('dokumen-mahasiswa.index') }}"
-                                    class="flex items-center px-4 py-3 text-sm hover:bg-blue-500 hover:text-white rounded transition border-b border-gray-100 last:border-b-0">
-                                    <i class="fas fa-file-alt w-4 h-4 mr-3"></i>
-                                    Dokumen Mahasiswa
+                                    class="flex items-center px-3 lg:px-4 py-2 lg:py-3 hover:bg-blue-500 hover:text-white rounded transition border-b border-gray-100 last:border-b-0">
+                                    <i class="fas fa-file-alt nav-icon mr-2 lg:mr-3"></i>
+                                    <span class="nav-menu-text">Dokumen Mahasiswa</span>
                                 </a>
                                 @else
-                                <div class="flex items-center px-4 py-3 text-sm text-gray-400 menu-disabled">
-                                    <i class="fas fa-file-alt w-4 h-4 mr-3"></i>
-                                    Dokumen Mahasiswa
+                                <div class="flex items-center px-3 lg:px-4 py-2 lg:py-3 text-gray-400 menu-disabled">
+                                    <i class="fas fa-file-alt nav-icon mr-2 lg:mr-3"></i>
+                                    <span class="nav-menu-text">Dokumen Mahasiswa</span>
                                 </div>
                                 @endif
                             </div>
@@ -274,11 +346,11 @@
                         <!-- Data Arsip -->
                         @if(Auth::user()->hasPermission('arsip'))
                         <x-nav-link :href="route('arsip.index')" :active="request()->routeIs('arsip.*')"
-                            class="text-white px-3 py-2 rounded-md font-medium transition-colors hover:bg-blue-500 hover:text-white">
+                            class="text-white nav-desktop-item rounded-md font-medium transition-colors hover:bg-blue-500 hover:text-white nav-menu-text">
                             {{ __('Data Arsip') }}
                         </x-nav-link>
                         @else
-                        <div class="text-white px-3 py-2 rounded-md font-medium menu-disabled-desktop tooltip">
+                        <div class="text-white nav-desktop-item rounded-md font-medium menu-disabled-desktop tooltip nav-menu-text">
                             {{ __('Data Arsip') }}
                         </div>
                         @endif
@@ -286,11 +358,11 @@
                         <!-- Data Sarpras -->
                         @if(Auth::user()->hasPermission('ruangan'))
                         <x-nav-link :href="route('ruangan.index')" :active="request()->routeIs('ruangan.*')"
-                            class="text-white px-3 py-2 rounded-md font-medium transition-colors hover:bg-blue-500 hover:text-white">
+                            class="text-white nav-desktop-item rounded-md font-medium transition-colors hover:bg-blue-500 hover:text-white nav-menu-text">
                             {{ __('Data Sarpras') }}
                         </x-nav-link>
                         @else
-                        <div class="text-white px-3 py-2 rounded-md font-medium menu-disabled-desktop tooltip">
+                        <div class="text-white nav-desktop-item rounded-md font-medium menu-disabled-desktop tooltip nav-menu-text">
                             {{ __('Data Sarpras') }}
                         </div>
                         @endif
@@ -298,11 +370,11 @@
                         <!-- Data Tendik -->
                         @if(Auth::user()->hasPermission('tenaga-pendidik'))
                         <x-nav-link :href="route('tenaga-pendidik.index')" :active="request()->routeIs('tenaga-pendidik.*')"
-                            class="text-white px-3 py-2 rounded-md font-medium transition-colors hover:bg-blue-500 hover:text-white">
+                            class="text-white nav-desktop-item rounded-md font-medium transition-colors hover:bg-blue-500 hover:text-white nav-menu-text">
                             {{ __('Data Tendik') }}
                         </x-nav-link>
                         @else
-                        <div class="text-white px-3 py-2 rounded-md font-medium menu-disabled-desktop tooltip">
+                        <div class="text-white nav-desktop-item rounded-md font-medium menu-disabled-desktop tooltip nav-menu-text">
                             {{ __('Data Tendik') }}
                         </div>
                         @endif
@@ -310,11 +382,11 @@
                         <!-- Data Dosen -->
                         @if(Auth::user()->hasPermission('dosen'))
                         <x-nav-link :href="route('dosen.index')" :active="request()->routeIs('dosen*')"
-                            class="text-white px-3 py-2 rounded-md font-medium transition-colors hover:bg-blue-500 hover:text-white">
+                            class="text-white nav-desktop-item rounded-md font-medium transition-colors hover:bg-blue-500 hover:text-white nav-menu-text">
                             {{ __('Data Dosen') }}
                         </x-nav-link>
                         @else
-                        <div class="text-white px-3 py-2 rounded-md font-medium menu-disabled-desktop tooltip">
+                        <div class="text-white nav-desktop-item rounded-md font-medium menu-disabled-desktop tooltip nav-menu-text">
                             {{ __('Data Dosen') }}
                         </div>
                         @endif
@@ -322,12 +394,12 @@
                 </div>
 
                 <!-- Kanan: Setting + Profile -->
-                <div class="hidden sm:flex items-center space-x-4">
+                <div class="hidden sm:flex items-center nav-profile-container">
                     <!-- Setting Dropdown -->
                     <div class="relative" x-data="{ open: false }">
                         <button @click="open = !open"
-                            class="flex items-center justify-center text-white p-2.5 rounded-lg transition-colors hover:bg-blue-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 pointer-events-none"
+                            class="flex items-center justify-center text-white p-1.5 lg:p-2 rounded-lg transition-colors hover:bg-blue-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon pointer-events-none"
                                 viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd"
                                     d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
@@ -336,15 +408,15 @@
                         </button>
 
                         <div x-show="open" x-transition x-cloak @click.away="open = false"
-                            class="absolute right-0 mt-2 w-56 bg-white text-gray-700 rounded-lg shadow-xl z-50 border border-gray-200 dropdown-content">
+                            class="absolute right-0 mt-2 nav-dropdown bg-white text-gray-700 rounded-lg shadow-xl z-50 border border-gray-200 dropdown-content">
                             <!-- Laporan Aktivitas User -->
                             @if(Auth::user()->hasPermission('userlogin') || Auth::user()->isSuperadmin())
                             <a href="{{ route('userlogin.index') }}"
-                                class="block px-4 py-3 text-sm hover:bg-blue-500 hover:text-white rounded border-b border-gray-100">
+                                class="block px-3 lg:px-4 py-2 lg:py-3 hover:bg-blue-500 hover:text-white rounded border-b border-gray-100 nav-menu-text">
                                 Laporan Aktivitas User
                             </a>
                             @else
-                            <div class="block px-4 py-3 text-sm text-gray-400 menu-disabled">
+                            <div class="block px-3 lg:px-4 py-2 lg:py-3 text-gray-400 menu-disabled nav-menu-text">
                                 Laporan Aktivitas User
                             </div>
                             @endif
@@ -352,11 +424,11 @@
                             <!-- Pengguna -->
                             @if(Auth::user()->hasPermission('users') || Auth::user()->isSuperadmin())
                             <a href="{{ route('register') }}"
-                                class="block px-4 py-3 text-sm hover:bg-blue-500 hover:text-white rounded border-b border-gray-100">
+                                class="block px-3 lg:px-4 py-2 lg:py-3 hover:bg-blue-500 hover:text-white rounded border-b border-gray-100 nav-menu-text">
                                 Pengguna
                             </a>
                             @else
-                            <div class="block px-4 py-3 text-sm text-gray-400 menu-disabled">
+                            <div class="block px-3 lg:px-4 py-2 lg:py-3 text-gray-400 menu-disabled nav-menu-text">
                                 Pengguna
                             </div>
                             @endif
@@ -365,7 +437,7 @@
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit"
-                                    class="w-full text-left px-4 py-3 text-sm hover:bg-blue-500 hover:text-white rounded">
+                                    class="w-full text-left px-3 lg:px-4 py-2 lg:py-3 hover:bg-blue-500 hover:text-white rounded nav-menu-text">
                                     Logout
                                 </button>
                             </form>
@@ -374,7 +446,7 @@
 
                     <!-- Profile -->
                     <a href="{{ route('profile.edit') }}"
-                        class="flex items-center space-x-3 px-3 py-2 rounded-md transition duration-200 ease-in-out transform hover:scale-105 hover:opacity-90 cursor-pointer">
+                        class="flex items-center space-x-2 lg:space-x-3 px-2 lg:px-3 py-1 lg:py-2 rounded-md transition duration-200 ease-in-out transform hover:scale-105 hover:opacity-90 cursor-pointer">
                         @php
                             $user = Auth::user();
                             $avatar = $user->profile_photo
@@ -384,18 +456,19 @@
                                     '&background=047857&color=fff';
                         @endphp
 
-                        <img src="{{ $avatar }}" class="w-8 h-8 rounded-full object-cover border-2 border-white"
+                        <img src="{{ $avatar }}" 
+                            class="nav-profile-avatar rounded-full object-cover border-2 border-white"
                             alt="Foto Profil"
                             onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=047857&color=fff'">
 
-                        <div class="text-left">
-                            <h2 class="font-medium text-sm text-white truncate max-w-[120px]">{{ $user->name }}</h2>
-                            <p class="text-xs text-green-100 truncate max-w-[120px]">{{ $user->email }}</p>
+                        <div class="text-left hidden lg:block">
+                            <h2 class="font-medium nav-profile-name text-white truncate max-w-[120px] 2xl:max-w-[140px]">{{ $user->name }}</h2>
+                            <p class="nav-profile-email text-green-100 truncate max-w-[120px] 2xl:max-w-[140px]">{{ $user->email }}</p>
                         </div>
                     </a>
                 </div>
 
-                <!-- Hamburger Mobile - Versi yang ditingkatkan -->
+                <!-- Hamburger Mobile -->
                 <div class="sm:hidden flex items-center">
                     <button @click="open = !open"
                         class="inline-flex items-center justify-center p-2 rounded-md text-white focus:outline-none transition-all duration-300"
@@ -410,10 +483,8 @@
             </div>
         </div>
 
-        <!-- Mobile Menu dengan animasi yang ditingkatkan -->
-        <div x-show="open" x-transition:enter="mobile-menu-enter" x-transition:enter-start="mobile-menu-enter"
-            x-transition:enter-end="mobile-menu-enter-active" x-transition:leave="mobile-menu-leave"
-            x-transition:leave-start="mobile-menu-leave" x-transition:leave-end="mobile-menu-leave-active"
+        <!-- Mobile Menu -->
+        <div x-show="open" x-transition
             class="sm:hidden bg-gradient-to-b from-blue-50 to-white text-gray-800 shadow-inner mobile-menu overflow-hidden relative z-50"
             x-cloak>
             <div class="pt-2 pb-3 space-y-1 px-4">

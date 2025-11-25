@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <title>Data Tenaga Pendidik - IAIT</title>
@@ -20,7 +21,7 @@
             position: relative;
             border-bottom: 2px solid #000;
             margin-bottom: 8px;
-            padding-bottom: 4px;
+            padding-bottom: 8px;
         }
 
         .kop::after {
@@ -35,10 +36,10 @@
 
         .logo {
             position: absolute;
-            left: 0;
-            top: 0;
-            width: 65px;
-            height: 65px;
+            left: 10px;
+            top: 8px;
+            width: 60px;
+            height: 60px;
         }
 
         .kop-text {
@@ -83,7 +84,8 @@
             font-size: 8px;
         }
 
-        th, td {
+        th,
+        td {
             border: 1px solid #000;
             padding: 4px 5px;
             vertical-align: top;
@@ -97,6 +99,44 @@
 
         .text-center {
             text-align: center;
+        }
+
+        /* === SUMMARY STATISTIK === */
+        .summary {
+            margin-top: 15px;
+            padding: 8px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            font-size: 9px;
+        }
+
+        .summary-container {
+            display: flex;
+            flex-direction: column;
+            /* Ubah dari row ke column */
+            align-items: flex-start;
+            /* Rata kiri */
+        }
+
+        .summary-item {
+            text-align: left;
+            /* Rata kiri */
+            margin-bottom: 5px;
+            /* Beri jarak antar item */
+            display: flex;
+            align-items: center;
+        }
+
+        .summary-number {
+            font-weight: bold;
+            font-size: 11px;
+            margin-right: 5px;
+            /* Jarak antara angka dan label */
+        }
+
+        .summary-label {
+            font-size: 8px;
+            color: #666;
         }
 
         /* === FOOTER === */
@@ -116,38 +156,9 @@
             font-size: 11px;
             margin-top: 15px;
         }
-
-        .summary {
-            margin-bottom: 8px;
-            padding: 6px;
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            font-size: 9px;
-        }
-
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            text-align: center;
-        }
-
-        .summary-item {
-            padding: 4px;
-        }
-
-        .summary-number {
-            font-weight: bold;
-            font-size: 11px;
-            display: block;
-        }
-
-        .summary-label {
-            font-size: 8px;
-            color: #666;
-        }
     </style>
 </head>
+
 <body>
 
     <!-- KOP SURAT -->
@@ -167,101 +178,103 @@
         Dicetak pada: {{ date('d-m-Y H:i:s') }}
     </div>
 
-    @if(isset($tenaga) && $tenaga->count() > 0)
-    
-    <!-- SUMMARY STATISTIK -->
-    <div class="summary">
-        <div class="summary-grid">
-            <div class="summary-item">
-                <span class="summary-number">{{ $tenaga->count() }}</span>
-                <span class="summary-label">TOTAL TENAGA</span>
-            </div>
-            <div class="summary-item">
-                <span class="summary-number">{{ $tenaga->where('status_kepegawaian', 'PNS')->count() }}</span>
-                <span class="summary-label">PNS</span>
-            </div>
-            <div class="summary-item">
-                <span class="summary-number">{{ $tenaga->where('status_kepegawaian', 'Non PNS Tetap')->count() }}</span>
-                <span class="summary-label">NON PNS TETAP</span>
-            </div>
-            <div class="summary-item">
-                <span class="summary-number">{{ $tenaga->where('status_kepegawaian', 'Non PNS Tidak Tetap')->count() }}</span>
-                <span class="summary-label">NON PNS TIDAK TETAP</span>
+    @if (isset($tenaga) && $tenaga->count() > 0)
+
+        <table>
+            <thead>
+                <tr>
+                    <th width="3%">NO</th>
+                    <th width="15%">NAMA LENGKAP</th>
+                    <th width="12%">POSISI/JABATAN</th>
+                    <th width="8%">NIP</th>
+                    <th width="10%">STATUS</th>
+                    <th width="4%">JK</th>
+                    <th width="10%">PROGRAM STUDI</th>
+                    <th width="10%">FAKULTAS</th>
+                    <th width="8%">TEMPAT LAHIR</th>
+                    <th width="6%">TGL LAHIR</th>
+                    <th width="6%">TMT KERJA</th>
+                    <th width="8%">PENDIDIKAN</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($tenaga as $index => $tendik)
+                    <tr>
+                        <td class="text-center">{{ $index + 1 }}</td>
+                        <td>
+                            <strong>
+                                {{ $tendik->gelar_depan ? $tendik->gelar_depan . ' ' : '' }}
+                                {{ $tendik->nama_tendik }}
+                                {{ $tendik->gelar_belakang ? ', ' . $tendik->gelar_belakang : '' }}
+                            </strong>
+                        </td>
+                        <td>{{ $tendik->jabatan_struktural ?? 'Umum' }}</td>
+                        <td class="text-center">{{ $tendik->nip ?? '-' }}</td>
+                        <td class="text-center">
+                            @if ($tendik->status_kepegawaian == 'PNS')
+                                PNS
+                            @elseif($tendik->status_kepegawaian == 'Non PNS Tetap')
+                                NON PNS TETAP
+                            @elseif($tendik->status_kepegawaian == 'Non PNS Tidak Tetap')
+                                NON PNS TDK TETAP
+                            @else
+                                {{ $tendik->status_kepegawaian }}
+                            @endif
+                        </td>
+                        <td class="text-center">{{ $tendik->jenis_kelamin == 'laki-laki' ? 'L' : 'P' }}</td>
+                        <td>{{ $tendik->prodi->nama_prodi ?? 'Umum' }}</td>
+                        <td>{{ $tendik->prodi->fakultas->nama_fakultas ?? '-' }}</td>
+                        <td>{{ $tendik->tempat_lahir ?? '-' }}</td>
+                        <td class="text-center">
+                            {{ $tendik->tanggal_lahir ? \Carbon\Carbon::parse($tendik->tanggal_lahir)->format('d-m-Y') : '-' }}
+                        </td>
+                        <td class="text-center">
+                            {{ $tendik->tmt_kerja ? \Carbon\Carbon::parse($tendik->tmt_kerja)->format('d-m-Y') : '-' }}
+                        </td>
+                        <td class="text-center">{{ $tendik->pendidikan_terakhir ?? '-' }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+
+        <!-- SUMMARY STATISTIK - DI BAWAH TABLE -->
+        <div class="summary">
+            <div class="summary-container">
+                <div class="summary-item">
+                    <span class="summary-number">{{ $tenaga->count() }}</span>
+                    <span class="summary-label">TOTAL TENAGA</span>
+                </div>
+            
+                <div class="summary-item">
+                    <span
+                        class="summary-number">{{ $tenaga->where('status_kepegawaian', 'KONTRAK')->count() }}</span>
+                    <span class="summary-label">KONTRAK</span>
+                </div>
+                <div class="summary-item">
+                    <span
+                        class="summary-number">{{ $tenaga->where('status_kepegawaian', 'TETAP')->count() }}</span>
+                    <span class="summary-label">TETAP</span>
+                </div>
             </div>
         </div>
-    </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th width="3%">NO</th>
-                <th width="15%">NAMA LENGKAP</th>
-                <th width="12%">POSISI/JABATAN</th>
-                <th width="8%">NIP</th>
-                <th width="10%">STATUS</th>
-                <th width="4%">JK</th>
-                <th width="10%">PROGRAM STUDI</th>
-                <th width="10%">FAKULTAS</th>
-                <th width="8%">TEMPAT LAHIR</th>
-                <th width="6%">TGL LAHIR</th>
-                <th width="6%">TMT KERJA</th>
-                <th width="8%">PENDIDIKAN</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($tenaga as $index => $tendik)
-            <tr>
-                <td class="text-center">{{ $index + 1 }}</td>
-                <td>
-                    <strong>
-                        {{ $tendik->gelar_depan ? $tendik->gelar_depan . ' ' : '' }}
-                        {{ $tendik->nama_tendik }}
-                        {{ $tendik->gelar_belakang ? ', ' . $tendik->gelar_belakang : '' }}
-                    </strong>
-                </td>
-                <td>{{ $tendik->jabatan_struktural ?? 'Umum' }}</td>
-                <td class="text-center">{{ $tendik->nip ?? '-' }}</td>
-                <td class="text-center">
-                    @if($tendik->status_kepegawaian == 'PNS')
-                        PNS
-                    @elseif($tendik->status_kepegawaian == 'Non PNS Tetap')
-                        NON PNS TETAP
-                    @elseif($tendik->status_kepegawaian == 'Non PNS Tidak Tetap')
-                        NON PNS TDK TETAP
-                    @else
-                        {{ $tendik->status_kepegawaian }}
-                    @endif
-                </td>
-                <td class="text-center">{{ $tendik->jenis_kelamin == 'laki-laki' ? 'L' : 'P' }}</td>
-                <td>{{ $tendik->prodi->nama_prodi ?? 'Umum' }}</td>
-                <td>{{ $tendik->prodi->fakultas->nama_fakultas ?? '-' }}</td>
-                <td>{{ $tendik->tempat_lahir ?? '-' }}</td>
-                <td class="text-center">{{ $tendik->tanggal_lahir ? \Carbon\Carbon::parse($tendik->tanggal_lahir)->format('d-m-Y') : '-' }}</td>
-                <td class="text-center">{{ $tendik->tmt_kerja ? \Carbon\Carbon::parse($tendik->tmt_kerja)->format('d-m-Y') : '-' }}</td>
-                <td class="text-center">{{ $tendik->pendidikan_terakhir ?? '-' }}</td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
-
-    <div class="footer">
-        <strong>DOKUMEN RESMI - INSTITUT AGAMA ISLAM TASIKMALAYA</strong><br>
-        Sistem Informasi Akademik | Hal. 1 | Total: {{ $tenaga->count() }} Data
-    </div>
-
+        <div class="footer">
+            <strong>DOKUMEN RESMI - INSTITUT AGAMA ISLAM TASIKMALAYA</strong><br>
+            Sistem Informasi Akademik | Hal. 1 | Total: {{ $tenaga->count() }} Data
+        </div>
     @else
+        <div class="no-data">
+            <h3>TIDAK ADA DATA TENAGA PENDIDIK</h3>
+            <p>Tidak ditemukan data tenaga pendidik dalam sistem.</p>
+        </div>
 
-    <div class="no-data">
-        <h3>TIDAK ADA DATA TENAGA PENDIDIK</h3>
-        <p>Tidak ditemukan data tenaga pendidik dalam sistem.</p>
-    </div>
-
-    <div class="footer">
-        <strong>DOKUMEN RESMI - INSTITUT AGAMA ISLAM TASIKMALAYA</strong><br>
-        Status: Tidak ada data yang ditemukan
-    </div>
+        <div class="footer">
+            <strong>DOKUMEN RESMI - INSTITUT AGAMA ISLAM TASIKMALAYA</strong><br>
+            Status: Tidak ada data yang ditemukan
+        </div>
 
     @endif
 
 </body>
+
 </html>

@@ -42,7 +42,7 @@ class DosenController extends Controller
 
     public function create()
     {
-         if (!Auth::user()->canCrud('dosen')) {
+        if (!Auth::user()->canCrud('dosen')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -52,7 +52,7 @@ class DosenController extends Controller
 
     public function store(Request $request)
     {
-         if (!Auth::user()->canCrud('dosen')) {
+        if (!Auth::user()->canCrud('dosen')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -78,6 +78,7 @@ class DosenController extends Controller
             'masa_kerja_golongan_bulan' => 'nullable|integer|min:0|max:11',
             'sertifikasi' => 'required|in:SUDAH,BELUM',
             'inpasing' => 'required|in:SUDAH,BELUM',
+            'status_dosen' => 'required|in:DOSEN_TETAP,DOSEN_TIDAK_TETAP,PNS',
             // Validasi file upload
             'file_sertifikasi' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
             'file_inpasing' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
@@ -166,7 +167,7 @@ class DosenController extends Controller
 
     public function show($id)
     {
-       if (!Auth::user()->hasPermission('dosen')) {
+        if (!Auth::user()->hasPermission('dosen')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -176,7 +177,7 @@ class DosenController extends Controller
 
     public function update(Request $request, $id)
     {
-         if (!Auth::user()->canCrud('dosen')) {
+        if (!Auth::user()->canCrud('dosen')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -204,6 +205,7 @@ class DosenController extends Controller
             'masa_kerja_golongan_bulan' => 'nullable|integer|min:0|max:11',
             'sertifikasi' => 'required|in:SUDAH,BELUM',
             'inpasing' => 'required|in:SUDAH,BELUM',
+            'status_dosen' => 'required|in:DOSEN_TETAP,DOSEN_TIDAK_TETAP,PNS',
             // Validasi file upload
             'file_sertifikasi' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
             'file_inpasing' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
@@ -299,7 +301,7 @@ class DosenController extends Controller
 
     public function destroy($id)
     {
-         if (!Auth::user()->canCrud('dosen')) {
+        if (!Auth::user()->canCrud('dosen')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -340,13 +342,45 @@ class DosenController extends Controller
 
     public function deleteSelected(Request $request)
     {
-         if (!Auth::user()->canCrud('dosen')) {
-            abort(403, 'Unauthorized action.');
+        if (!Auth::user()->canCrud('dosen')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized action.'
+            ], 403);
         }
 
-        $ids = $request->selected_dosen;
-        if ($ids) {
-            $dosens = Dosen::whereIn('id', $ids)->get();
+        try {
+            $ids = $request->input('selected_dosen', []);
+
+            \Log::info('Delete selected attempt', ['ids' => $ids, 'user_id' => Auth::id()]);
+
+            if (empty($ids)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tidak ada data yang dipilih untuk dihapus.'
+                ], 400);
+            }
+
+            // Validasi IDs
+            $validIds = array_filter($ids, function ($id) {
+                return is_numeric($id) && $id > 0;
+            });
+
+            if (empty($validIds)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'ID data tidak valid.'
+                ], 400);
+            }
+
+            $dosens = Dosen::whereIn('id', $validIds)->get();
+
+            if ($dosens->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data tidak ditemukan.'
+                ], 404);
+            }
 
             $fileFields = [
                 'file_sertifikasi',
@@ -369,19 +403,65 @@ class DosenController extends Controller
                 'file_dokumen'
             ];
 
-            foreach ($dosens as $d) {
-                foreach ($fileFields as $field) {
-                    $oldFile = public_path('dokumen_dosen/' . $d->$field);
-                    if ($d->$field && file_exists($oldFile)) {
-                        unlink($oldFile);
+            $deletedCount = 0;
+            $errors = [];
+
+            foreach ($dosens as $dosen) {
+                try {
+                    // Delete files
+                    foreach ($fileFields as $field) {
+                        if ($dosen->$field) {
+                            $filePath = public_path('dokumen_dosen/' . $dosen->$field);
+                            if (file_exists($filePath) && is_file($filePath)) {
+                                @unlink($filePath);
+                            }
+                        }
                     }
+
+                    // Delete record
+                    $dosen->delete();
+                    $deletedCount++;
+                } catch (\Exception $e) {
+                    \Log::error('Error deleting dosen: ' . $e->getMessage(), [
+                        'dosen_id' => $dosen->id,
+                        'error' => $e->getMessage()
+                    ]);
+                    $errors[] = "Gagal menghapus {$dosen->nama}: " . $e->getMessage();
+                    continue;
                 }
             }
 
-            Dosen::whereIn('id', $ids)->delete();
-        }
+            if ($deletedCount === 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal menghapus semua data yang dipilih. ' . implode(', ', $errors)
+                ], 500);
+            }
 
-        return redirect()->route('dosen.index')->with('success', 'Data dosen terpilih berhasil dihapus.');
+            $message = "Berhasil menghapus {$deletedCount} data dosen.";
+            if (!empty($errors)) {
+                $message .= " Namun ada beberapa error: " . implode(', ', $errors);
+            }
+
+            \Log::info('Bulk delete successful', ['deleted_count' => $deletedCount]);
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'deleted_count' => $deletedCount
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Bulk delete error: ' . $e->getMessage(), [
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     // ==========================================

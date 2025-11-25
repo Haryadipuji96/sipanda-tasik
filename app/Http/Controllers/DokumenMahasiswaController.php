@@ -72,8 +72,8 @@ class DokumenMahasiswaController extends Controller
             'tahun_masuk' => 'required|integer|min:2000|max:' . ($currentYear + 1),
             'tahun_keluar' => 'nullable|integer|min:2000|max:' . ($currentYear + 1), // Diperbaiki
             'status_mahasiswa' => 'required|in:Aktif,Lulus,Cuti,Drop Out',
-            'file_ijazah' => 'nullable|file|mimes:pdf|max:5120',
-            'file_transkrip' => 'nullable|file|mimes:pdf|max:5120',
+            'file_ijazah' => 'nullable|file|mimes:pdf|max:2048',
+            'file_transkrip' => 'nullable|file|mimes:pdf|max:2048',
         ]);
 
         try {
@@ -165,8 +165,8 @@ class DokumenMahasiswaController extends Controller
             'tahun_masuk' => 'required|digits:4|integer|min:2000|max:' . (date('Y') + 1),
             'tahun_keluar' => 'nullable|digits:4|integer|min:2000|max:' . (date('Y') + 5),
             'status_mahasiswa' => 'required|in:Aktif,Lulus,Cuti,Drop Out',
-            'file_ijazah' => 'nullable|file|mimes:pdf|max:5120',
-            'file_transkrip' => 'nullable|file|mimes:pdf|max:5120',
+            'file_ijazah' => 'nullable|file|mimes:pdf|max:2048',
+            'file_transkrip' => 'nullable|file|mimes:pdf|max:2048',
         ]);
 
         try {

@@ -1,378 +1,816 @@
-<!DOCTYPE html>
-<html lang="id">
+<x-app-layout>
+    <x-slot name="title">Tambah Tenaga Pendidik</x-slot>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tambah Tenaga Pendidik</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="//unpkg.com/alpinejs" defer></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-</head>
+    <style>
+        .form-section {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+        }
 
-<body class="bg-gray-50">
-    <div class="min-h-screen">
-        <!-- Header/Navbar -->
-        <header class="bg-white shadow-sm">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16">
-                    {{-- Header content --}}
-                </div>
-            </div>
-        </header>
+        .form-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+        }
 
-        <!-- Main Content -->
-        <div class="py-6">
-            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8"> <!-- UBAH MAX-WIDTH MENJADI 4xl -->
-                <div class="bg-white shadow-xl rounded-2xl p-4 sm:p-6 md:p-8 w-full border border-gray-100">
-                    <!-- Header -->
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 pb-4 border-b">
-                        <div class="flex items-center space-x-3 mb-3 sm:mb-0">
-                            <div class="bg-green-100 text-blue-600 p-2 rounded-full">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 4v16m8-8H4" />
-                                </svg>
+        .form-body {
+            padding: 1.5rem;
+        }
+
+        .info-box {
+            background-color: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+
+        .btn-secondary {
+            background-color: #6b7280;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background-color: #4b5563;
+        }
+
+        .file-upload {
+            border: 2px dashed #d1d5db;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.2s;
+            cursor: pointer;
+            background-color: #f8fafc;
+        }
+
+        .file-upload:hover {
+            border-color: #3b82f6;
+            background-color: #f0f9ff;
+        }
+
+        .file-upload.dragover {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+
+        .section-divider {
+            border-top: 2px solid #e5e7eb;
+            margin: 2rem 0;
+            padding-top: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .form-body {
+                padding: 1rem;
+            }
+
+            .form-header {
+                padding: 1rem;
+            }
+        }
+    </style>
+
+    <div class="p-4 sm:p-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="form-section">
+                <!-- Header -->
+                <div class="form-header">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="bg-white bg-opacity-20 p-2 rounded-full">
+                                <i class="fas fa-chalkboard-teacher text-white text-lg sm:text-xl"></i>
                             </div>
-                            <h1 class="text-xl sm:text-2xl font-semibold text-gray-800">Tambah Tenaga Pendidik</h1>
+                            <div>
+                                <h1 class="text-lg sm:text-xl font-semibold">Tambah Tenaga Pendidik Baru</h1>
+                                <p class="text-blue-100 text-xs sm:text-sm mt-1">
+                                    Input data lengkap tenaga pendidik dan upload berkas dokumen
+                                </p>
+                            </div>
                         </div>
                         <a href="{{ route('tenaga-pendidik.index') }}"
-                            class="text-sm text-gray-600 hover:text-gray-800 transition flex items-center space-x-1 self-start sm:self-auto">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 19l-7-7 7-7" />
-                            </svg>
-                            <span>Kembali</span>
+                            class="text-white hover:text-blue-100 transition flex items-center space-x-2 self-start sm:self-auto">
+                            <i class="fas fa-arrow-left text-sm"></i>
+                            <span class="text-sm">Kembali</span>
                         </a>
                     </div>
+                </div>
 
-                    @if ($errors->any())
-                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm">
-                            <ul class="list-disc pl-5 space-y-1">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
+                <!-- Form -->
+                <form action="{{ route('tenaga-pendidik.store') }}" method="POST" enctype="multipart/form-data"
+                    id="tendikForm" x-data="{ golongan: [{ tahun: '', golongan: '' }] }">
+                    @csrf
 
-                    <form action="{{ route('tenaga-pendidik.store') }}" method="POST" enctype="multipart/form-data"
-                        class="space-y-4" x-data="{ golongan: [{ tahun: '', golongan: '' }] }">
-                        @csrf
+                    <div class="form-body">
+                        <!-- Informasi Utama -->
+                        <div class="mb-6 sm:mb-8">
+                            <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+                                <i class="fas fa-info-circle mr-2 text-blue-500"></i>
+                                Informasi Utama
+                            </h3>
 
-                        <!-- Program Studi & Jabatan Struktural -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block font-medium mb-1 text-sm sm:text-base">Program Studi</label>
-                                <select name="id_prodi" class="border p-2 rounded w-full text-sm sm:text-base">
-                                    <option value="">-- Pilih Prodi (Opsional) --</option>
-                                    @foreach ($prodi as $p)
-                                        <option value="{{ $p->id }}"
-                                            {{ old('id_prodi') == $p->id ? 'selected' : '' }}>
-                                            {{ $p->nama_prodi }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                            <div class="info-box">
+                                <div class="flex items-start">
+                                    <i class="fas fa-info-circle text-blue-500 mt-0.5 mr-3 text-sm"></i>
+                                    <div>
+                                        <h4 class="font-medium text-blue-800 mb-1 text-sm sm:text-base">Informasi Input
+                                        </h4>
+                                        <p class="text-blue-700 text-xs sm:text-sm">
+                                            • Isi data dengan lengkap dan benar<br>
+                                            • Field bertanda <span class="text-red-500">*</span> wajib diisi<br>
+                                            • Format file: <strong>PDF, JPG, PNG</strong> | Maks. <strong>2MB</strong>
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                <label class="block font-medium mb-1 text-sm sm:text-base">Posisi/Jabatan
-                                    Struktural</label>
-                                <select name="jabatan_struktural"
-                                    class="border p-2 rounded w-full text-sm sm:text-base">
-                                    <option value="">-- Pilih Posisi --</option>
-                                    @foreach ($jabatanOptions as $jabatan)
-                                        <option value="{{ $jabatan }}"
-                                            {{ old('jabatan_struktural') == $jabatan ? 'selected' : '' }}>
-                                            {{ $jabatan }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
 
-                        <!-- Nama & Gelar -->
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <div>
-                                <label class="block font-medium mb-1 text-sm sm:text-base">Gelar Depan</label>
-                                <input type="text" name="gelar_depan" value="{{ old('gelar_depan') }}"
-                                    class="border p-2 rounded w-full text-sm sm:text-base" placeholder="Contoh: Dr.">
-                            </div>
-                            <div>
-                                <label class="block font-medium mb-1 text-sm sm:text-base">Nama Tenaga Pendidik</label>
-                                <input type="text" name="nama_tendik" value="{{ old('nama_tendik') }}"
-                                    class="border p-2 rounded w-full text-sm sm:text-base"
-                                    placeholder="Masukkan nama lengkap">
-                            </div>
-                            <div>
-                                <label class="block font-medium mb-1 text-sm sm:text-base">Gelar Belakang</label>
-                                <input type="text" name="gelar_belakang" value="{{ old('gelar_belakang') }}"
-                                    class="border p-2 rounded w-full text-sm sm:text-base" placeholder="Contoh: S.Pd">
-                            </div>
-                        </div>
+                            <div class="space-y-4 sm:space-y-6">
+                                <!-- Program Studi & Jabatan Struktural -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Program Studi
+                                        </label>
+                                        <select name="id_prodi"
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                                            <option value="">-- Pilih Prodi (Opsional) --</option>
+                                            @foreach ($prodi as $p)
+                                                <option value="{{ $p->id }}"
+                                                    {{ old('id_prodi') == $p->id ? 'selected' : '' }}>
+                                                    {{ $p->nama_prodi }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('id_prodi')
+                                            <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Posisi/Jabatan Struktural
+                                        </label>
+                                        <select name="jabatan_struktural"
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                                            <option value="">-- Pilih Posisi --</option>
+                                            @foreach ($jabatanOptions as $jabatan)
+                                                <option value="{{ $jabatan }}"
+                                                    {{ old('jabatan_struktural') == $jabatan ? 'selected' : '' }}>
+                                                    {{ $jabatan }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('jabatan_struktural')
+                                            <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                </div>
 
-                        <!-- Status Kepegawaian & Jenis Kelamin -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block font-medium mb-1 text-sm sm:text-base">Status Kepegawaian</label>
-                                <select name="status_kepegawaian"
-                                    class="border p-2 rounded w-full text-sm sm:text-base">
-                                    <option value="">-- Pilih Status --</option>
-                                    <option value="PNS" {{ old('status_kepegawaian') == 'PNS' ? 'selected' : '' }}>PNS
-                                    </option>
-                                    <option value="Non PNS Tetap"
-                                        {{ old('status_kepegawaian') == 'Non PNS Tetap' ? 'selected' : '' }}>Non PNS Tetap
-                                    </option>
-                                    <option value="Non PNS Tidak Tetap"
-                                        {{ old('status_kepegawaian') == 'Non PNS Tidak Tetap' ? 'selected' : '' }}>Non PNS
-                                        Tidak Tetap</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block font-medium mb-1 text-sm sm:text-base">Jenis Kelamin</label>
-                                <select name="jenis_kelamin" class="border p-2 rounded w-full text-sm sm:text-base">
-                                    <option value="">-- Pilih Jenis Kelamin --</option>
-                                    <option value="laki-laki" {{ old('jenis_kelamin') == 'laki-laki' ? 'selected' : '' }}>
-                                        Laki-laki</option>
-                                    <option value="perempuan" {{ old('jenis_kelamin') == 'perempuan' ? 'selected' : '' }}>
-                                        Perempuan</option>
-                                </select>
-                            </div>
-                        </div>
+                                <!-- Nama & Gelar -->
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Gelar Depan
+                                        </label>
+                                        <input type="text" name="gelar_depan" value="{{ old('gelar_depan') }}"
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                            placeholder="Contoh: Dr." maxlength="50">
+                                        @error('gelar_depan')
+                                            <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Nama Tenaga Pendidik <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text" name="nama_tendik" value="{{ old('nama_tendik') }}"
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                            placeholder="Masukkan nama lengkap" required maxlength="255">
+                                        @error('nama_tendik')
+                                            <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Gelar Belakang
+                                        </label>
+                                        <input type="text" name="gelar_belakang" value="{{ old('gelar_belakang') }}"
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                            placeholder="Contoh: S.Pd, M.Kom" maxlength="50">
+                                        @error('gelar_belakang')
+                                            <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                </div>
 
-                        <!-- Tempat, Tanggal Lahir & TMT Kerja -->
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <div>
-                                <label class="block font-medium mb-1 text-sm sm:text-base">Tempat Lahir</label>
-                                <input type="text" name="tempat_lahir" value="{{ old('tempat_lahir') }}"
-                                    class="border p-2 rounded w-full text-sm sm:text-base" placeholder="Tempat lahir">
-                            </div>
-                            <div>
-                                <label class="block font-medium mb-1 text-sm sm:text-base">Tanggal Lahir</label>
-                                <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir') }}"
-                                    class="border p-2 rounded w-full text-sm sm:text-base">
-                            </div>
-                            <div>
-                                <label class="block font-medium mb-1 text-sm sm:text-base">TMT Kerja</label>
-                                <input type="date" name="tmt_kerja" value="{{ old('tmt_kerja') }}"
-                                    class="border p-2 rounded w-full text-sm sm:text-base">
+                                <!-- Status Kepegawaian & Jenis Kelamin -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Status Kepegawaian
+                                        </label>
+                                        <select name="status_kepegawaian"
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                                            <option value="">-- Pilih Status --</option>
+                                            <option value="KONTRAK"
+                                                {{ old('status_kepegawaian') == 'KONTRAK' ? 'selected' : '' }}>
+                                                KONTRAK</option>
+                                            <option value="TETAP"
+                                                {{ old('status_kepegawaian') == 'TETAP' ? 'selected' : '' }}>
+                                                TETAP</option>
+                                        </select>
+                                        @error('status_kepegawaian')
+                                            <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Jenis Kelamin
+                                        </label>
+                                        <select name="jenis_kelamin"
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                                            <option value="">-- Pilih Jenis Kelamin --</option>
+                                            <option value="laki-laki"
+                                                {{ old('jenis_kelamin') == 'laki-laki' ? 'selected' : '' }}>Laki-laki
+                                            </option>
+                                            <option value="perempuan"
+                                                {{ old('jenis_kelamin') == 'perempuan' ? 'selected' : '' }}>Perempuan
+                                            </option>
+                                        </select>
+                                        @error('jenis_kelamin')
+                                            <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <!-- Tempat, Tanggal Lahir & TMT Kerja -->
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Tempat Lahir
+                                        </label>
+                                        <input type="text" name="tempat_lahir" value="{{ old('tempat_lahir') }}"
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                            placeholder="Tempat lahir" maxlength="100">
+                                        @error('tempat_lahir')
+                                            <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Tanggal Lahir
+                                        </label>
+                                        <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir') }}"
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                                        @error('tanggal_lahir')
+                                            <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            TMT Kerja
+                                        </label>
+                                        <input type="date" name="tmt_kerja" value="{{ old('tmt_kerja') }}"
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                                        @error('tmt_kerja')
+                                            <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Riwayat Golongan -->
-                        <div class="mb-6">
-                            <div class="flex justify-between items-center mb-3">
-                                <label class="block font-medium text-sm sm:text-base">Riwayat Golongan</label>
-                                <button type="button" @click="golongan.push({ tahun: '', golongan: '' })"
-                                    class="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600 transition">
-                                    + Tambah Riwayat
-                                </button>
-                            </div>
-                            <template x-for="(item, index) in golongan" :key="index">
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
+                        <div class="mb-6 sm:mb-8">
+                            <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+                                <i class="fas fa-history mr-2 text-purple-500"></i>
+                                Riwayat Golongan
+                            </h3>
+
+                            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                                <div class="flex items-start">
+                                    <i class="fas fa-lightbulb text-yellow-500 mt-0.5 mr-3 text-sm"></i>
                                     <div>
-                                        <input type="text" :name="'golongan[' + index + '][tahun]'"
-                                            x-model="item.tahun"
-                                            class="border p-2 rounded w-full text-sm sm:text-base"
-                                            placeholder="Tahun">
-                                    </div>
-                                    <div class="flex space-x-2">
-                                        <input type="text" :name="'golongan[' + index + '][golongan]'"
-                                            x-model="item.golongan"
-                                            class="border p-2 rounded w-full text-sm sm:text-base"
-                                            placeholder="Golongan">
-                                        <button type="button" @click="golongan.splice(index,1)"
-                                            class="bg-red-500 text-white px-2 rounded hover:bg-red-600 transition"
-                                            x-show="golongan.length > 1">×</button>
+                                        <p class="text-yellow-700 text-xs sm:text-sm">
+                                            Tambahkan riwayat golongan secara berurutan dari yang terbaru
+                                        </p>
                                     </div>
                                 </div>
-                            </template>
+                            </div>
+
+                            <div class="space-y-3">
+                                <template x-for="(item, index) in golongan" :key="index">
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                                Tahun
+                                            </label>
+                                            <input type="text" :name="'golongan[' + index + '][tahun]'"
+                                                x-model="item.tahun"
+                                                class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                                placeholder="Tahun" maxlength="4">
+                                        </div>
+                                        <div class="flex space-x-2">
+                                            <div class="flex-1">
+                                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                                    Golongan
+                                                </label>
+                                                <input type="text" :name="'golongan[' + index + '][golongan]'"
+                                                    x-model="item.golongan"
+                                                    class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                                    placeholder="Golongan" maxlength="50">
+                                            </div>
+                                            <button type="button" @click="golongan.splice(index,1)"
+                                                class="bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-600 transition flex items-center justify-center h-10"
+                                                x-show="golongan.length > 1" title="Hapus">
+                                                <i class="fas fa-times text-sm"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </template>
+
+                                <button type="button" @click="golongan.push({ tahun: '', golongan: '' })"
+                                    class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition flex items-center space-x-2 text-sm">
+                                    <i class="fas fa-plus"></i>
+                                    <span>Tambah Riwayat Golongan</span>
+                                </button>
+                            </div>
                         </div>
 
-                        <!-- NIP, No HP, Email, Alamat, Keterangan -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block font-medium mb-1 text-sm sm:text-base">NIP</label>
-                                <input type="text" name="nip" value="{{ old('nip') }}"
-                                    class="border p-2 rounded w-full text-sm sm:text-base" placeholder="NIP">
-                            </div>
-                            <div>
-                                <label class="block font-medium mb-1 text-sm sm:text-base">No HP</label>
-                                <input type="text" name="no_hp" value="{{ old('no_hp') }}"
-                                    class="border p-2 rounded w-full text-sm sm:text-base" placeholder="08xxxx">
-                            </div>
-                            <div>
-                                <label class="block font-medium mb-1 text-sm sm:text-base">Email</label>
-                                <input type="email" name="email" value="{{ old('email') }}"
-                                    class="border p-2 rounded w-full text-sm sm:text-base"
-                                    placeholder="email@example.com">
-                            </div>
-                            <div>
-                                <label class="block font-medium mb-1 text-sm sm:text-base">Alamat</label>
-                                <input type="text" name="alamat" value="{{ old('alamat') }}"
-                                    class="border p-2 rounded w-full text-sm sm:text-base"
-                                    placeholder="Alamat lengkap">
+                        <!-- Informasi Kontak & Pendidikan -->
+                        <div class="mb-6 sm:mb-8">
+                            <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+                                <i class="fas fa-address-card mr-2 text-green-500"></i>
+                                Informasi Kontak & Pendidikan
+                            </h3>
+
+                            <div class="space-y-4 sm:space-y-6">
+                                <!-- NIP, No HP, Email, Alamat -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            NIP
+                                        </label>
+                                        <input type="text" name="nip" value="{{ old('nip') }}"
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                            placeholder="NIP" maxlength="50">
+                                        @error('nip')
+                                            <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            No HP
+                                        </label>
+                                        <input type="text" name="no_hp" value="{{ old('no_hp') }}"
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                            placeholder="08xxxx" maxlength="15">
+                                        @error('no_hp')
+                                            <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Email
+                                        </label>
+                                        <input type="email" name="email" value="{{ old('email') }}"
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                            placeholder="email@example.com" maxlength="100">
+                                        @error('email')
+                                            <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Alamat
+                                        </label>
+                                        <input type="text" name="alamat" value="{{ old('alamat') }}"
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                            placeholder="Alamat lengkap" maxlength="255">
+                                        @error('alamat')
+                                            <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <!-- Pendidikan Terakhir -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Pendidikan Terakhir
+                                    </label>
+                                    <select name="pendidikan_terakhir"
+                                        class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                                        <option value="">-- Pilih Pendidikan Terakhir --</option>
+                                        <option value="SMA/Sederajat"
+                                            {{ old('pendidikan_terakhir') == 'SMA/Sederajat' ? 'selected' : '' }}>
+                                            SMA/Sederajat</option>
+                                        <option value="D1"
+                                            {{ old('pendidikan_terakhir') == 'D1' ? 'selected' : '' }}>D1</option>
+                                        <option value="D2"
+                                            {{ old('pendidikan_terakhir') == 'D2' ? 'selected' : '' }}>D2</option>
+                                        <option value="D3"
+                                            {{ old('pendidikan_terakhir') == 'D3' ? 'selected' : '' }}>D3</option>
+                                        <option value="D4"
+                                            {{ old('pendidikan_terakhir') == 'D4' ? 'selected' : '' }}>D4</option>
+                                        <option value="S1"
+                                            {{ old('pendidikan_terakhir') == 'S1' ? 'selected' : '' }}>S1</option>
+                                        <option value="S2"
+                                            {{ old('pendidikan_terakhir') == 'S2' ? 'selected' : '' }}>S2</option>
+                                        <option value="S3"
+                                            {{ old('pendidikan_terakhir') == 'S3' ? 'selected' : '' }}>S3</option>
+                                        <option value="Profesi"
+                                            {{ old('pendidikan_terakhir') == 'Profesi' ? 'selected' : '' }}>Profesi
+                                        </option>
+                                        <option value="Spesialis"
+                                            {{ old('pendidikan_terakhir') == 'Spesialis' ? 'selected' : '' }}>Spesialis
+                                        </option>
+                                    </select>
+                                    @error('pendidikan_terakhir')
+                                        <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <!-- Keterangan -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Keterangan
+                                    </label>
+                                    <textarea name="keterangan" rows="3"
+                                        class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition resize-none"
+                                        placeholder="Tambahkan keterangan tambahan tentang tenaga pendidik...">{{ old('keterangan') }}</textarea>
+                                    <p class="text-gray-500 text-xs mt-1">
+                                        Keterangan opsional untuk informasi tambahan
+                                    </p>
+                                    @error('keterangan')
+                                        <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
                             </div>
                         </div>
 
-                        <div>
-                            <label class="block font-medium mb-1 text-sm sm:text-base">Pendidikan Terakhir</label>
-                            <select name="pendidikan_terakhir" class="border p-2 rounded w-full text-sm sm:text-base">
-                                <option value="">-- Pilih Pendidikan Terakhir --</option>
-                                <option value="SMA/Sederajat"
-                                    {{ old('pendidikan_terakhir') == 'SMA/Sederajat' ? 'selected' : '' }}>SMA/Sederajat
-                                </option>
-                                <option value="D1" {{ old('pendidikan_terakhir') == 'D1' ? 'selected' : '' }}>D1
-                                </option>
-                                <option value="D2" {{ old('pendidikan_terakhir') == 'D2' ? 'selected' : '' }}>D2
-                                </option>
-                                <option value="D3" {{ old('pendidikan_terakhir') == 'D3' ? 'selected' : '' }}>D3
-                                </option>
-                                <option value="D4" {{ old('pendidikan_terakhir') == 'D4' ? 'selected' : '' }}>D4
-                                </option>
-                                <option value="S1" {{ old('pendidikan_terakhir') == 'S1' ? 'selected' : '' }}>S1
-                                </option>
-                                <option value="S2" {{ old('pendidikan_terakhir') == 'S2' ? 'selected' : '' }}>S2
-                                </option>
-                                <option value="S3" {{ old('pendidikan_terakhir') == 'S3' ? 'selected' : '' }}>S3
-                                </option>
-                                <option value="Profesi"
-                                    {{ old('pendidikan_terakhir') == 'Profesi' ? 'selected' : '' }}>Profesi</option>
-                                <option value="Spesialis"
-                                    {{ old('pendidikan_terakhir') == 'Spesialis' ? 'selected' : '' }}>Spesialis
-                                </option>
-                            </select>
-                        </div>
+                        <!-- Upload Berkas -->
+                        <div class="mb-6 sm:mb-8">
+                            <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+                                <i class="fas fa-file-upload mr-2 text-orange-500"></i>
+                                Upload Berkas Dokumen
+                            </h3>
 
-                        <div>
-                            <label class="block font-medium mb-1 text-sm sm:text-base">Keterangan</label>
-                            <textarea name="keterangan" class="border p-2 rounded w-full text-sm sm:text-base" rows="2"
-                                placeholder="Tambahkan keterangan">{{ old('keterangan') }}</textarea>
-                        </div>
-
-                        <!-- UPLOAD BERKAS BARU -->
-                        <div class="border-t pt-6 mt-6">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-4">📎 Upload Berkas</h3>
+                            <div class="info-box">
+                                <div class="flex items-start">
+                                    <i class="fas fa-info-circle text-blue-500 mt-0.5 mr-3 text-sm"></i>
+                                    <div>
+                                        <h4 class="font-medium text-blue-800 mb-1 text-sm sm:text-base">Format Berkas
+                                        </h4>
+                                        <p class="text-blue-700 text-xs sm:text-sm">
+                                            • Format file: <strong>PDF, JPG, PNG</strong><br>
+                                            • Maksimal ukuran: <strong>2MB</strong> per file<br>
+                                            • Upload hanya file yang diperlukan
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <!-- KTP -->
                                 <div>
-                                    <label class="block font-medium mb-1 text-sm">KTP</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">KTP</label>
                                     <input type="file" name="file_ktp"
                                         class="w-full rounded-md border border-gray-300 bg-white text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-blue-600 file:text-white file:text-sm file:font-medium"
-                                        accept=".pdf,.jpg,.png">
+                                        accept=".pdf,.jpg,.jpeg,.png">
                                 </div>
 
                                 <!-- KK -->
                                 <div>
-                                    <label class="block font-medium mb-1 text-sm">Kartu Keluarga (KK)</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Kartu Keluarga
+                                        (KK)</label>
                                     <input type="file" name="file_kk"
                                         class="w-full rounded-md border border-gray-300 bg-white text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-blue-600 file:text-white file:text-sm file:font-medium"
-                                        accept=".pdf,.jpg,.png">
+                                        accept=".pdf,.jpg,.jpeg,.png">
                                 </div>
 
                                 <!-- Ijazah S1 -->
                                 <div>
-                                    <label class="block font-medium mb-1 text-sm">Ijazah S1</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Ijazah S1</label>
                                     <input type="file" name="file_ijazah_s1"
                                         class="w-full rounded-md border border-gray-300 bg-white text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-blue-600 file:text-white file:text-sm file:font-medium"
-                                        accept=".pdf,.jpg,.png">
+                                        accept=".pdf,.jpg,.jpeg,.png">
                                 </div>
 
                                 <!-- Transkrip S1 -->
                                 <div>
-                                    <label class="block font-medium mb-1 text-sm">Transkrip Nilai S1</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Transkrip Nilai
+                                        S1</label>
                                     <input type="file" name="file_transkrip_s1"
                                         class="w-full rounded-md border border-gray-300 bg-white text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-blue-600 file:text-white file:text-sm file:font-medium"
-                                        accept=".pdf,.jpg,.png">
+                                        accept=".pdf,.jpg,.jpeg,.png">
                                 </div>
 
                                 <!-- Ijazah S2 -->
                                 <div>
-                                    <label class="block font-medium mb-1 text-sm">Ijazah S2</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Ijazah S2</label>
                                     <input type="file" name="file_ijazah_s2"
                                         class="w-full rounded-md border border-gray-300 bg-white text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-blue-600 file:text-white file:text-sm file:font-medium"
-                                        accept=".pdf,.jpg,.png">
+                                        accept=".pdf,.jpg,.jpeg,.png">
                                 </div>
 
                                 <!-- Transkrip S2 -->
                                 <div>
-                                    <label class="block font-medium mb-1 text-sm">Transkrip Nilai S2</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Transkrip Nilai
+                                        S2</label>
                                     <input type="file" name="file_transkrip_s2"
                                         class="w-full rounded-md border border-gray-300 bg-white text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-blue-600 file:text-white file:text-sm file:font-medium"
-                                        accept=".pdf,.jpg,.png">
+                                        accept=".pdf,.jpg,.jpeg,.png">
                                 </div>
 
                                 <!-- Ijazah S3 -->
                                 <div>
-                                    <label class="block font-medium mb-1 text-sm">Ijazah S3</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Ijazah S3</label>
                                     <input type="file" name="file_ijazah_s3"
                                         class="w-full rounded-md border border-gray-300 bg-white text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-blue-600 file:text-white file:text-sm file:font-medium"
-                                        accept=".pdf,.jpg,.png">
+                                        accept=".pdf,.jpg,.jpeg,.png">
                                 </div>
 
                                 <!-- Transkrip S3 -->
                                 <div>
-                                    <label class="block font-medium mb-1 text-sm">Transkrip Nilai S3</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Transkrip Nilai
+                                        S3</label>
                                     <input type="file" name="file_transkrip_s3"
                                         class="w-full rounded-md border border-gray-300 bg-white text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-blue-600 file:text-white file:text-sm file:font-medium"
-                                        accept=".pdf,.jpg,.png">
+                                        accept=".pdf,.jpg,.jpeg,.png">
                                 </div>
 
                                 <!-- Perjanjian Kerja -->
                                 <div>
-                                    <label class="block font-medium mb-1 text-sm">Perjanjian Kerja</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Perjanjian
+                                        Kerja</label>
                                     <input type="file" name="file_perjanjian_kerja"
                                         class="w-full rounded-md border border-gray-300 bg-white text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-blue-600 file:text-white file:text-sm file:font-medium"
-                                        accept=".pdf,.jpg,.png">
+                                        accept=".pdf,.jpg,.jpeg,.png">
                                 </div>
 
                                 <!-- SK -->
                                 <div>
-                                    <label class="block font-medium mb-1 text-sm">Surat Keputusan (SK)</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Surat Keputusan
+                                        (SK)</label>
                                     <input type="file" name="file_sk"
                                         class="w-full rounded-md border border-gray-300 bg-white text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-blue-600 file:text-white file:text-sm file:font-medium"
-                                        accept=".pdf,.jpg,.png">
+                                        accept=".pdf,.jpg,.jpeg,.png">
                                 </div>
 
                                 <!-- Surat Tugas -->
                                 <div>
-                                    <label class="block font-medium mb-1 text-sm">Surat Tugas</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Surat Tugas</label>
                                     <input type="file" name="file_surat_tugas"
                                         class="w-full rounded-md border border-gray-300 bg-white text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-blue-600 file:text-white file:text-sm file:font-medium"
-                                        accept=".pdf,.jpg,.png">
+                                        accept=".pdf,.jpg,.jpeg,.png">
                                 </div>
                             </div>
+
                             <p class="text-gray-500 text-xs mt-3">Format: <b>PDF, JPG, PNG</b> | Maksimal <b>2MB</b>
                                 per file</p>
                         </div>
 
-                        <!-- Upload File Utama (Lama) -->
-                        <div class="mb-4 border-t pt-6">
-                            <label for="file" class="block font-medium mb-1 text-sm sm:text-base">Upload File
-                                Dokumen Lainnya</label>
-                            <div class="flex flex-col w-full">
+                        <!-- Upload File Lainnya -->
+                        <div class="mb-6 sm:mb-8">
+                            <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+                                <i class="fas fa-paperclip mr-2 text-gray-500"></i>
+                                Upload File Lainnya
+                            </h3>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    File Dokumen Lainnya
+                                </label>
                                 <input type="file" name="file" id="file"
-                                    class="flex w-full rounded-md border border-blue-300 bg-white text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-blue-600 file:text-white file:text-sm file:font-medium"
-                                    accept=".pdf,.doc,.docx,.jpg,.png" />
-                                <p class="text-gray-500 text-xs mt-1">Format: <b>PDF, DOC, DOCX, JPG, PNG</b> | Max 2MB
+                                    class="w-full rounded-md border border-gray-300 bg-white text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-blue-600 file:text-white file:text-sm file:font-medium"
+                                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                                <p class="text-gray-500 text-xs mt-1">
+                                    Format: <b>PDF, DOC, DOCX, JPG, PNG</b> | Maksimal <b>2MB</b>
                                 </p>
+                                @error('file')
+                                    <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- Informasi Tambahan -->
+                        <div class="mb-6 sm:mb-8">
+                            <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+                                <i class="fas fa-cogs mr-2 text-green-500"></i>
+                                Informasi Tambahan
+                            </h3>
+
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-calendar text-blue-500 mr-2 text-sm"></i>
+                                        <span class="text-gray-600">Dibuat pada:</span>
+                                        <span class="ml-2 font-medium">{{ now()->format('d/m/Y') }}</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-database text-green-500 mr-2 text-sm"></i>
+                                        <span class="text-gray-600">Status:</span>
+                                        <span class="ml-2 font-medium text-green-600">Aktif</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Tombol -->
-                        <div class="flex flex-col sm:flex-row justify-between space-y-2 sm:space-y-0 pt-4">
+                        <div class="flex flex-col sm:flex-row justify-end gap-3 pt-4 sm:pt-6 border-t">
                             <a href="{{ route('tenaga-pendidik.index') }}"
-                                class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-center transition">Batal</a>
+                                class="btn-secondary text-center order-2 sm:order-1 px-4 py-2 text-sm sm:text-base">
+                                <i class="fas fa-times mr-2"></i>
+                                Batal
+                            </a>
                             <button type="submit"
-                                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition">Simpan</button>
+                                class="btn-primary flex items-center justify-center order-1 sm:order-2 px-4 py-2 text-sm sm:text-base">
+                                <i class="fas fa-save mr-2"></i>
+                                Simpan Tenaga Pendidik
+                            </button>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-</body>
 
-</html>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function untuk validasi file (hanya validasi, tidak tampilkan success)
+            function validateFile(input, showSuccess = false) {
+                const file = input.files[0];
+                if (file) {
+                    // Validate file size (2MB)
+                    if (file.size > 2 * 1024 * 1024) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'File Terlalu Besar',
+                            text: 'Ukuran file maksimal 2MB. File Anda: ' + (file.size / (1024 * 1024))
+                                .toFixed(2) + 'MB'
+                        });
+                        input.value = '';
+                        return false;
+                    }
+
+                    // Validate file type
+                    const allowedTypes = ['application/pdf', 'application/msword',
+                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                        'image/jpeg', 'image/jpg', 'image/png'
+                    ];
+                    if (!allowedTypes.includes(file.type)) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Format File Tidak Didukung',
+                            text: 'Hanya file PDF, DOC, DOCX, JPG, dan PNG yang diizinkan.'
+                        });
+                        input.value = '';
+                        return false;
+                    }
+
+                    // Show success message hanya jika diminta (saat change event)
+                    if (showSuccess && input.name === 'file') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'File Valid',
+                            text: 'File siap diupload: ' + file.name,
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
+
+                    return true;
+                }
+                return false;
+            }
+
+            // Function untuk handle file change (dengan success message)
+            function handleFileChange(input) {
+                validateFile(input, true); // true untuk show success message
+            }
+
+            // Attach event listeners untuk semua file inputs
+            const fileInputs = document.querySelectorAll('input[type="file"]');
+            fileInputs.forEach(input => {
+                input.addEventListener('change', function(e) {
+                    handleFileChange(this);
+                });
+            });
+
+            // Form validation - BAHASA INDONESIA
+            const form = document.getElementById('tendikForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    const namaTendik = document.querySelector('input[name="nama_tendik"]');
+
+                    if (!namaTendik || !namaTendik.value.trim()) {
+                        e.preventDefault();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Belum Lengkap',
+                            text: 'Nama Tenaga Pendidik wajib diisi!'
+                        });
+                        return;
+                    }
+
+                    // Validasi semua file inputs sebelum submit (TANPA success message)
+                    let allFilesValid = true;
+                    let invalidFiles = [];
+
+                    fileInputs.forEach(input => {
+                        if (input.files.length > 0) {
+                            if (!validateFile(input, false)) { // false untuk tidak show success
+                                allFilesValid = false;
+                                invalidFiles.push(input.name);
+                            }
+                        }
+                    });
+
+                    if (!allFilesValid) {
+                        e.preventDefault();
+                        // Tidak perlu show alert lagi karena sudah ditampilkan di validateFile
+                        return;
+                    }
+
+                    // Jika semua valid, lanjutkan submit
+                    // Tidak perlu show success message di sini
+                });
+            }
+
+            // Auto-capitalize for names
+            const namaTendikInput = document.querySelector('input[name="nama_tendik"]');
+            if (namaTendikInput) {
+                namaTendikInput.addEventListener('blur', function() {
+                    this.value = this.value.replace(/\w\S*/g, function(txt) {
+                        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+                    });
+                });
+            }
+
+            // NOTIFIKASI SUKSES - BAHASA INDONESIA
+            @if (session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: "{{ session('success') }}",
+                    timer: 3000,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = "{{ route('tenaga-pendidik.index') }}";
+                });
+            @endif
+
+            // NOTIFIKASI ERROR VALIDATION - BAHASA INDONESIA
+            @if ($errors->any())
+                @if (!session('success'))
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Terjadi Kesalahan!',
+                        html: `@foreach ($errors->all() as $error)
+                        <p>• {{ $error }}</p>
+                       @endforeach`,
+                        timer: 5000,
+                        showConfirmButton: true
+                    });
+                @endif
+            @endif
+        });
+
+        // Responsive behavior
+        function handleResize() {
+            const formBody = document.querySelector('.form-body');
+            if (window.innerWidth < 640) {
+                formBody.classList.add('px-2');
+            } else {
+                formBody.classList.remove('px-2');
+            }
+        }
+
+        // Initial call
+        handleResize();
+        // Add resize listener
+        window.addEventListener('resize', handleResize);
+    </script>
+</x-app-layout>

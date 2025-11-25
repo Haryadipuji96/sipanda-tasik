@@ -62,20 +62,38 @@
                         <th class="border px-3 py-2 text-left">Nama Prodi</th>
                         <th class="border px-3 py-2 text-left">Fakultas</th>
                         <th class="border px-3 py-2 text-left">Jenjang</th>
+                        <th class="border px-3 py-2 text-left">Ketua Prodi</th>
                         <th class="border px-3 py-2 text-left">Deskripsi</th>
                         <th class="border px-3 py-2 text-center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($prodi as $index => $p)
-                        <tr>
+                        <tr x-data="{ openModal: false }">
                             <td class="border px-3 py-2">{{ $index + $prodi->firstItem() }}</td>
-                            <td class="border px-3 py-2">{{ $p->nama_prodi }}</td>
+                            <td class="border px-3 py-2 font-medium">{{ $p->nama_prodi }}</td>
                             <td class="border px-3 py-2">{{ $p->fakultas->nama_fakultas ?? '-' }}</td>
-                            <td class="border px-3 py-2">{{ $p->jenjang }}</td>
-                            <td class="border px-3 py-2">{{ $p->deskripsi }}</td>
                             <td class="border px-3 py-2">
-                                <div class="flex items-center justify-center gap-2" x-data="{ openModal: false }">
+                                <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                                    {{ $p->jenjang }}
+                                </span>
+                            </td>
+                            <td class="border px-3 py-2">
+                                @if($p->ketua_prodi)
+                                    <span class="text-green-600 font-medium">{{ $p->ketua_prodi }}</span>
+                                @else
+                                    <span class="text-gray-400">-</span>
+                                @endif
+                            </td>
+                            <td class="border px-3 py-2">
+                                @if($p->deskripsi)
+                                    <span class="text-gray-600">{{ Str::limit($p->deskripsi, 50) }}</span>
+                                @else
+                                    <span class="text-gray-400">-</span>
+                                @endif
+                            </td>
+                            <td class="border px-3 py-2">
+                                <div class="flex items-center justify-center gap-2">
                                     <!-- Tombol Edit -->
                                     <button @click="openModal = true"
                                         class="p-2 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-full transition"
@@ -102,13 +120,88 @@
                                         </button>
                                     </form>
 
-                                    
+                                    <!-- Modal Edit -->
+                                    <div x-show="openModal" x-cloak x-transition.opacity
+                                        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+                                        <div @click.away="openModal = false" x-transition.scale
+                                            class="relative bg-white rounded-xl shadow-xl w-full max-w-lg p-6 mx-4">
+
+                                            <button @click="openModal = false"
+                                                class="absolute top-3 right-3 text-gray-400 hover:text-gray-600">
+                                                ✕
+                                            </button>
+
+                                            <h1 class="text-xl font-semibold mb-5 text-gray-800 border-b pb-2 text-start">
+                                                Edit Program Studi
+                                            </h1>
+
+                                            <form action="{{ route('prodi.update', $p->id) }}" method="POST"
+                                                class="edit-form">
+                                                @csrf
+                                                @method('PUT')
+
+                                                <div class="mb-4">
+                                                    <label class="block font-medium mb-1">Fakultas</label>
+                                                    <select name="id_fakultas" class="w-full border rounded px-3 py-2" required>
+                                                        <option value="">-- Pilih Fakultas --</option>
+                                                        @foreach ($fakultas as $f)
+                                                            <option value="{{ $f->id }}" {{ $p->id_fakultas == $f->id ? 'selected' : '' }}>
+                                                                {{ $f->nama_fakultas }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+
+                                                <div class="mb-4">
+                                                    <label class="block font-medium mb-1">Nama Program Studi</label>
+                                                    <input type="text" name="nama_prodi"
+                                                        value="{{ $p->nama_prodi }}"
+                                                        class="w-full border rounded px-3 py-2" required>
+                                                </div>
+
+                                                <div class="mb-4">
+                                                    <label class="block font-medium mb-1">Jenjang</label>
+                                                    <select name="jenjang" class="w-full border rounded px-3 py-2" required>
+                                                        <option value="">-- Pilih Jenjang --</option>
+                                                        <option value="S1" {{ $p->jenjang == 'S1' ? 'selected' : '' }}>S1</option>
+                                                        <option value="S2" {{ $p->jenjang == 'S2' ? 'selected' : '' }}>S2</option>
+                                                        <option value="S3" {{ $p->jenjang == 'S3' ? 'selected' : '' }}>S3</option>
+                                                        <option value="D3" {{ $p->jenjang == 'D3' ? 'selected' : '' }}>D3</option>
+                                                        <option value="D4" {{ $p->jenjang == 'D4' ? 'selected' : '' }}>D4</option>
+                                                        <option value="Prof" {{ $p->jenjang == 'Prof' ? 'selected' : '' }}>Profesi</option>
+                                                        <option value="Lainnya" {{ $p->jenjang == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="mb-4">
+                                                    <label class="block font-medium mb-1">Ketua Program Studi</label>
+                                                    <input type="text" name="ketua_prodi"
+                                                        value="{{ $p->ketua_prodi }}"
+                                                        class="w-full border rounded px-3 py-2"
+                                                        placeholder="Nama ketua program studi">
+                                                </div>
+
+                                                <div class="mb-4">
+                                                    <label class="block font-medium mb-1">Deskripsi</label>
+                                                    <textarea name="deskripsi" rows="3" class="w-full border rounded px-3 py-2">{{ $p->deskripsi }}</textarea>
+                                                </div>
+
+                                                <div class="flex justify-end space-x-2">
+                                                    <button type="button" @click="openModal = false"
+                                                        class="bg-red-500 text-white px-4 py-2 rounded">Batal</button>
+                                                    <button type="submit"
+                                                        class="bg-blue-600 text-white px-4 py-2 rounded">Update</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <!-- End Modal -->
                                 </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center py-3">Belum ada data program studi.</td>
+                            <td colspan="7" class="text-center py-3">Belum ada data program studi.</td>
                         </tr>
                     @endforelse
                 </tbody>

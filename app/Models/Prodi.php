@@ -16,6 +16,7 @@ class Prodi extends Model
         'id_fakultas',
         'nama_prodi',
         'jenjang',
+        'ketua_prodi',
         'deskripsi',
     ];
 

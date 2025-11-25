@@ -35,7 +35,7 @@ class Ruangan extends Model
         return $this->hasOneThrough(Fakultas::class, Prodi::class, 'id', 'id', 'id_prodi', 'id_fakultas');
     }
 
-     public function getRouteKeyName()
+    public function getRouteKeyName()
     {
         return 'id';
     }
@@ -45,7 +45,13 @@ class Ruangan extends Model
         return $this->hasMany(DataSarpras::class, 'ruangan_id');
     }
 
-    // Scope untuk filter tipe ruangan - UBAH DI SINI
+    // TAMBAHKAN INI - Relasi barang sebagai alias untuk sarpras
+    public function barang()
+    {
+        return $this->hasMany(DataSarpras::class, 'ruangan_id');
+    }
+
+    // Scope untuk filter tipe ruangan
     public function scopeSarana($query)
     {
         return $query->where('tipe_ruangan', 'sarana');

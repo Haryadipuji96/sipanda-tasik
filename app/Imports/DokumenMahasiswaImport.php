@@ -3,36 +3,37 @@
 namespace App\Imports;
 
 use App\Models\DokumenMahasiswa;
+use App\Models\Prodi;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
-use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
-use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
-use PhpOffice\PhpSpreadsheet\Cell\Cell;
-use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 
-class DokumenMahasiswaImport extends DefaultValueBinder implements ToModel, WithHeadingRow, WithValidation, WithCustomValueBinder
+class DokumenMahasiswaImport implements ToModel, WithHeadingRow, WithValidation, SkipsEmptyRows
 {
-    public function bindValue(Cell $cell, $value)
-    {
-        // Force NIM column to be treated as text
-        if ($cell->getColumn() === 'A' && $cell->getRow() >= 2) {
-            $cell->setValueExplicit($value, DataType::TYPE_STRING);
-            return true;
-        }
-
-        return parent::bindValue($cell, $value);
-    }
+    protected $prodiCache = [];
 
     public function model(array $row)
     {
-        // Convert NIM to string and remove any decimal points
+        // Skip jika row kosong atau header
+        if (empty($row['nim']) || $row['nim'] === 'nim*') {
+            return null;
+        }
+
+        // Convert NIM to string
         $nim = $this->formatNim($row['nim']);
         
+        // Cari ID prodi berdasarkan nama (dari dropdown, pasti valid)
+        $prodiId = $this->findProdiId($row['program_studi']);
+        
+        if (!$prodiId) {
+            throw new \Exception("Program Studi '{$row['program_studi']}' tidak ditemukan");
+        }
+
         return new DokumenMahasiswa([
             'nim' => $nim,
             'nama_lengkap' => $row['nama_lengkap'],
-            'prodi_id' => $row['program_studi_id'] ?? $row['prodi_id'],
+            'prodi_id' => $prodiId,
             'status_mahasiswa' => $row['status_mahasiswa'],
             'tahun_masuk' => $row['tahun_masuk'],
             'tahun_keluar' => $this->handleTahunKeluar($row['tahun_keluar'] ?? null, $row['status_mahasiswa']),
@@ -44,9 +45,9 @@ class DokumenMahasiswaImport extends DefaultValueBinder implements ToModel, With
         $currentYear = date('Y');
         
         return [
-            'nim' => 'required|string|max:20|unique:dokumen_mahasiswa,nim',
+            'nim' => 'required|max:20|unique:dokumen_mahasiswa,nim',
             'nama_lengkap' => 'required|string|max:255',
-            'program_studi_id' => 'required|exists:prodi,id',
+            'program_studi' => 'required',
             'status_mahasiswa' => 'required|in:Aktif,Lulus,Cuti,Drop Out',
             'tahun_masuk' => 'required|integer|min:2000|max:' . ($currentYear + 1),
             'tahun_keluar' => 'nullable|integer|min:2000|max:' . ($currentYear + 1),
@@ -59,11 +60,9 @@ class DokumenMahasiswaImport extends DefaultValueBinder implements ToModel, With
         
         return [
             'nim.required' => 'NIM harus diisi',
-            'nim.string' => 'NIM harus berupa teks',
             'nim.unique' => 'NIM sudah digunakan',
             'nama_lengkap.required' => 'Nama lengkap harus diisi',
-            'program_studi_id.required' => 'Program Studi ID harus diisi',
-            'program_studi_id.exists' => 'Program Studi ID tidak valid',
+            'program_studi.required' => 'Program Studi harus diisi',
             'status_mahasiswa.required' => 'Status mahasiswa harus diisi',
             'status_mahasiswa.in' => 'Status mahasiswa harus: Aktif, Lulus, Cuti, atau Drop Out',
             'tahun_masuk.required' => 'Tahun masuk harus diisi',
@@ -76,9 +75,18 @@ class DokumenMahasiswaImport extends DefaultValueBinder implements ToModel, With
         ];
     }
 
+    private function findProdiId($prodiName)
+    {
+        if (!isset($this->prodiCache[$prodiName])) {
+            $prodi = Prodi::where('nama_prodi', $prodiName)->first();
+            $this->prodiCache[$prodiName] = $prodi ? $prodi->id : null;
+        }
+
+        return $this->prodiCache[$prodiName];
+    }
+
     private function handleTahunKeluar($tahunKeluar, $status)
     {
-        // Only set tahun_keluar if status is Lulus and value is provided
         if ($status === 'Lulus' && !empty($tahunKeluar)) {
             return $tahunKeluar;
         }
@@ -87,13 +95,27 @@ class DokumenMahasiswaImport extends DefaultValueBinder implements ToModel, With
 
     private function formatNim($nim)
     {
-        // Handle various NIM formats
-        if (is_numeric($nim)) {
-            // Remove decimal points and convert to string
+        // Handle semua kemungkinan format NIM
+        if ($nim === null || $nim === '') {
+            return '';
+        }
+
+        // Jika float (202301001.0)
+        if (is_float($nim)) {
             return (string) intval($nim);
         }
         
-        // If already string, just return it
+        // Jika integer (202301001)
+        if (is_int($nim)) {
+            return (string) $nim;
+        }
+        
+        // Jika sudah string, return as is
+        if (is_string($nim)) {
+            return $nim;
+        }
+        
+        // Fallback: convert to string
         return (string) $nim;
     }
 }

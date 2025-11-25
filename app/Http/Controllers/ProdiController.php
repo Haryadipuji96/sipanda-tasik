@@ -43,6 +43,7 @@ class ProdiController extends Controller
             'id_fakultas' => 'required|exists:fakultas,id',
             'nama_prodi' => 'required|string|max:255',
             'jenjang' => 'nullable|string|max:50',
+            'ketua_prodi' => 'nullable|string|max:255',
             'deskripsi' => 'nullable|string',
         ]);
 
@@ -72,6 +73,7 @@ class ProdiController extends Controller
                 'id_fakultas' => 'required|exists:fakultas,id', // PERBAIKAN: exists:fakultas,id
                 'nama_prodi' => 'required|string|max:255',
                 'jenjang' => 'nullable|string|max:50',
+                'ketua_prodi' => 'nullable|string|max:255',
                 'deskripsi' => 'nullable|string',
             ]);
 

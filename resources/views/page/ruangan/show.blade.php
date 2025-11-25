@@ -90,19 +90,21 @@
                         </div>
                     </div>
                     <div class="flex gap-2 mt-4 md:mt-0">
-                        @canCrud('ruangan')
+                        <!-- Tombol Tambah Barang -->
                         <a href="{{ route('ruangan.tambah-barang', $ruangan->id) }}"
                             class="btn-action btn-primary gap-2 px-4 py-2">
                             <i class="fas fa-plus w-4 h-4"></i>
                             Tambah Barang
                         </a>
-                        @endcanCrud
+
+                        <!-- Tombol Download PDF -->
                         <a href="{{ route('ruangan.pdf', $ruangan->id) }}"
-                            class="btn-action btn-success gap-2 px-4 py-2">
+                            class="btn-action btn-warning gap-2 px-4 py-2">
                             <i class="fas fa-file-pdf w-4 h-4"></i>
                             Download PDF
                         </a>
 
+                        <!-- Tombol Kembali -->
                         <a href="{{ route('ruangan.index') }}" class="btn-action btn-secondary px-4 py-2">
                             <i class="fas fa-arrow-left w-4 h-4"></i>
                             Kembali
@@ -243,6 +245,55 @@
 
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        // Untuk modal edit ruangan
+        document.addEventListener('DOMContentLoaded', function() {
+            const editFileInput = document.querySelector('#editModal input[name="file_dokumen"]');
+            if (editFileInput) {
+                editFileInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        // Validate file size (2MB)
+                        if (file.size > 2 * 1024 * 1024) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'File Terlalu Besar',
+                                text: 'Ukuran file maksimal 2MB. File Anda: ' + (file.size / (1024 *
+                                    1024)).toFixed(2) + 'MB'
+                            });
+                            this.value = '';
+                            return;
+                        }
+
+                        // Validate file type
+                        const allowedTypes = ['application/pdf', 'application/msword',
+                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                            'image/jpeg', 'image/jpg', 'image/png'
+                        ];
+                        if (!allowedTypes.includes(file.type)) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Format File Tidak Didukung',
+                                text: 'Hanya file PDF, DOC, DOCX, JPG, dan PNG yang diizinkan.'
+                            });
+                            this.value = '';
+                            return;
+                        }
+
+                        // Show success message
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'File Valid',
+                            text: 'File siap diupload: ' + file.name,
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
+                });
+            }
+        });
+    </script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

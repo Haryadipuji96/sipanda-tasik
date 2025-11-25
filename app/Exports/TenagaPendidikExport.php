@@ -127,9 +127,8 @@ class TenagaPendidikExport implements FromCollection, WithHeadings, WithMapping,
     private function getStatusLabel($status)
     {
         $labels = [
-            'PNS' => 'PNS',
-            'Non PNS Tetap' => 'Non PNS Tetap',
-            'Non PNS Tidak Tetap' => 'Non PNS Tidak Tetap'
+            'KONTRAK' => 'KONTRAK',
+            'TETAP' => 'TETAP'
         ];
 
         return $labels[$status] ?? $status;

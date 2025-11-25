@@ -232,9 +232,9 @@
                 <div class="nama-lengkap">
                     {{ $dosen->gelar_depan ? $dosen->gelar_depan . ' ' : '' }}{{ $dosen->nama }}{{ $dosen->gelar_belakang ? ', ' . $dosen->gelar_belakang : '' }}
                 </div>
-                @if($dosen->gelar_depan || $dosen->gelar_belakang)
+                @if ($dosen->gelar_depan || $dosen->gelar_belakang)
                     <div class="gelar-info">
-                        <strong>Gelar Depan:</strong> {{ $dosen->gelar_depan ?? '-' }} | 
+                        <strong>Gelar Depan:</strong> {{ $dosen->gelar_depan ?? '-' }} |
                         <strong>Gelar Belakang:</strong> {{ $dosen->gelar_belakang ?? '-' }}
                     </div>
                 @endif
@@ -316,7 +316,8 @@
         </tr>
         <tr>
             <td>Masa Kerja Golongan</td>
-            <td>{{ $dosen->masa_kerja_golongan_tahun ?? 0 }} Tahun {{ $dosen->masa_kerja_golongan_bulan ?? 0 }} Bulan</td>
+            <td>{{ $dosen->masa_kerja_golongan_tahun ?? 0 }} Tahun {{ $dosen->masa_kerja_golongan_bulan ?? 0 }} Bulan
+            </td>
         </tr>
         <tr>
             <td>No SK</td>
@@ -325,6 +326,19 @@
         <tr>
             <td>JaFung (No SK)</td>
             <td>{{ $dosen->no_sk_jafung ?? '-' }}</td>
+        </tr>
+        <!-- STATUS DOSEN - TAMBAHKAN SETELAH JaFung -->
+        <tr>
+            <td>Status Dosen</td>
+            <td>
+                <span
+                    style="padding: 4px 8px; border-radius: 3px; font-weight: bold; font-size: 10.5pt;
+            {{ $dosen->status_dosen == 'DOSEN_TETAP' ? 'background-color: #d4f7dc; color: #0d5c1c; border: 1px solid #a3e9b3;' : '' }}
+            {{ $dosen->status_dosen == 'DOSEN_TIDAK_TETAP' ? 'background-color: #fff3cd; color: #856404; border: 1px solid #ffeaa7;' : '' }}
+            {{ $dosen->status_dosen == 'PNS' ? 'background-color: #cce7ff; color: #004085; border: 1px solid #99d1ff;' : '' }}">
+                    {{ $dosen->status_dosen_text }}
+                </span>
+            </td>
         </tr>
     </table>
 
@@ -337,7 +351,7 @@
                 <span class="status-badge {{ $dosen->sertifikasi == 'SUDAH' ? 'status-sudah' : 'status-belum' }}">
                     {{ $dosen->sertifikasi }}
                 </span>
-                @if($dosen->sertifikasi == 'SUDAH' && $dosen->file_sertifikasi)
+                @if ($dosen->sertifikasi == 'SUDAH' && $dosen->file_sertifikasi)
                     <span class="file-indicator">File Tersedia</span>
                 @endif
             </td>
@@ -348,7 +362,7 @@
                 <span class="status-badge {{ $dosen->inpasing == 'SUDAH' ? 'status-sudah' : 'status-belum' }}">
                     {{ $dosen->inpasing }}
                 </span>
-                @if($dosen->inpasing == 'SUDAH' && $dosen->file_inpasing)
+                @if ($dosen->inpasing == 'SUDAH' && $dosen->file_inpasing)
                     <span class="file-indicator">File Tersedia</span>
                 @endif
             </td>
@@ -365,7 +379,7 @@
         <div class="berkas-item {{ $dosen->file_ijazah_s1 ? 'berkas-ada' : 'berkas-tidak' }}">
             Ijazah S1 <span class="berkas-status">{{ $dosen->file_ijazah_s1 ? '✓ ADA' : '✗ TIDAK ADA' }}</span>
         </div>
-        
+
         <!-- Baris 2 -->
         <div class="berkas-item {{ $dosen->file_transkrip_s1 ? 'berkas-ada' : 'berkas-tidak' }}">
             Transkrip S1 <span class="berkas-status">{{ $dosen->file_transkrip_s1 ? '✓ ADA' : '✗ TIDAK ADA' }}</span>
@@ -373,7 +387,7 @@
         <div class="berkas-item {{ $dosen->file_ijazah_s2 ? 'berkas-ada' : 'berkas-tidak' }}">
             Ijazah S2 <span class="berkas-status">{{ $dosen->file_ijazah_s2 ? '✓ ADA' : '✗ TIDAK ADA' }}</span>
         </div>
-        
+
         <!-- Baris 3 -->
         <div class="berkas-item {{ $dosen->file_transkrip_s2 ? 'berkas-ada' : 'berkas-tidak' }}">
             Transkrip S2 <span class="berkas-status">{{ $dosen->file_transkrip_s2 ? '✓ ADA' : '✗ TIDAK ADA' }}</span>
@@ -381,7 +395,7 @@
         <div class="berkas-item {{ $dosen->file_ijazah_s3 ? 'berkas-ada' : 'berkas-tidak' }}">
             Ijazah S3 <span class="berkas-status">{{ $dosen->file_ijazah_s3 ? '✓ ADA' : '✗ TIDAK ADA' }}</span>
         </div>
-        
+
         <!-- Baris 4 -->
         <div class="berkas-item {{ $dosen->file_transkrip_s3 ? 'berkas-ada' : 'berkas-tidak' }}">
             Transkrip S3 <span class="berkas-status">{{ $dosen->file_transkrip_s3 ? '✓ ADA' : '✗ TIDAK ADA' }}</span>
@@ -389,23 +403,26 @@
         <div class="berkas-item {{ $dosen->file_jafung ? 'berkas-ada' : 'berkas-tidak' }}">
             Jafung <span class="berkas-status">{{ $dosen->file_jafung ? '✓ ADA' : '✗ TIDAK ADA' }}</span>
         </div>
-        
+
         <!-- Baris 5 -->
         <div class="berkas-item {{ $dosen->file_kk ? 'berkas-ada' : 'berkas-tidak' }}">
             Kartu Keluarga <span class="berkas-status">{{ $dosen->file_kk ? '✓ ADA' : '✗ TIDAK ADA' }}</span>
         </div>
         <div class="berkas-item {{ $dosen->file_perjanjian_kerja ? 'berkas-ada' : 'berkas-tidak' }}">
-            Perjanjian Kerja <span class="berkas-status">{{ $dosen->file_perjanjian_kerja ? '✓ ADA' : '✗ TIDAK ADA' }}</span>
+            Perjanjian Kerja <span
+                class="berkas-status">{{ $dosen->file_perjanjian_kerja ? '✓ ADA' : '✗ TIDAK ADA' }}</span>
         </div>
-        
+
         <!-- Baris 6 -->
         <div class="berkas-item {{ $dosen->file_sk_pengangkatan ? 'berkas-ada' : 'berkas-tidak' }}">
-            SK Pengangkatan <span class="berkas-status">{{ $dosen->file_sk_pengangkatan ? '✓ ADA' : '✗ TIDAK ADA' }}</span>
+            SK Pengangkatan <span
+                class="berkas-status">{{ $dosen->file_sk_pengangkatan ? '✓ ADA' : '✗ TIDAK ADA' }}</span>
         </div>
         <div class="berkas-item {{ $dosen->file_surat_pernyataan ? 'berkas-ada' : 'berkas-tidak' }}">
-            Surat Pernyataan <span class="berkas-status">{{ $dosen->file_surat_pernyataan ? '✓ ADA' : '✗ TIDAK ADA' }}</span>
+            Surat Pernyataan <span
+                class="berkas-status">{{ $dosen->file_surat_pernyataan ? '✓ ADA' : '✗ TIDAK ADA' }}</span>
         </div>
-        
+
         <!-- Baris 7 -->
         <div class="berkas-item {{ $dosen->file_sktp ? 'berkas-ada' : 'berkas-tidak' }}">
             SKTP <span class="berkas-status">{{ $dosen->file_sktp ? '✓ ADA' : '✗ TIDAK ADA' }}</span>
@@ -413,7 +430,7 @@
         <div class="berkas-item {{ $dosen->file_surat_tugas ? 'berkas-ada' : 'berkas-tidak' }}">
             Surat Tugas <span class="berkas-status">{{ $dosen->file_surat_tugas ? '✓ ADA' : '✗ TIDAK ADA' }}</span>
         </div>
-        
+
         <!-- Baris 8 -->
         <div class="berkas-item {{ $dosen->file_sk_aktif ? 'berkas-ada' : 'berkas-tidak' }}">
             SK Aktif Tridharma <span class="berkas-status">{{ $dosen->file_sk_aktif ? '✓ ADA' : '✗ TIDAK ADA' }}</span>
@@ -422,13 +439,13 @@
 
     <!-- DOKUMEN LAMA -->
     @if ($dosen->file_dokumen)
-    <div class="section-title">DOKUMEN LAINNYA</div>
-    <table class="biodata">
-        <tr>
-            <td>File Dokumen</td>
-            <td>{{ $dosen->file_dokumen }}</td>
-        </tr>
-    </table>
+        <div class="section-title">DOKUMEN LAINNYA</div>
+        <table class="biodata">
+            <tr>
+                <td>File Dokumen</td>
+                <td>{{ $dosen->file_dokumen }}</td>
+            </tr>
+        </table>
     @endif
 
     <!-- FOOTER -->

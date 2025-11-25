@@ -135,7 +135,7 @@
                 <!-- DATA KEPEGAWAIAN -->
                 <div class="mb-6">
                     <h2 class="text-lg font-semibold text-gray-700 mb-3 flex items-center">
-                        <span class="bg-white text-gray-800 px-3 py-1 rounded">💼 Data Kepegawaian</span>
+                        <span class="bg-white text-gray-800 px-3 py-1 rounded">💼 Data Dosen</span>
                     </h2>
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm border">
@@ -176,6 +176,19 @@
                             <tr>
                                 <td class="border px-4 py-2 font-medium bg-gray-50">JaFung (No SK)</td>
                                 <td class="border px-4 py-2">{{ $dosen->no_sk_jafung ?? '-' }}</td>
+                            </tr>
+                            <!-- STATUS DOSEN - TAMBAHKAN SETELAH JaFung -->
+                            <tr class="bg-gray-50">
+                                <td class="border px-4 py-2 font-medium">Status Dosen</td>
+                                <td class="border px-4 py-2">
+                                    <span
+                                        class="px-3 py-1 rounded-full text-sm font-semibold 
+            {{ $dosen->status_dosen == 'DOSEN_TETAP' ? 'bg-green-100 text-green-800' : '' }}
+            {{ $dosen->status_dosen == 'DOSEN_TIDAK_TETAP' ? 'bg-yellow-100 text-yellow-800' : '' }}
+            {{ $dosen->status_dosen == 'PNS' ? 'bg-blue-100 text-blue-800' : '' }}">
+                                        {{ $dosen->status_dosen_text }}
+                                    </span>
+                                </td>
                             </tr>
                         </table>
                     </div>

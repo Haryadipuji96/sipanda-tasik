@@ -36,6 +36,7 @@ class Dosen extends Model
         'file_dokumen',
         'sertifikasi',
         'inpasing',
+        'status_dosen', // ✅ SUDAH ADA
         // File upload baru
         'file_sertifikasi',
         'file_inpasing',
@@ -56,9 +57,30 @@ class Dosen extends Model
         'file_sk_aktif',
     ];
 
+    // ✅ METHOD OPTIONS SUDAH BENAR
+    public static function getStatusDosenOptions()
+    {
+        return [
+            'DOSEN_TETAP' => 'Dosen Tetap',
+            'DOSEN_TIDAK_TETAP' => 'Dosen Tidak Tetap',
+            'PNS' => 'PNS',
+        ];
+    }
+
     protected $casts = [
         'tanggal_lahir' => 'date',
+        'tmt_kerja' => 'date', // ⚠️ TAMBAHKAN INI
     ];
+
+    protected $attributes = [
+        'status_dosen' => 'DOSEN_TETAP', // ✅ OPTIONAL: DEFAULT VALUE
+    ];
+
+    // ✅ ACCESSOR SUDAH BENAR
+    public function getStatusDosenTextAttribute()
+    {
+        return self::getStatusDosenOptions()[$this->status_dosen] ?? $this->status_dosen;
+    }
 
     public function prodi()
     {
@@ -71,13 +93,21 @@ class Dosen extends Model
         return $this->pendidikan_data ? json_decode($this->pendidikan_data, true) : [];
     }
 
-    // Helper untuk format tempat tanggal lahir
+    // ⚠️ PERBAIKI ACCESSOR INI
     public function getTempatTanggalLahirAttribute()
     {
-        if ($this->tempat_lahir && $this->tanggal_lahir) {
-            return $this->tempat_lahir . ', ' . $this->tanggal_lahir->format('d/m/Y');
+        $tempat = $this->tempat_lahir;
+        $tanggal = $this->tanggal_lahir ? $this->tanggal_lahir->format('d-m-Y') : '';
+        
+        if ($tempat && $tanggal) {
+            return $tempat . ', ' . $tanggal;
+        } elseif ($tempat) {
+            return $tempat;
+        } elseif ($tanggal) {
+            return $tanggal;
         }
-        return $this->tempat_lahir ?? '-';
+        
+        return '-';
     }
 
     // Helper untuk nama lengkap dengan gelar

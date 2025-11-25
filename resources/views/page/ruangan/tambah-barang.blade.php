@@ -101,7 +101,8 @@
                             <!-- Nama Barang -->
                             <div>
                                 <label class="block font-medium mb-1 text-gray-700">
-                                    <i class="fas fa-tag mr-1 text-blue-500"></i>Nama Barang <span class="text-red-500">*</span>
+                                    <i class="fas fa-tag mr-1 text-blue-500"></i>Nama Barang <span
+                                        class="text-red-500">*</span>
                                 </label>
                                 <input type="text" name="nama_barang" value="{{ old('nama_barang') }}"
                                     class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -114,28 +115,37 @@
                             <!-- Kategori Barang -->
                             <div>
                                 <label class="block font-medium mb-1 text-gray-700">
-                                    <i class="fas fa-list mr-1 text-blue-500"></i>Kategori Barang <span class="text-red-500">*</span>
+                                    <i class="fas fa-list mr-1 text-blue-500"></i>Kategori Barang <span
+                                        class="text-red-500">*</span>
                                 </label>
                                 <select name="kategori_barang"
                                     class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
                                     required>
                                     <option value="">-- Pilih Kategori Barang --</option>
-                                    <option value="PERABOTAN & FURNITURE" {{ old('kategori_barang') == 'PERABOTAN & FURNITURE' ? 'selected' : '' }}>
+                                    <option value="PERABOTAN & FURNITURE"
+                                        {{ old('kategori_barang') == 'PERABOTAN & FURNITURE' ? 'selected' : '' }}>
                                         PERABOTAN & FURNITURE (Meja, Kursi, Lemari, Rak, Sofa, dll)
                                     </option>
-                                    <option value="ELEKTRONIK & TEKNOLOGI" {{ old('kategori_barang') == 'ELEKTRONIK & TEKNOLOGI' ? 'selected' : '' }}>
-                                        ELEKTRONIK & TEKNOLOGI (Komputer, Laptop, Printer, Proyektor, AC, TV, Lampu, dll)
+                                    <option value="ELEKTRONIK & TEKNOLOGI"
+                                        {{ old('kategori_barang') == 'ELEKTRONIK & TEKNOLOGI' ? 'selected' : '' }}>
+                                        ELEKTRONIK & TEKNOLOGI (Komputer, Laptop, Printer, Proyektor, AC, TV, Lampu,
+                                        dll)
                                     </option>
-                                    <option value="PERALATAN LABORATORIUM" {{ old('kategori_barang') == 'PERALATAN LABORATORIUM' ? 'selected' : '' }}>
+                                    <option value="PERALATAN LABORATORIUM"
+                                        {{ old('kategori_barang') == 'PERALATAN LABORATORIUM' ? 'selected' : '' }}>
                                         PERALATAN LABORATORIUM (Mikroskop, Alat Kimia, Alat Biologi, Alat Fisika, dll)
                                     </option>
-                                    <option value="PERALATAN KANTOR" {{ old('kategori_barang') == 'PERALATAN KANTOR' ? 'selected' : '' }}>
-                                        PERALATAN KANTOR (Mesin Ketik, Mesin Fax, Mesin Fotocopy, Stapler, Calculator, dll)
+                                    <option value="PERALATAN KANTOR"
+                                        {{ old('kategori_barang') == 'PERALATAN KANTOR' ? 'selected' : '' }}>
+                                        PERALATAN KANTOR (Mesin Ketik, Mesin Fax, Mesin Fotocopy, Stapler, Calculator,
+                                        dll)
                                     </option>
-                                    <option value="ALAT KOMUNIKASI" {{ old('kategori_barang') == 'ALAT KOMUNIKASI' ? 'selected' : '' }}>
+                                    <option value="ALAT KOMUNIKASI"
+                                        {{ old('kategori_barang') == 'ALAT KOMUNIKASI' ? 'selected' : '' }}>
                                         ALAT KOMUNIKASI (Telepon, Handy Talky, Pager, dll)
                                     </option>
-                                    <option value="LAINNYA" {{ old('kategori_barang') == 'LAINNYA' ? 'selected' : '' }}>
+                                    <option value="LAINNYA"
+                                        {{ old('kategori_barang') == 'LAINNYA' ? 'selected' : '' }}>
                                         LAINNYA (Barang tidak termasuk kategori di atas)
                                     </option>
                                 </select>
@@ -177,7 +187,8 @@
                             <!-- Jumlah -->
                             <div>
                                 <label class="block font-medium mb-1 text-gray-700">
-                                    <i class="fas fa-calculator mr-1 text-blue-500"></i>Jumlah <span class="text-red-500">*</span>
+                                    <i class="fas fa-calculator mr-1 text-blue-500"></i>Jumlah <span
+                                        class="text-red-500">*</span>
                                 </label>
                                 <input type="number" name="jumlah" value="{{ old('jumlah', 1) }}"
                                     class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -190,17 +201,22 @@
                             <!-- Satuan -->
                             <div>
                                 <label class="block font-medium mb-1 text-gray-700">
-                                    <i class="fas fa-balance-scale mr-1 text-blue-500"></i>Satuan <span class="text-red-500">*</span>
+                                    <i class="fas fa-balance-scale mr-1 text-blue-500"></i>Satuan <span
+                                        class="text-red-500">*</span>
                                 </label>
                                 <select name="satuan"
                                     class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
                                     required>
                                     <option value="">-- Pilih Satuan --</option>
-                                    <option value="unit" {{ old('satuan') == 'unit' ? 'selected' : '' }}>Unit</option>
-                                    <option value="buah" {{ old('satuan') == 'buah' ? 'selected' : '' }}>Buah</option>
+                                    <option value="unit" {{ old('satuan') == 'unit' ? 'selected' : '' }}>Unit
+                                    </option>
+                                    <option value="buah" {{ old('satuan') == 'buah' ? 'selected' : '' }}>Buah
+                                    </option>
                                     <option value="set" {{ old('satuan') == 'set' ? 'selected' : '' }}>Set</option>
-                                    <option value="lusin" {{ old('satuan') == 'lusin' ? 'selected' : '' }}>Lusin</option>
-                                    <option value="paket" {{ old('satuan') == 'paket' ? 'selected' : '' }}>Paket</option>
+                                    <option value="lusin" {{ old('satuan') == 'lusin' ? 'selected' : '' }}>Lusin
+                                    </option>
+                                    <option value="paket" {{ old('satuan') == 'paket' ? 'selected' : '' }}>Paket
+                                    </option>
                                 </select>
                                 @error('satuan')
                                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
@@ -210,17 +226,23 @@
                             <!-- Kondisi -->
                             <div>
                                 <label class="block font-medium mb-1 text-gray-700">
-                                    <i class="fas fa-heartbeat mr-1 text-blue-500"></i>Kondisi <span class="text-red-500">*</span>
+                                    <i class="fas fa-heartbeat mr-1 text-blue-500"></i>Kondisi <span
+                                        class="text-red-500">*</span>
                                 </label>
                                 <select name="kondisi"
                                     class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
                                     required>
                                     <option value="">-- Pilih Kondisi --</option>
-                                    <option value="Baik Sekali" {{ old('kondisi') == 'Baik Sekali' ? 'selected' : '' }}>Baik Sekali</option>
-                                    <option value="Baik" {{ old('kondisi') == 'Baik' ? 'selected' : '' }}>Baik</option>
-                                    <option value="Cukup" {{ old('kondisi') == 'Cukup' ? 'selected' : '' }}>Cukup</option>
-                                    <option value="Rusak Ringan" {{ old('kondisi') == 'Rusak Ringan' ? 'selected' : '' }}>Rusak Ringan</option>
-                                    <option value="Rusak Berat" {{ old('kondisi') == 'Rusak Berat' ? 'selected' : '' }}>Rusak Berat</option>
+                                    <option value="Baik Sekali"
+                                        {{ old('kondisi') == 'Baik Sekali' ? 'selected' : '' }}>Baik Sekali</option>
+                                    <option value="Baik" {{ old('kondisi') == 'Baik' ? 'selected' : '' }}>Baik
+                                    </option>
+                                    <option value="Cukup" {{ old('kondisi') == 'Cukup' ? 'selected' : '' }}>Cukup
+                                    </option>
+                                    <option value="Rusak Ringan"
+                                        {{ old('kondisi') == 'Rusak Ringan' ? 'selected' : '' }}>Rusak Ringan</option>
+                                    <option value="Rusak Berat"
+                                        {{ old('kondisi') == 'Rusak Berat' ? 'selected' : '' }}>Rusak Berat</option>
                                 </select>
                                 @error('kondisi')
                                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
@@ -232,13 +254,26 @@
                             <!-- Tanggal Pengadaan -->
                             <div>
                                 <label class="block font-medium mb-1 text-gray-700">
-                                    <i class="fas fa-calendar-alt mr-1 text-blue-500"></i>Tanggal Pengadaan <span class="text-red-500">*</span>
+                                    <i class="fas fa-calendar-alt mr-1 text-blue-500"></i>Tanggal Pengadaan
+                                    <!-- HAPUS tanda bintang merah -->
                                 </label>
                                 <input type="date" name="tanggal_pengadaan"
                                     value="{{ old('tanggal_pengadaan') }}"
-                                    class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-                                    required>
+                                    class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                                <!-- HAPUS: required -->
                                 @error('tanggal_pengadaan')
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label class="block font-medium mb-1 text-gray-700">
+                                    <i class="fas fa-calendar mr-1 text-blue-500"></i>Tahun Pengadaan
+                                </label>
+                                <input type="text" name="tahun" value="{{ old('tahun') }}"
+                                    class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                                    placeholder="Contoh: 2024" maxlength="4">
+                                @error('tahun')
                                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
@@ -246,15 +281,19 @@
                             <!-- Sumber -->
                             <div>
                                 <label class="block font-medium mb-1 text-gray-700">
-                                    <i class="fas fa-gift mr-1 text-blue-500"></i>Sumber Barang <span class="text-red-500">*</span>
+                                    <i class="fas fa-gift mr-1 text-blue-500"></i>Sumber Barang <span
+                                        class="text-red-500">*</span>
                                 </label>
                                 <select name="sumber"
                                     class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
                                     required>
                                     <option value="">-- Pilih Sumber --</option>
-                                    <option value="HIBAH" {{ old('sumber') == 'HIBAH' ? 'selected' : '' }}>HIBAH</option>
-                                    <option value="LEMBAGA" {{ old('sumber') == 'LEMBAGA' ? 'selected' : '' }}>LEMBAGA</option>
-                                    <option value="YAYASAN" {{ old('sumber') == 'YAYASAN' ? 'selected' : '' }}>YAYASAN</option>
+                                    <option value="HIBAH" {{ old('sumber') == 'HIBAH' ? 'selected' : '' }}>HIBAH
+                                    </option>
+                                    <option value="LEMBAGA" {{ old('sumber') == 'LEMBAGA' ? 'selected' : '' }}>LEMBAGA
+                                    </option>
+                                    <option value="YAYASAN" {{ old('sumber') == 'YAYASAN' ? 'selected' : '' }}>YAYASAN
+                                    </option>
                                 </select>
                                 @error('sumber')
                                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
@@ -265,7 +304,8 @@
                         <!-- Spesifikasi -->
                         <div class="mb-4">
                             <label class="block font-medium mb-1 text-gray-700">
-                                <i class="fas fa-info-circle mr-1 text-blue-500"></i>Spesifikasi Barang <span class="text-red-500">*</span>
+                                <i class="fas fa-info-circle mr-1 text-blue-500"></i>Spesifikasi Barang <span
+                                    class="text-red-500">*</span>
                             </label>
                             <textarea name="spesifikasi" rows="3"
                                 class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -279,7 +319,8 @@
                             <!-- Kode Seri -->
                             <div>
                                 <label class="block font-medium mb-1 text-gray-700">
-                                    <i class="fas fa-hashtag mr-1 text-blue-500"></i>Kode / Seri Barang <span class="text-red-500">*</span>
+                                    <i class="fas fa-hashtag mr-1 text-blue-500"></i>Kode / Seri Barang <span
+                                        class="text-red-500">*</span>
                                 </label>
                                 <input type="text" name="kode_seri" value="{{ old('kode_seri') }}"
                                     class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -312,7 +353,7 @@
                                 class="flex w-full rounded-md border border-blue-300 bg-white text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-blue-600 file:text-white file:text-sm file:font-medium"
                                 accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
                             <p class="text-gray-500 text-xs mt-1">
-                                Format: PDF, DOC, DOCX, JPG, JPEG, PNG | Maksimal: 5MB
+                                Format: PDF, DOC, DOCX, JPG, JPEG, PNG | Maksimal: 2MB
                             </p>
                             @error('file_dokumen')
                                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
@@ -333,18 +374,27 @@
                         </div>
                     </div>
 
-                    <!-- Tombol -->
+
+                    <!-- Tambahkan di bagian tombol form -->
                     <div class="flex flex-col sm:flex-row justify-end gap-2 pt-4 border-t">
+                        <!-- Tombol Import -->
+                        <a href="{{ route('ruangan.import-barang-form', $ruangan->id) }}"
+                            class="btn-success px-6 py-2 transition flex items-center justify-center order-1 sm:order-1 mb-2 sm:mb-0">
+                            <i class="fas fa-file-import mr-2"></i>Import Barang Massal
+                        </a>
+
                         <a href="{{ route('ruangan.show', $ruangan->id) }}"
-                            class="btn-secondary px-6 py-2 text-center transition order-2 sm:order-1">
+                            class="btn-secondary px-6 py-2 text-center transition order-3 sm:order-2">
                             <i class="fas fa-times mr-2"></i>Batal
                         </a>
+
                         <button type="submit" name="add_another" value="1"
-                            class="btn-success px-6 py-2 transition flex items-center justify-center order-1 sm:order-2 mb-2 sm:mb-0">
+                            class="btn-warning px-6 py-2 transition flex items-center justify-center order-2 sm:order-3 mb-2 sm:mb-0">
                             <i class="fas fa-plus-circle mr-2"></i>Simpan & Tambah Lagi
                         </button>
+
                         <button type="submit"
-                            class="btn-primary px-6 py-2 transition flex items-center justify-center order-3">
+                            class="btn-primary px-6 py-2 transition flex items-center justify-center order-4">
                             <i class="fas fa-save mr-2"></i>Simpan Barang
                         </button>
                     </div>
@@ -357,7 +407,52 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // NOTIFIKASI SUKSES
+            // Validasi file upload
+            const fileInput = document.getElementById('file_dokumen');
+            if (fileInput) {
+                fileInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        // Validate file size (2MB)
+                        if (file.size > 2 * 1024 * 1024) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'File Terlalu Besar',
+                                text: 'Ukuran file maksimal 2MB. File Anda: ' + (file.size / (1024 *
+                                    1024)).toFixed(2) + 'MB'
+                            });
+                            this.value = '';
+                            return;
+                        }
+
+                        // Validate file type
+                        const allowedTypes = ['application/pdf', 'application/msword',
+                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                            'image/jpeg', 'image/jpg', 'image/png'
+                        ];
+                        if (!allowedTypes.includes(file.type)) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Format File Tidak Didukung',
+                                text: 'Hanya file PDF, DOC, DOCX, JPG, dan PNG yang diizinkan.'
+                            });
+                            this.value = '';
+                            return;
+                        }
+
+                        // Show success message
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'File Valid',
+                            text: 'File siap diupload: ' + file.name,
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
+                });
+            }
+
+            // NOTIFIKASI SUKSES - BAHASA INDONESIA
             @if (session('success'))
                 Swal.fire({
                     icon: 'success',
@@ -368,7 +463,7 @@
                 });
             @endif
 
-            // NOTIFIKASI ERROR
+            // NOTIFIKASI ERROR - BAHASA INDONESIA
             @if (session('error'))
                 Swal.fire({
                     icon: 'error',
@@ -379,31 +474,48 @@
                 });
             @endif
 
-            // VALIDASI FORM SEBELUM SUBMIT
+            // VALIDASI FORM SEBELUM SUBMIT - BAHASA INDONESIA
             const form = document.getElementById('formTambahBarang');
-            form.addEventListener('submit', function(e) {
-                const requiredFields = form.querySelectorAll('[required]');
-                let isValid = true;
-                
-                requiredFields.forEach(field => {
-                    if (!field.value.trim()) {
-                        isValid = false;
-                        field.classList.add('border-red-500');
-                    } else {
-                        field.classList.remove('border-red-500');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    const requiredFields = form.querySelectorAll('[required]');
+                    let isValid = true;
+
+                    requiredFields.forEach(field => {
+                        if (!field.value.trim()) {
+                            isValid = false;
+                            field.classList.add('border-red-500');
+                        } else {
+                            field.classList.remove('border-red-500');
+                        }
+                    });
+
+                    // Validasi file size sebelum submit (double check)
+                    const fileInput = document.getElementById('file_dokumen');
+                    if (fileInput && fileInput.files.length > 0) {
+                        const file = fileInput.files[0];
+                        if (file.size > 2 * 1024 * 1024) {
+                            isValid = false;
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'File Terlalu Besar',
+                                text: 'Ukuran file maksimal 2MB. File Anda: ' + (file.size / (1024 *
+                                    1024)).toFixed(2) + 'MB'
+                            });
+                        }
+                    }
+
+                    if (!isValid) {
+                        e.preventDefault();
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Data Belum Lengkap',
+                            text: 'Harap isi semua field yang wajib diisi dan pastikan file tidak melebihi 2MB!',
+                            confirmButtonColor: '#3b82f6'
+                        });
                     }
                 });
-
-                if (!isValid) {
-                    e.preventDefault();
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Data Belum Lengkap',
-                        text: 'Harap isi semua field yang wajib diisi!',
-                        confirmButtonColor: '#3b82f6'
-                    });
-                }
-            });
+            }
         });
     </script>
 </x-app-layout>

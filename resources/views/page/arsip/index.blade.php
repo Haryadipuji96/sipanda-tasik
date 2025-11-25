@@ -146,7 +146,7 @@
                         <th class="border px-3 py-2 text-left">Tanggal</th>
                         <th class="border px-3 py-2 text-left">Tahun</th>
                         <th class="border px-3 py-2 text-left">Kategori</th>
-                       
+
                         <th class="border px-3 py-2 text-left">Keterangan</th>
                         <th class="border px-3 py-2 text-center">File</th>
                         <th class="border px-3 py-2 text-center w-32">Aksi</th>
@@ -169,9 +169,10 @@
                 <tbody>
                     @forelse ($arsip as $index => $a)
                         <tr class="hover:bg-gray-50">
+                            <!-- Di dalam tabel, ganti name="selected_dosen[]" menjadi name="selected_arsip[]" -->
                             @canCrud('arsip')
                             <td class="border px-3 py-2 text-center">
-                                <input type="checkbox" class="select-item" name="selected_dosen[]"
+                                <input type="checkbox" class="select-item" name="selected_arsip[]"
                                     value="{{ $a->id }}">
                             </td>
                             @endcanCrud
@@ -183,7 +184,7 @@
                             </td>
                             <td class="border px-3 py-2 text-center">{{ $a->tahun ?? '-' }}</td>
                             <td class="border px-3 py-2">{!! highlight($a->kategori->nama_kategori ?? '-', request('search')) !!}</td>
-                            
+
                             <td class="border px-3 py-2">{{ $a->keterangan ?? '-' }}</td>
 
                             <td class="border px-4 py-2 text-center">
@@ -266,7 +267,7 @@
                                                         </select>
                                                     </div>
 
-                                                
+
                                                     {{-- Judul --}}
                                                     <div class="mb-4">
                                                         <label class="block font-medium mb-1 text-start">Judul
@@ -304,6 +305,7 @@
 
 
                                                     {{-- 🔹 File Dokumen Saat Ini --}}
+                                                    <!-- GANTI bagian file info di modal edit -->
                                                     <div
                                                         class="grid w-full max-w-xs items-start gap-1.5 mb-4 text-start">
                                                         <label class="text-sm text-gray-400 font-medium leading-none">
@@ -317,6 +319,7 @@
                                                             </a>
                                                             <p class="text-gray-500 text-xs mt-1">
                                                                 Upload file baru untuk mengganti yang lama.
+                                                                <strong>Maks. 2MB</strong> <!-- TAMBAHKAN INI -->
                                                             </p>
                                                         @else
                                                             <p class="text-gray-500 italic text-sm">Belum ada file.</p>
@@ -325,6 +328,8 @@
                                                         <input type="file" name="file_dokumen" id="file_dokumen"
                                                             class="flex w-full rounded-md border border-blue-300 bg-white text-sm text-gray-400 file:border-0 file:bg-blue-600 file:text-white file:text-sm file:font-medium"
                                                             accept=".pdf,.doc,.docx,.jpg,.png" />
+                                                        <p class="text-gray-500 text-xs">Format: PDF, DOC, DOCX, JPG,
+                                                            PNG - Maks. 2MB</p> <!-- TAMBAHKAN INI -->
                                                     </div>
                                                     {{-- Keterangan --}}
                                                     <div class="mb-4">
@@ -405,54 +410,157 @@
             const deleteBtn = document.getElementById('delete-selected');
 
             // Toggle semua checkbox
-            selectAll.addEventListener('change', function() {
-                checkboxes.forEach(cb => cb.checked = selectAll.checked);
-                toggleDeleteBtn();
-            });
+            if (selectAll) {
+                selectAll.addEventListener('change', function() {
+                    checkboxes.forEach(cb => cb.checked = this.checked);
+                    toggleDeleteBtn();
+                });
+            }
 
             // Toggle tombol hapus ketika checkbox dipilih
             checkboxes.forEach(cb => {
-                cb.addEventListener('change', toggleDeleteBtn);
+                cb.addEventListener('change', function() {
+                    toggleDeleteBtn();
+                    // Uncheck select all jika ada checkbox yang diuncheck
+                    if (selectAll && !this.checked) {
+                        selectAll.checked = false;
+                    }
+                });
             });
 
             function toggleDeleteBtn() {
+                if (!deleteBtn) return;
                 const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
                 deleteBtn.disabled = !anyChecked;
             }
 
-            // Event hapus terpilih
-            deleteBtn.addEventListener('click', function() {
-                const selected = Array.from(checkboxes)
-                    .filter(cb => cb.checked)
-                    .map(cb => cb.value);
+            // Event hapus terpilih - FIXED VERSION
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', function() {
+                    const selected = Array.from(checkboxes)
+                        .filter(cb => cb.checked)
+                        .map(cb => cb.value);
 
-                if (selected.length === 0) return;
-
-                Swal.fire({
-                    title: 'Apakah anda yakin?',
-                    text: "Data yang terpilih akan dihapus!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#16a34a',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Ya, hapus!',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const form = document.createElement('form');
-                        form.method = 'POST';
-                        form.action = "{{ route('dosen.deleteSelected') }}";
-                        form.innerHTML = `
-                    @csrf
-                    @method('DELETE')
-                    ${selected.map(id => `<input type="hidden" name="selected_dosen[]" value="${id}">`).join('')}
-                `;
-                        document.body.appendChild(form);
-                        form.submit();
+                    if (selected.length === 0) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Peringatan',
+                            text: 'Tidak ada data yang dipilih!',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                        return;
                     }
+
+                    Swal.fire({
+                        title: 'Apakah anda yakin?',
+                        html: `Anda akan menghapus <strong>${selected.length} data arsip</strong> yang terpilih!`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#dc2626',
+                        cancelButtonColor: '#6b7280',
+                        confirmButtonText: 'Ya, Hapus!',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Create form dynamically - FIXED VERSION
+                            const form = document.createElement('form');
+                            form.method = 'POST';
+                            form.action = "{{ route('arsip.deleteSelected') }}";
+
+                            // CSRF Token
+                            const csrfInput = document.createElement('input');
+                            csrfInput.type = 'hidden';
+                            csrfInput.name = '_token';
+                            csrfInput.value = '{{ csrf_token() }}';
+                            form.appendChild(csrfInput);
+
+                            // Selected items
+                            selected.forEach(id => {
+                                const input = document.createElement('input');
+                                input.type = 'hidden';
+                                input.name = 'selected_arsip[]';
+                                input.value = id;
+                                form.appendChild(input);
+                            });
+
+                            // Submit form
+                            document.body.appendChild(form);
+                            form.submit();
+                        }
+                    });
                 });
-            });
+            }
         });
     </script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // File validation untuk modal edit
+        const editFileInput = document.getElementById('file_dokumen');
+        if (editFileInput) {
+            editFileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    // Validate file size (2MB)
+                    if (file.size > 2 * 1024 * 1024) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'File Terlalu Besar',
+                            text: 'Ukuran file maksimal 2MB. File Anda: ' + (file.size / (1024 * 1024)).toFixed(2) + 'MB'
+                        });
+                        this.value = '';
+                        return;
+                    }
+
+                    // Validate file type
+                    const allowedTypes = ['application/pdf', 'application/msword',
+                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                        'image/jpeg', 'image/jpg', 'image/png'
+                    ];
+                    if (!allowedTypes.includes(file.type)) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Format File Tidak Didukung',
+                            text: 'Hanya file PDF, DOC, DOCX, JPG, dan PNG yang diizinkan.'
+                        });
+                        this.value = '';
+                        return;
+                    }
+
+                    // Show success message
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'File Valid',
+                        text: 'File siap diupload: ' + file.name,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        }
+
+        // Form validation untuk modal edit
+        const editForm = document.querySelector('form[action*="arsip"]');
+        if (editForm) {
+            editForm.addEventListener('submit', function(e) {
+                const kategori = this.querySelector('select[name="id_kategori"]');
+                const judulDokumen = this.querySelector('input[name="judul_dokumen"]');
+                
+                if (!kategori || !judulDokumen) return;
+
+                if (!kategori.value || !judulDokumen.value.trim()) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Data Belum Lengkap',
+                        text: 'Kategori Arsip dan Judul Dokumen wajib diisi!'
+                    });
+                    return;
+                }
+            });
+        }
+    });
+</script>
 
 </x-app-layout>

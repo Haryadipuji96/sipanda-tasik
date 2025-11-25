@@ -85,15 +85,12 @@
                             <td class="border border-gray-300 px-3 py-2 text-center">
                                 <span
                                     class="px-2 py-1 rounded text-xs font-semibold
-                                    {{ $item->status_kepegawaian == 'PNS' ? 'bg-green-100 text-green-800' : '' }}
-                                    {{ $item->status_kepegawaian == 'Non PNS Tetap' ? 'bg-blue-100 text-blue-800' : '' }}
-                                    {{ $item->status_kepegawaian == 'Non PNS Tidak Tetap' ? 'bg-yellow-100 text-yellow-800' : '' }}">
-                                    @if ($item->status_kepegawaian == 'PNS')
-                                        PNS
-                                    @elseif($item->status_kepegawaian == 'Non PNS Tetap')
-                                        NON PNS TETAP
-                                    @elseif($item->status_kepegawaian == 'Non PNS Tidak Tetap')
-                                        NON PNS TDK TETAP
+                                    {{ $item->status_kepegawaian == 'TETAP' ? 'bg-green-100 text-green-800' : '' }}
+                                    {{ $item->status_kepegawaian == 'KONTRAK' ? 'bg-blue-100 text-blue-800' : '' }}">
+                                    @if ($item->status_kepegawaian == 'TETAP')
+                                        TETAP
+                                    @elseif($item->status_kepegawaian == 'KONTRAK')
+                                        KONTRAK
                                     @else
                                         {{ $item->status_kepegawaian }}
                                     @endif
@@ -131,15 +128,12 @@
                                 </span>
                                 <span
                                     class="px-2 py-1 rounded text-xs font-semibold
-                                    {{ $item->status_kepegawaian == 'PNS' ? 'bg-green-100 text-green-800' : '' }}
-                                    {{ $item->status_kepegawaian == 'Non PNS Tetap' ? 'bg-blue-100 text-blue-800' : '' }}
-                                    {{ $item->status_kepegawaian == 'Non PNS Tidak Tetap' ? 'bg-yellow-100 text-yellow-800' : '' }}">
-                                    @if ($item->status_kepegawaian == 'PNS')
-                                        PNS
-                                    @elseif($item->status_kepegawaian == 'Non PNS Tetap')
-                                        NON PNS TETAP
-                                    @elseif($item->status_kepegawaian == 'Non PNS Tidak Tetap')
-                                        NON PNS TDK TETAP
+                                    {{ $item->status_kepegawaian == 'TETAP' ? 'bg-green-100 text-green-800' : '' }}
+                                    {{ $item->status_kepegawaian == 'KONTRAK' ? 'bg-blue-100 text-blue-800' : '' }}">
+                                    @if ($item->status_kepegawaian == 'TETAP')
+                                        TETAP
+                                    @elseif($item->status_kepegawaian == 'KONTRAK')
+                                        KONTRAK
                                     @else
                                         {{ $item->status_kepegawaian }}
                                     @endif
@@ -226,25 +220,20 @@
         <!-- Summary -->
         @if ($tenaga->count() > 0)
             <div class="mt-6 p-4 bg-gray-50 rounded-lg">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                     <div class="text-center">
                         <p class="text-2xl font-bold text-blue-600">{{ $tenaga->count() }}</p>
                         <p class="text-gray-600">Total Tenaga</p>
                     </div>
                     <div class="text-center">
                         <p class="text-2xl font-bold text-green-600">
-                            {{ $tenaga->where('status_kepegawaian', 'PNS')->count() }}</p>
-                        <p class="text-gray-600">PNS</p>
+                            {{ $tenaga->where('status_kepegawaian', 'TETAP')->count() }}</p>
+                        <p class="text-gray-600">TETAP</p>
                     </div>
                     <div class="text-center">
                         <p class="text-2xl font-bold text-blue-600">
-                            {{ $tenaga->where('status_kepegawaian', 'Non PNS Tetap')->count() }}</p>
-                        <p class="text-gray-600">Non PNS Tetap</p>
-                    </div>
-                    <div class="text-center">
-                        <p class="text-2xl font-bold text-yellow-600">
-                            {{ $tenaga->where('status_kepegawaian', 'Non PNS Tidak Tetap')->count() }}</p>
-                        <p class="text-gray-600">Non PNS Tidak Tetap</p>
+                            {{ $tenaga->where('status_kepegawaian', 'KONTRAK')->count() }}</p>
+                        <p class="text-gray-600">KONTRAK</p>
                     </div>
                 </div>
             </div>

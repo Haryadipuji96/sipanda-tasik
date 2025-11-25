@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\TemplateBarangRuanganExport;
+use App\Exports\TemplateRuanganExport;
+use App\Imports\BarangRuanganImport;
+use App\Imports\RuanganImport;
 use App\Models\DataSarpras;
 use App\Models\Ruangan;
 use App\Models\Fakultas;
@@ -9,52 +13,63 @@ use App\Models\Prodi;
 use Illuminate\Http\Request;
 use PDF;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 
 class RuanganController extends Controller
 {
-    public function index(Request $request)
-    {
-        if (!Auth::user()->hasPermission('ruangan')) {
-            abort(403, 'Unauthorized action.');
-        }
-
-
-        $query = Ruangan::with(['prodi.fakultas'])->latest();
-
-        // Search functionality
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('nama_ruangan', 'like', "%{$search}%")
-                    ->orWhereHas('prodi', function ($q) use ($search) {
-                        $q->where('nama_prodi', 'like', "%{$search}%")
-                            ->orWhereHas('fakultas', function ($q) use ($search) {
-                                $q->where('nama_fakultas', 'like', "%{$search}%");
-                            });
-                    });
-            });
-        }
-
-        // Filter by tipe ruangan - DIUBAH
-        if ($request->filled('tipe_ruangan')) {
-            $query->where('tipe_ruangan', $request->tipe_ruangan);
-        }
-
-        // Filter by prodi
-        if ($request->filled('prodi')) {
-            $query->where('id_prodi', $request->prodi);
-        }
-
-        $ruangan = $query->paginate(15);
-        $fakultas = Fakultas::all();
-        $prodi = Prodi::with('fakultas')->get();
-
-        return view('page.ruangan.index', compact('ruangan', 'fakultas', 'prodi'));
+   public function index(Request $request)
+{
+    if (!Auth::user()->hasPermission('ruangan')) {
+        abort(403, 'Unauthorized action.');
     }
+
+    $query = Ruangan::with(['prodi.fakultas', 'barang'])->latest(); // GANTI sarpras MENJADI barang
+
+    // Search functionality untuk ruangan
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where(function ($q) use ($search) {
+            $q->where('nama_ruangan', 'like', "%{$search}%")
+                ->orWhereHas('prodi', function ($q) use ($search) {
+                    $q->where('nama_prodi', 'like', "%{$search}%")
+                        ->orWhereHas('fakultas', function ($q) use ($search) {
+                            $q->where('nama_fakultas', 'like', "%{$search}%");
+                        });
+                });
+        });
+    }
+
+    // Pencarian barang - PASTIKAN PAKAI 'barang'
+    if ($request->filled('search_barang')) {
+        $searchBarang = $request->search_barang;
+        $query->whereHas('barang', function ($q) use ($searchBarang) {
+            $q->where('nama_barang', 'like', "%{$searchBarang}%");
+        });
+    }
+
+    // Filter lainnya...
+    if ($request->filled('tipe_ruangan')) {
+        $query->where('tipe_ruangan', $request->tipe_ruangan);
+    }
+
+    if ($request->filled('kondisi')) {
+        $query->where('kondisi_ruangan', $request->kondisi);
+    }
+
+    if ($request->filled('prodi')) {
+        $query->where('id_prodi', $request->prodi);
+    }
+
+    $ruangan = $query->paginate(15);
+    $fakultas = Fakultas::all();
+    $prodi = Prodi::with('fakultas')->get();
+
+    return view('page.ruangan.index', compact('ruangan', 'fakultas', 'prodi'));
+}
 
     public function create()
     {
-           if (!Auth::user()->canCrud('ruangan')) {
+        if (!Auth::user()->canCrud('ruangan')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -66,7 +81,7 @@ class RuanganController extends Controller
 
     public function createSarana() // DIUBAH
     {
-           if (!Auth::user()->canCrud('ruangan')) {
+        if (!Auth::user()->canCrud('ruangan')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -79,7 +94,7 @@ class RuanganController extends Controller
     public function createPrasarana() // DIUBAH
     {
 
-           if (!Auth::user()->canCrud('ruangan')) {
+        if (!Auth::user()->canCrud('ruangan')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -88,46 +103,71 @@ class RuanganController extends Controller
 
     public function store(Request $request)
     {
-           if (!Auth::user()->canCrud('ruangan')) {
+        if (!Auth::user()->canCrud('ruangan')) {
             abort(403, 'Unauthorized action.');
         }
 
-        // Validasi berdasarkan tipe ruangan - DIUBAH
-        if ($request->tipe_ruangan === 'sarana') { // DIUBAH
+        // Validasi berdasarkan tipe ruangan
+        if ($request->tipe_ruangan === 'sarana') {
             $request->validate([
-                'tipe_ruangan' => 'required|in:sarana', // DIUBAH
+                'tipe_ruangan' => 'required|in:sarana',
                 'id_fakultas' => 'required|exists:fakultas,id',
                 'id_prodi' => 'required|exists:prodi,id',
                 'nama_ruangan' => 'required|string|max:255|unique:ruangan,nama_ruangan',
+                'file_dokumen' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048', // TAMBAHKAN INI
+            ], [
+                'file_dokumen.max' => 'Ukuran file tidak boleh lebih dari 2MB.',
+                'file_dokumen.mimes' => 'Format file harus PDF, DOC, DOCX, JPG, atau PNG.',
             ]);
 
             $data = [
                 'nama_ruangan' => $request->nama_ruangan,
                 'kondisi_ruangan' => 'Baik',
-                'tipe_ruangan' => 'sarana', // DIUBAH
+                'tipe_ruangan' => 'sarana',
                 'id_prodi' => $request->id_prodi,
-                'unit_prasarana' => null, // DIUBAH
+                'unit_prasarana' => null,
             ];
         } else {
             $request->validate([
-                'tipe_ruangan' => 'required|in:prasarana', // DIUBAH
-                'unit_prasarana' => 'required|string|max:255', // DIUBAH
+                'tipe_ruangan' => 'required|in:prasarana',
+                'unit_prasarana' => 'required|string|max:255',
                 'nama_ruangan' => 'required|string|max:255|unique:ruangan,nama_ruangan',
+                'file_dokumen' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048', // TAMBAHKAN INI
+            ], [
+                'file_dokumen.max' => 'Ukuran file tidak boleh lebih dari 2MB.',
+                'file_dokumen.mimes' => 'Format file harus PDF, DOC, DOCX, JPG, atau PNG.',
             ]);
 
             // Jika memilih Lainnya, gunakan nilai dari unit_lainnya
-            $unitPrasarana = $request->unit_prasarana; // DIUBAH
-            if ($request->unit_prasarana === 'Lainnya' && $request->unit_lainnya) { // DIUBAH
+            $unitPrasarana = $request->unit_prasarana;
+            if ($request->unit_prasarana === 'Lainnya' && $request->unit_lainnya) {
                 $unitPrasarana = $request->unit_lainnya;
             }
 
             $data = [
                 'nama_ruangan' => $request->nama_ruangan,
                 'kondisi_ruangan' => 'Baik',
-                'tipe_ruangan' => 'prasarana', // DIUBAH
+                'tipe_ruangan' => 'prasarana',
                 'id_prodi' => null,
-                'unit_prasarana' => $unitPrasarana, // DIUBAH
+                'unit_prasarana' => $unitPrasarana,
             ];
+        }
+
+        // Handle file upload jika ada
+        if ($request->hasFile('file_dokumen')) {
+            $file = $request->file('file_dokumen');
+
+            // Validasi tambahan untuk memastikan ukuran file
+            if ($file->getSize() > 2 * 1024 * 1024) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Ukuran file tidak boleh lebih dari 2MB. File Anda: ' .
+                        round($file->getSize() / (1024 * 1024), 2) . 'MB');
+            }
+
+            $filename = now()->format('YmdHis') . '-Ruangan.' . $file->getClientOriginalExtension();
+            $file->move(public_path('dokumen_ruangan'), $filename);
+            $data['file_dokumen'] = $filename;
         }
 
         Ruangan::create($data);
@@ -136,32 +176,9 @@ class RuanganController extends Controller
             ->with('success', 'Data ruangan berhasil ditambahkan.');
     }
 
-    public function show($id)
+    public function update(Request $request, Ruangan $ruangan)
     {
-        if (!Auth::user()->hasPermission('ruangan')) {
-            abort(403, 'Unauthorized action.');
-        }
-
-        $ruangan = Ruangan::with(['prodi.fakultas'])->findOrFail($id);
-        return view('page.ruangan.show', compact('ruangan'));
-    }
-
-    public function edit(Ruangan $ruangan) // PERBAIKAN: Route model binding
-    {
-           if (!Auth::user()->canCrud('ruangan')) {
-            abort(403, 'Unauthorized action.');
-        }
-
-        $ruangan->load(['prodi.fakultas']);
-        $fakultas = Fakultas::all();
-        $prodi = Prodi::with('fakultas')->get();
-
-        return view('page.ruangan.edit', compact('ruangan', 'fakultas', 'prodi'));
-    }
-
-    public function update(Request $request, Ruangan $ruangan) // PERBAIKAN: Route model binding
-    {
-           if (!Auth::user()->canCrud('ruangan')) {
+        if (!Auth::user()->canCrud('ruangan')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -171,12 +188,20 @@ class RuanganController extends Controller
                 'nama_ruangan' => 'required|string|max:255|unique:ruangan,nama_ruangan,' . $ruangan->id,
                 'id_prodi' => 'required|exists:prodi,id',
                 'kondisi_ruangan' => 'required|string|max:255',
+                'file_dokumen' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048', // TAMBAHKAN INI
+            ], [
+                'file_dokumen.max' => 'Ukuran file tidak boleh lebih dari 2MB.',
+                'file_dokumen.mimes' => 'Format file harus PDF, DOC, DOCX, JPG, atau PNG.',
             ]);
         } else {
             $request->validate([
                 'nama_ruangan' => 'required|string|max:255|unique:ruangan,nama_ruangan,' . $ruangan->id,
                 'unit_prasarana' => 'required|string|max:255',
                 'kondisi_ruangan' => 'required|string|max:255',
+                'file_dokumen' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048', // TAMBAHKAN INI
+            ], [
+                'file_dokumen.max' => 'Ukuran file tidak boleh lebih dari 2MB.',
+                'file_dokumen.mimes' => 'Format file harus PDF, DOC, DOCX, JPG, atau PNG.',
             ]);
         }
 
@@ -196,6 +221,28 @@ class RuanganController extends Controller
                 $updateData['id_prodi'] = null;
             }
 
+            // Handle file upload jika ada
+            if ($request->hasFile('file_dokumen')) {
+                $file = $request->file('file_dokumen');
+
+                // Validasi tambahan untuk memastikan ukuran file
+                if ($file->getSize() > 2 * 1024 * 1024) {
+                    return redirect()->back()
+                        ->withInput()
+                        ->with('error', 'Ukuran file tidak boleh lebih dari 2MB. File Anda: ' .
+                            round($file->getSize() / (1024 * 1024), 2) . 'MB');
+                }
+
+                // Hapus file lama jika ada
+                if ($ruangan->file_dokumen && file_exists(public_path('dokumen_ruangan/' . $ruangan->file_dokumen))) {
+                    unlink(public_path('dokumen_ruangan/' . $ruangan->file_dokumen));
+                }
+
+                $filename = now()->format('YmdHis') . '-Ruangan.' . $file->getClientOriginalExtension();
+                $file->move(public_path('dokumen_ruangan'), $filename);
+                $updateData['file_dokumen'] = $filename;
+            }
+
             $ruangan->update($updateData);
 
             return redirect()->route('ruangan.index')
@@ -207,9 +254,34 @@ class RuanganController extends Controller
         }
     }
 
+    public function show($id)
+    {
+        if (!Auth::user()->hasPermission('ruangan')) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $ruangan = Ruangan::with(['prodi.fakultas'])->findOrFail($id);
+        return view('page.ruangan.show', compact('ruangan'));
+    }
+
+    public function edit(Ruangan $ruangan) // PERBAIKAN: Route model binding
+    {
+        if (!Auth::user()->canCrud('ruangan')) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $ruangan->load(['prodi.fakultas']);
+        $fakultas = Fakultas::all();
+        $prodi = Prodi::with('fakultas')->get();
+
+        return view('page.ruangan.edit', compact('ruangan', 'fakultas', 'prodi'));
+    }
+
+
+
     public function destroy($id)
     {
-           if (!Auth::user()->canCrud('ruangan')) {
+        if (!Auth::user()->canCrud('ruangan')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -229,16 +301,37 @@ class RuanganController extends Controller
 
     public function deleteSelected(Request $request)
     {
-           if (!Auth::user()->canCrud('ruangan')) {
+        if (!Auth::user()->canCrud('ruangan')) {
             abort(403, 'Unauthorized action.');
         }
 
-        $ids = $request->selected_ruangan;
-        $forceDelete = $request->force_delete ?? false;
+        try {
+            $ids = $request->input('selected_ruangan', []);
+            $forceDelete = $request->boolean('force_delete', false);
 
-        if ($ids) {
+            \Log::info('Delete selected ruangan attempt', [
+                'ids' => $ids,
+                'force_delete' => $forceDelete,
+                'user_id' => Auth::id()
+            ]);
+
+            if (empty($ids)) {
+                return redirect()->route('ruangan.index')
+                    ->with('error', 'Tidak ada data yang dipilih untuk dihapus.');
+            }
+
+            // Validasi IDs
+            $validIds = array_filter($ids, function ($id) {
+                return is_numeric($id) && $id > 0;
+            });
+
+            if (empty($validIds)) {
+                return redirect()->route('ruangan.index')
+                    ->with('error', 'ID data tidak valid.');
+            }
+
             // Cek apakah ada ruangan yang digunakan
-            $usedRooms = Ruangan::whereIn('id', $ids)
+            $usedRooms = Ruangan::whereIn('id', $validIds)
                 ->whereHas('sarpras')
                 ->withCount('sarpras')
                 ->get();
@@ -256,38 +349,65 @@ class RuanganController extends Controller
                     );
             }
 
+            $deletedCount = 0;
+
             // Jika force delete, hapus juga data sarpras nya
             if ($forceDelete) {
-                foreach ($ids as $id) {
+                foreach ($validIds as $id) {
                     $ruangan = Ruangan::with('sarpras')->find($id);
                     if ($ruangan) {
                         // Hapus semua barang di ruangan tersebut
                         $ruangan->sarpras()->delete();
-                        $ruangan->delete();
+                        if ($ruangan->delete()) {
+                            $deletedCount++;
+                        }
                     }
                 }
             } else {
                 // Hapus hanya ruangan yang tidak punya barang
-                Ruangan::whereIn('id', $ids)->whereDoesntHave('sarpras')->delete();
+                $roomsToDelete = Ruangan::whereIn('id', $validIds)
+                    ->whereDoesntHave('sarpras')
+                    ->get();
+
+                foreach ($roomsToDelete as $room) {
+                    if ($room->delete()) {
+                        $deletedCount++;
+                    }
+                }
             }
 
-            $deletedCount = Ruangan::whereIn('id', $ids)->count();
+            if ($deletedCount === 0) {
+                return redirect()->route('ruangan.index')
+                    ->with('error', 'Tidak ada data yang berhasil dihapus.');
+            }
+
+            $message = ($forceDelete ?
+                'Data ruangan dan barang terkait berhasil dihapus paksa.' :
+                'Data ruangan terpilih berhasil dihapus.') .
+                ' (' . $deletedCount . ' data dihapus)';
+
+            \Log::info('Bulk delete ruangan successful', [
+                'deleted_count' => $deletedCount,
+                'force_delete' => $forceDelete
+            ]);
 
             return redirect()->route('ruangan.index')
-                ->with(
-                    'success',
-                    ($forceDelete ? 'Data ruangan dan barang terkait berhasil dihapus paksa.' : 'Data ruangan terpilih berhasil dihapus.') .
-                        ' (' . $deletedCount . ' data dihapus)'
-                );
-        }
+                ->with('success', $message);
+        } catch (\Exception $e) {
+            \Log::error('Bulk delete ruangan error: ' . $e->getMessage(), [
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
 
-        return redirect()->route('ruangan.index')
-            ->with('error', 'Tidak ada data yang dipilih untuk dihapus.');
+            return redirect()->route('ruangan.index')
+                ->with('error', 'Terjadi kesalahan sistem: ' . $e->getMessage());
+        }
     }
 
     public function checkUsedRooms(Request $request)
     {
-           if (!Auth::user()->canCrud('ruangan')) {
+        if (!Auth::user()->canCrud('ruangan')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -307,7 +427,7 @@ class RuanganController extends Controller
 
     public function getProdiByFakultas($id_fakultas)
     {
-           if (!Auth::user()->canCrud('ruangan')) {
+        if (!Auth::user()->canCrud('ruangan')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -339,7 +459,7 @@ class RuanganController extends Controller
 
     public function getRuanganByProdi($id_prodi)
     {
-           if (!Auth::user()->canCrud('ruangan')) {
+        if (!Auth::user()->canCrud('ruangan')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -404,7 +524,8 @@ class RuanganController extends Controller
             'satuan' => 'required|string|max:50',
             'harga' => 'nullable|numeric|min:0',
             'kondisi' => 'required|string|max:50',
-            'tanggal_pengadaan' => 'required|date',
+            'tanggal_pengadaan' => 'nullable|date',
+            'tahun' => 'nullable|integer|min:2000|max:' . date('Y'),
             'sumber' => 'required|string|max:50',
             'kode_seri' => 'required|string|max:255',
             'lokasi_lain' => 'nullable|string|max:255',
@@ -423,6 +544,7 @@ class RuanganController extends Controller
                 'harga' => $request->harga,
                 'kondisi' => $request->kondisi,
                 'tanggal_pengadaan' => $request->tanggal_pengadaan,
+                'tahun' => $request->tahun,
                 'sumber' => $request->sumber,
                 'kode_seri' => $request->kode_seri,
                 'lokasi_lain' => $request->lokasi_lain,
@@ -515,7 +637,8 @@ class RuanganController extends Controller
             'satuan' => 'required|string|max:50',
             'harga' => 'nullable|numeric|min:0',
             'kondisi' => 'required|string|max:50',
-            'tanggal_pengadaan' => 'required|date',
+            'tanggal_pengadaan' => 'nullable|date',
+            'tahun' => 'nullable|integer|min:2000|max:' . date('Y'),
             'sumber' => 'required|string|max:50',
             'kode_seri' => 'required|string|max:255',
             'lokasi_lain' => 'nullable|string|max:255',
@@ -534,6 +657,7 @@ class RuanganController extends Controller
                 'harga' => $request->harga,
                 'kondisi' => $request->kondisi,
                 'tanggal_pengadaan' => $request->tanggal_pengadaan,
+                'tahun' => $request->tahun,
                 'sumber' => $request->sumber,
                 'kode_seri' => $request->kode_seri,
                 'lokasi_lain' => $request->lokasi_lain,
@@ -579,5 +703,58 @@ class RuanganController extends Controller
                 ->with('error', 'Terjadi kesalahan: ' . $e->getMessage())
                 ->withInput();
         }
+    }
+
+    public function showImportBarangForm($id)
+    {
+        if (!Auth::user()->canCrud('ruangan')) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $ruangan = Ruangan::findOrFail($id);
+        return view('page.ruangan.import-barang', compact('ruangan'));
+    }
+
+    public function importBarang(Request $request, $id)
+    {
+        if (!Auth::user()->canCrud('ruangan')) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv|max:10240'
+        ]);
+
+        $ruangan = Ruangan::findOrFail($id);
+
+        try {
+            $import = new BarangRuanganImport($ruangan->id);
+            Excel::import($import, $request->file('file'));
+
+            return redirect()->route('ruangan.show', $id)
+                ->with('success', 'Data barang berhasil diimport ke ruangan ' . $ruangan->nama_ruangan . '!');
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+
+            $errorMessages = [];
+            foreach ($failures as $failure) {
+                $errorMessages[] = "Baris {$failure->row()} ({$failure->attribute()}): {$failure->errors()[0]}";
+            }
+
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan dalam import data:')
+                ->with('import_errors', $errorMessages);
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    public function downloadTemplateBarang($id)
+    {
+        $ruangan = Ruangan::findOrFail($id);
+        $filename = 'Template_Import_Barang_' . str_replace(' ', '_', $ruangan->nama_ruangan) . '.xlsx';
+
+        return Excel::download(new TemplateBarangRuanganExport($ruangan), $filename);
     }
 }

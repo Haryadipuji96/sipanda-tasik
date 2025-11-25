@@ -161,7 +161,9 @@
                         <th rowspan="3" class="border px-4 py-2">Prodi</th>
                         <th rowspan="3" class="border px-4 py-2">Tempat/Tgl Lahir</th>
                         <th rowspan="3" class="border px-4 py-2">NIDN</th>
+
                         <th rowspan="3" class="border px-4 py-2">NUPTK</th>
+                        <th rowspan="3" class="border px-4 py-1">Status Dosen</th>
                         <th colspan="3" class="border px-4 py-2 text-center">PENDIDIKAN</th>
                         <th rowspan="3" class="border px-4 py-2">Jabatan</th>
                         <th rowspan="3" class="border px-4 py-2">TMT Kerja</th>
@@ -270,8 +272,18 @@
                                     <td class="border px-4 py-2 text-center" rowspan="{{ $maxRows }}">
                                         {{ $d->nik ?? '-' }}
                                     </td>
+
                                     <td class="border px-4 py-2 text-center" rowspan="{{ $maxRows }}">
                                         {{ $d->nuptk ?? '-' }}
+                                    </td>
+                                    <td class="border px-4 py-2 text-center" rowspan="{{ $maxRows }}">
+                                        <span
+                                            class="px-2 py-1 text-xs rounded-full font-semibold 
+        {{ $d->status_dosen == 'DOSEN_TETAP' ? 'bg-green-100 text-green-800' : '' }}
+        {{ $d->status_dosen == 'DOSEN_TIDAK_TETAP' ? 'bg-yellow-100 text-yellow-800' : '' }}
+        {{ $d->status_dosen == 'PNS' ? 'bg-blue-100 text-blue-800' : '' }}">
+                                            {{ $d->status_dosen_text }}
+                                        </span>
                                     </td>
                                 @endif
 
@@ -297,6 +309,7 @@
                                         {{ $d->masa_kerja_tahun ?? 0 }}</td>
                                     <td class="border px-4 py-2 text-center" rowspan="{{ $maxRows }}">
                                         {{ $d->masa_kerja_bulan ?? 0 }}</td>
+
                                     <td class="border px-2 py-1 text-xs" rowspan="{{ $maxRows }}">
                                         {{ $d->pangkat_golongan ?? '-' }}</td>
                                     <td class="border px-2 py-1 text-xs" rowspan="{{ $maxRows }}">
@@ -397,16 +410,13 @@
 
                                         <!-- Modal Edit -->
                                         <div x-show="openModal" x-cloak
-                                            class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+                                            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                                             <div @click.away="openModal = false"
-                                                class="relative bg-white rounded-xl shadow-xl w-full max-w-6xl p-6 mx-4 overflow-y-auto max-h-[90vh]"
+                                                class="bg-white rounded-lg w-full max-w-6xl p-6 shadow-lg overflow-y-auto max-h-[90vh]"
                                                 x-data="formDosenEdit({{ json_encode($d->pendidikan_array ?? []) }}, '{{ $d->sertifikasi }}', '{{ $d->inpasing }}')">
-                                                <button @click="openModal = false"
-                                                    class="absolute top-3 right-3 text-gray-400 hover:text-gray-600">✕</button>
-                                                <h1
+                                                <h2
                                                     class="text-xl font-semibold mb-5 text-gray-800 border-b pb-2 text-start">
-                                                    Edit Data Dosen - {{ $d->nama }}
-                                                </h1>
+                                                    Edit Data Dosen - {{ $d->nama }}</h2>
 
                                                 <form action="{{ route('dosen.update', $d->id) }}" method="POST"
                                                     enctype="multipart/form-data">
@@ -415,10 +425,11 @@
 
                                                     <!-- Program Studi -->
                                                     <div class="mb-4">
-                                                        <label class="block font-medium mb-1 text-start">Program Studi
-                                                            <span class="text-red-500">*</span></label>
+                                                        <label
+                                                            class="block font-medium mb-1 text-sm text-start">Program
+                                                            Studi <span class="text-red-500">*</span></label>
                                                         <select name="id_prodi"
-                                                            class="w-full border rounded px-3 py-2" required>
+                                                            class="border p-2 rounded w-full text-sm" required>
                                                             <option value="">-- Pilih Prodi --</option>
                                                             @foreach ($prodi as $p)
                                                                 <option value="{{ $p->id }}"
@@ -431,78 +442,82 @@
                                                     </div>
 
                                                     <!-- Gelar Depan & Nama -->
-                                                    <div class="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                                                         <div>
-                                                            <label class="block font-medium mb-1 text-start">Gelar
+                                                            <label
+                                                                class="block font-medium mb-1 text-sm text-start">Gelar
                                                                 Depan</label>
                                                             <input type="text" name="gelar_depan"
                                                                 value="{{ $d->gelar_depan }}"
-                                                                class="w-full border rounded px-3 py-2"
+                                                                class="border p-2 rounded w-full text-sm"
                                                                 placeholder="Dr.">
                                                         </div>
                                                         <div class="md:col-span-2">
-                                                            <label class="block font-medium mb-1 text-start">Nama
-                                                                Lengkap
-                                                                <span class="text-red-500">*</span></label>
+                                                            <label
+                                                                class="block font-medium mb-1 text-sm text-start">Nama
+                                                                Lengkap <span class="text-red-500">*</span></label>
                                                             <input type="text" name="nama"
                                                                 value="{{ $d->nama }}"
-                                                                class="w-full border rounded px-3 py-2" required>
+                                                                class="border p-2 rounded w-full text-sm" required>
                                                         </div>
                                                     </div>
 
                                                     <!-- Gelar Belakang -->
                                                     <div class="mb-4">
-                                                        <label class="block font-medium mb-1 text-start">Gelar
+                                                        <label class="block font-medium mb-1 text-sm text-start">Gelar
                                                             Belakang</label>
                                                         <input type="text" name="gelar_belakang"
                                                             value="{{ $d->gelar_belakang }}"
-                                                            class="w-full border rounded px-3 py-2"
+                                                            class="border p-2 rounded w-full text-sm"
                                                             placeholder="M.Pd., M.Kom.">
                                                     </div>
 
                                                     <!-- Tempat & Tanggal Lahir -->
-                                                    <div class="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                                         <div>
-                                                            <label class="block font-medium mb-1 text-start">Tempat
+                                                            <label
+                                                                class="block font-medium mb-1 text-sm text-start">Tempat
                                                                 Lahir</label>
                                                             <input type="text" name="tempat_lahir"
                                                                 value="{{ $d->tempat_lahir }}"
-                                                                class="w-full border rounded px-3 py-2">
+                                                                class="border p-2 rounded w-full text-sm">
                                                         </div>
                                                         <div>
-                                                            <label class="block font-medium mb-1 text-start">Tanggal
+                                                            <label
+                                                                class="block font-medium mb-1 text-sm text-start">Tanggal
                                                                 Lahir</label>
                                                             <input type="date" name="tanggal_lahir"
                                                                 value="{{ $d->tanggal_lahir }}"
-                                                                class="w-full border rounded px-3 py-2">
+                                                                class="border p-2 rounded w-full text-sm">
                                                         </div>
                                                     </div>
 
                                                     <!-- NIDN & NUPTK -->
-                                                    <div class="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                                         <div>
                                                             <label
-                                                                class="block font-medium mb-1 text-start">NIDN</label>
+                                                                class="block font-medium mb-1 text-sm text-start">NIDN</label>
                                                             <input type="text" name="nik"
                                                                 value="{{ $d->nik }}"
-                                                                class="w-full border rounded px-3 py-2">
+                                                                class="border p-2 rounded w-full text-sm">
                                                         </div>
                                                         <div>
                                                             <label
-                                                                class="block font-medium mb-1 text-start">NUPTK</label>
+                                                                class="block font-medium mb-1 text-sm text-start">NUPTK</label>
                                                             <input type="text" name="nuptk"
                                                                 value="{{ $d->nuptk }}"
-                                                                class="w-full border rounded px-3 py-2">
+                                                                class="border p-2 rounded w-full text-sm">
                                                         </div>
                                                     </div>
 
                                                     <!-- Pendidikan Terakhir -->
                                                     <div class="mb-4" x-data="{ pendidikanTerakhir: '{{ $d->pendidikan_terakhir ?? '' }}' }">
-                                                        <label class="block font-medium mb-1 text-start">Pendidikan
+                                                        <label
+                                                            class="block font-medium mb-1 text-sm text-start">Pendidikan
                                                             Terakhir</label>
                                                         <select name="pendidikan_terakhir"
                                                             x-model="pendidikanTerakhir"
-                                                            class="w-full border rounded px-3 py-2 mb-2">
+                                                            class="border p-2 rounded w-full text-sm mb-2">
                                                             <option value="">-- Pilih Pendidikan Terakhir --
                                                             </option>
                                                             <option value="D3">D3</option>
@@ -518,7 +533,7 @@
                                                         <div x-show="pendidikanTerakhir === 'Lainnya'" x-transition>
                                                             <input type="text" name="pendidikan_lainnya"
                                                                 value="{{ $d->pendidikan_lainnya ?? '' }}"
-                                                                class="w-full border rounded px-3 py-2"
+                                                                class="border p-2 rounded w-full text-sm"
                                                                 placeholder="Masukkan pendidikan lainnya">
                                                         </div>
                                                     </div>
@@ -526,7 +541,8 @@
                                                     <!-- Riwayat Pendidikan -->
                                                     <div class="mb-6 border-t pt-4">
                                                         <div class="flex justify-between items-center mb-3">
-                                                            <label class="block font-medium">Riwayat Pendidikan</label>
+                                                            <label class="block font-medium text-sm text-start">Riwayat
+                                                                Pendidikan</label>
                                                             <button type="button" @click="addPendidikan()"
                                                                 class="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600">
                                                                 + Tambah Pendidikan
@@ -539,7 +555,7 @@
                                                                 class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3 p-3 bg-gray-50 rounded border">
                                                                 <div>
                                                                     <label
-                                                                        class="text-xs text-gray-600">Jenjang</label>
+                                                                        class="text-xs text-gray-600 text-start">Jenjang</label>
                                                                     <select :name="'pendidikan[' + index + '][jenjang]'"
                                                                         x-model="item.jenjang"
                                                                         class="w-full border rounded px-2 py-1 text-sm">
@@ -556,7 +572,7 @@
                                                                 </div>
                                                                 <div>
                                                                     <label
-                                                                        class="text-xs text-gray-600">Prodi/Jurusan</label>
+                                                                        class="text-xs text-gray-600 text-start">Prodi/Jurusan</label>
                                                                     <input type="text"
                                                                         :name="'pendidikan[' + index + '][prodi]'"
                                                                         x-model="item.prodi"
@@ -564,7 +580,8 @@
                                                                         placeholder="PAI">
                                                                 </div>
                                                                 <div>
-                                                                    <label class="text-xs text-gray-600">Tahun
+                                                                    <label
+                                                                        class="text-xs text-gray-600 text-start">Tahun
                                                                         Lulus</label>
                                                                     <input type="text"
                                                                         :name="'pendidikan[' + index + '][tahun_lulus]'"
@@ -575,7 +592,7 @@
                                                                 <div class="flex gap-2">
                                                                     <div class="flex-1">
                                                                         <label
-                                                                            class="text-xs text-gray-600">Universitas/PT</label>
+                                                                            class="text-xs text-gray-600 text-start">Universitas/PT</label>
                                                                         <input type="text"
                                                                             :name="'pendidikan[' + index + '][universitas]'"
                                                                             x-model="item.universitas"
@@ -592,112 +609,138 @@
                                                         </template>
                                                     </div>
 
-                                                    <!-- Jabatan -->
-                                                    <div class="mb-4">
-                                                        <label
-                                                            class="block font-medium mb-1 text-start">Jabatan</label>
-                                                        <input type="text" name="jabatan"
-                                                            value="{{ $d->jabatan }}"
-                                                            class="w-full border rounded px-3 py-2">
-                                                    </div>
-
-                                                    <!-- TMT Kerja -->
-                                                    <div class="mb-4">
-                                                        <label class="block font-medium mb-1 text-start">TMT
-                                                            Kerja</label>
-                                                        <input type="date" name="tmt_kerja"
-                                                            value="{{ $d->tmt_kerja }}"
-                                                            class="w-full border rounded px-3 py-2">
+                                                    <!-- Jabatan & TMT Kerja -->
+                                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                                        <div>
+                                                            <label
+                                                                class="block font-medium mb-1 text-sm text-start">Jabatan</label>
+                                                            <input type="text" name="jabatan"
+                                                                value="{{ $d->jabatan }}"
+                                                                class="border p-2 rounded w-full text-sm">
+                                                        </div>
+                                                        <div>
+                                                            <label
+                                                                class="block font-medium mb-1 text-sm text-start">TMT
+                                                                Kerja</label>
+                                                            <input type="date" name="tmt_kerja"
+                                                                value="{{ $d->tmt_kerja }}"
+                                                                class="border p-2 rounded w-full text-sm">
+                                                        </div>
                                                     </div>
 
                                                     <!-- Masa Kerja -->
-                                                    <div class="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                                         <div>
-                                                            <label class="block font-medium mb-1 text-start">Masa Kerja
-                                                                (Tahun)</label>
+                                                            <label
+                                                                class="block font-medium mb-1 text-sm text-start">Masa
+                                                                Kerja (Tahun)</label>
                                                             <input type="number" name="masa_kerja_tahun"
                                                                 value="{{ $d->masa_kerja_tahun }}"
-                                                                class="w-full border rounded px-3 py-2"
+                                                                class="border p-2 rounded w-full text-sm"
                                                                 min="0">
                                                         </div>
                                                         <div>
-                                                            <label class="block font-medium mb-1 text-start">Masa Kerja
-                                                                (Bulan)</label>
+                                                            <label
+                                                                class="block font-medium mb-1 text-sm text-start">Masa
+                                                                Kerja (Bulan)</label>
                                                             <input type="number" name="masa_kerja_bulan"
                                                                 value="{{ $d->masa_kerja_bulan }}"
-                                                                class="w-full border rounded px-3 py-2" min="0"
-                                                                max="11">
+                                                                class="border p-2 rounded w-full text-sm"
+                                                                min="0" max="11">
                                                         </div>
                                                     </div>
 
-                                                    <!-- Golongan -->
-                                                    <div class="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <!-- Status Dosen -->
+                                                    <div class="mb-4">
+                                                        <label class="block font-medium mb-1 text-sm text-start">Status
+                                                            Dosen <span class="text-red-500">*</span></label>
+                                                        <select name="status_dosen"
+                                                            class="border p-2 rounded w-full text-sm" required>
+                                                            <option value="">-- Pilih Status Dosen --</option>
+                                                            <option value="DOSEN_TETAP"
+                                                                {{ $d->status_dosen == 'DOSEN_TETAP' ? 'selected' : '' }}>
+                                                                Dosen Tetap</option>
+                                                            <option value="DOSEN_TIDAK_TETAP"
+                                                                {{ $d->status_dosen == 'DOSEN_TIDAK_TETAP' ? 'selected' : '' }}>
+                                                                Dosen Tidak Tetap</option>
+                                                            <option value="PNS"
+                                                                {{ $d->status_dosen == 'PNS' ? 'selected' : '' }}>PNS
+                                                            </option>
+                                                        </select>
+                                                    </div>
+
+                                                    <!-- Golongan & Jabatan Fungsional -->
+                                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                                         <div>
                                                             <label
-                                                                class="block font-medium mb-1 text-start">Pangkat/Golongan</label>
+                                                                class="block font-medium mb-1 text-sm text-start">Pangkat/Golongan</label>
                                                             <input type="text" name="pangkat_golongan"
                                                                 value="{{ $d->pangkat_golongan }}"
-                                                                class="w-full border rounded px-3 py-2"
+                                                                class="border p-2 rounded w-full text-sm"
                                                                 placeholder="III/b">
                                                         </div>
                                                         <div>
-                                                            <label class="block font-medium mb-1 text-start">Jabatan
+                                                            <label
+                                                                class="block font-medium mb-1 text-sm text-start">Jabatan
                                                                 Fungsional</label>
                                                             <input type="text" name="jabatan_fungsional"
                                                                 value="{{ $d->jabatan_fungsional }}"
-                                                                class="w-full border rounded px-3 py-2"
+                                                                class="border p-2 rounded w-full text-sm"
                                                                 placeholder="Lektor">
                                                         </div>
                                                     </div>
 
                                                     <!-- Masa Kerja Golongan -->
-                                                    <div class="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                                         <div>
-                                                            <label class="block font-medium mb-1 text-start">Masa Kerja
-                                                                Golongan (Tahun)</label>
+                                                            <label
+                                                                class="block font-medium mb-1 text-sm text-start">Masa
+                                                                Kerja Golongan (Tahun)</label>
                                                             <input type="number" name="masa_kerja_golongan_tahun"
                                                                 value="{{ $d->masa_kerja_golongan_tahun }}"
-                                                                class="w-full border rounded px-3 py-2"
+                                                                class="border p-2 rounded w-full text-sm"
                                                                 min="0">
                                                         </div>
                                                         <div>
-                                                            <label class="block font-medium mb-1 text-start">Masa Kerja
-                                                                Golongan (Bulan)</label>
+                                                            <label
+                                                                class="block font-medium mb-1 text-sm text-start">Masa
+                                                                Kerja Golongan (Bulan)</label>
                                                             <input type="number" name="masa_kerja_golongan_bulan"
                                                                 value="{{ $d->masa_kerja_golongan_bulan }}"
-                                                                class="w-full border rounded px-3 py-2" min="0"
-                                                                max="11">
+                                                                class="border p-2 rounded w-full text-sm"
+                                                                min="0" max="11">
                                                         </div>
                                                     </div>
 
                                                     <!-- No SK & JaFung -->
-                                                    <div class="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                                         <div>
-                                                            <label class="block font-medium mb-1 text-start">No
+                                                            <label class="block font-medium mb-1 text-sm text-start">No
                                                                 SK</label>
                                                             <input type="text" name="no_sk"
                                                                 value="{{ $d->no_sk }}"
-                                                                class="w-full border rounded px-3 py-2"
+                                                                class="border p-2 rounded w-full text-sm"
                                                                 placeholder="123/SK/2024">
                                                         </div>
                                                         <div>
-                                                            <label class="block font-medium mb-1 text-start">JaFung (No
-                                                                SK)</label>
+                                                            <label
+                                                                class="block font-medium mb-1 text-sm text-start">JaFung
+                                                                (No SK)</label>
                                                             <input type="text" name="no_sk_jafung"
                                                                 value="{{ $d->no_sk_jafung }}"
-                                                                class="w-full border rounded px-3 py-2"
+                                                                class="border p-2 rounded w-full text-sm"
                                                                 placeholder="Lektor">
                                                         </div>
                                                     </div>
 
                                                     <!-- Sertifikasi & Inpasing -->
-                                                    <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                                                         <div>
                                                             <label
-                                                                class="block font-medium mb-1 text-start">Sertifikasi
+                                                                class="block font-medium mb-1 text-sm text-start">Sertifikasi
                                                                 <span class="text-red-500">*</span></label>
                                                             <select name="sertifikasi" x-model="sertifikasi"
-                                                                class="w-full border rounded px-3 py-2" required>
+                                                                class="border p-2 rounded w-full text-sm" required>
                                                                 <option value="BELUM">BELUM</option>
                                                                 <option value="SUDAH">SUDAH</option>
                                                             </select>
@@ -706,27 +749,43 @@
                                                             <div x-show="sertifikasi === 'SUDAH'" x-transition
                                                                 class="mt-2">
                                                                 <label
-                                                                    class="block font-medium mb-1 text-sm text-gray-700">Upload
+                                                                    class="block font-medium mb-1 text-sm text-gray-700 text-start">Upload
                                                                     Sertifikasi</label>
                                                                 @if ($d->file_sertifikasi)
                                                                     <div class="mb-2">
-                                                                        <p class="text-sm text-green-600">File saat
-                                                                            ini: {{ $d->file_sertifikasi }}</p>
-                                                                        <p class="text-xs text-gray-500">Upload file
-                                                                            baru untuk mengganti</p>
+                                                                        <a href="{{ asset('dokumen_dosen/' . $d->file_sertifikasi) }}"
+                                                                            target="_blank"
+                                                                            class="text-blue-600 hover:underline text-sm inline-flex items-center">
+                                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                class="h-4 w-4 mr-1" fill="none"
+                                                                                viewBox="0 0 24 24"
+                                                                                stroke="currentColor">
+                                                                                <path stroke-linecap="round"
+                                                                                    stroke-linejoin="round"
+                                                                                    stroke-width="2"
+                                                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                                                <path stroke-linecap="round"
+                                                                                    stroke-linejoin="round"
+                                                                                    stroke-width="2"
+                                                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                                            </svg>
+                                                                            Lihat file saat ini
+                                                                        </a>
+                                                                        <p
+                                                                            class="text-gray-500 text-xs mt-1 text-start">
+                                                                            Upload file baru untuk mengganti.</p>
                                                                     </div>
                                                                 @endif
                                                                 <input type="file" name="file_sertifikasi"
-                                                                    class="w-full border rounded px-3 py-2 text-sm">
-                                                                <p class="text-gray-500 text-xs mt-1">Format: PDF, JPG,
-                                                                    PNG | Maks: 2MB</p>
+                                                                    class="w-full rounded-md border border-gray-300 bg-white text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-blue-600 file:text-white file:text-sm file:font-medium">
                                                             </div>
                                                         </div>
                                                         <div>
-                                                            <label class="block font-medium mb-1 text-start">Inpasing
+                                                            <label
+                                                                class="block font-medium mb-1 text-sm text-start">Inpasing
                                                                 <span class="text-red-500">*</span></label>
                                                             <select name="inpasing" x-model="inpasing"
-                                                                class="w-full border rounded px-3 py-2" required>
+                                                                class="border p-2 rounded w-full text-sm" required>
                                                                 <option value="BELUM">BELUM</option>
                                                                 <option value="SUDAH">SUDAH</option>
                                                             </select>
@@ -735,248 +794,112 @@
                                                             <div x-show="inpasing === 'SUDAH'" x-transition
                                                                 class="mt-2">
                                                                 <label
-                                                                    class="block font-medium mb-1 text-sm text-gray-700">Upload
+                                                                    class="block font-medium mb-1 text-sm text-gray-700 text-start">Upload
                                                                     Inpasing</label>
                                                                 @if ($d->file_inpasing)
                                                                     <div class="mb-2">
-                                                                        <p class="text-sm text-green-600">File saat
-                                                                            ini: {{ $d->file_inpasing }}</p>
-                                                                        <p class="text-xs text-gray-500">Upload file
-                                                                            baru untuk mengganti</p>
+                                                                        <a href="{{ asset('dokumen_dosen/' . $d->file_inpasing) }}"
+                                                                            target="_blank"
+                                                                            class="text-blue-600 hover:underline text-sm inline-flex items-center">
+                                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                class="h-4 w-4 mr-1" fill="none"
+                                                                                viewBox="0 0 24 24"
+                                                                                stroke="currentColor">
+                                                                                <path stroke-linecap="round"
+                                                                                    stroke-linejoin="round"
+                                                                                    stroke-width="2"
+                                                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                                                <path stroke-linecap="round"
+                                                                                    stroke-linejoin="round"
+                                                                                    stroke-width="2"
+                                                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                                            </svg>
+                                                                            Lihat file saat ini
+                                                                        </a>
+                                                                        <p
+                                                                            class="text-gray-500 text-xs mt-1 text-start">
+                                                                            Upload file baru untuk mengganti.</p>
                                                                     </div>
                                                                 @endif
                                                                 <input type="file" name="file_inpasing"
-                                                                    class="w-full border rounded px-3 py-2 text-sm">
-                                                                <p class="text-gray-500 text-xs mt-1">Format: PDF, JPG,
-                                                                    PNG | Maks: 2MB</p>
+                                                                    class="w-full rounded-md border border-gray-300 bg-white text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-blue-600 file:text-white file:text-sm file:font-medium">
                                                             </div>
                                                         </div>
                                                     </div>
 
-                                                    <!-- Upload Berkas Dosen -->
-                                                    <div class="mb-6 border-t pt-6">
-                                                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Upload
-                                                            Berkas Dosen</h3>
+                                                    <!-- UPLOAD BERKAS DOSEN -->
+                                                    <div class="mt-6 border-t pt-6">
+                                                        <h3
+                                                            class="text-lg font-semibold text-gray-800 mb-4 text-start">
+                                                            📎 Upload Berkas Dosen</h3>
 
-                                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                            <!-- Kolom 1 -->
-                                                            <div class="space-y-4">
-                                                                <!-- KTP -->
+                                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-start">
+                                                            @php
+                                                                $berkasDosenFields = [
+                                                                    'file_ktp' => 'KTP',
+                                                                    'file_ijazah_s1' => 'Ijazah S1',
+                                                                    'file_transkrip_s1' => 'Transkrip Nilai S1',
+                                                                    'file_ijazah_s2' => 'Ijazah S2',
+                                                                    'file_transkrip_s2' => 'Transkrip Nilai S2',
+                                                                    'file_ijazah_s3' => 'Ijazah S3',
+                                                                    'file_transkrip_s3' => 'Transkrip Nilai S3',
+                                                                    'file_jafung' => 'Jafung',
+                                                                    'file_kk' => 'Kartu Keluarga (KK)',
+                                                                    'file_perjanjian_kerja' => 'Perjanjian Kerja',
+                                                                    'file_sk_pengangkatan' => 'SK Pengangkatan',
+                                                                    'file_surat_pernyataan' => 'Surat Pernyataan',
+                                                                    'file_sktp' => 'SKTP',
+                                                                    'file_surat_tugas' => 'Surat Tugas',
+                                                                    'file_sk_aktif' => 'SK Aktif Tridharma',
+                                                                ];
+                                                            @endphp
+
+                                                            @foreach ($berkasDosenFields as $field => $label)
                                                                 <div>
                                                                     <label
-                                                                        class="block font-medium mb-1 text-sm text-gray-700">Upload
-                                                                        KTP</label>
-                                                                    @if ($d->file_ktp)
-                                                                        <p class="text-sm text-green-600 mb-1">File:
-                                                                            {{ $d->file_ktp }}</p>
+                                                                        class="block font-medium mb-1 text-sm">{{ $label }}</label>
+                                                                    @if ($d->$field)
+                                                                        <div class="mb-2">
+                                                                            <a href="{{ asset('dokumen_dosen/' . $d->$field) }}"
+                                                                                target="_blank"
+                                                                                class="text-blue-600 hover:underline text-sm inline-flex items-center">
+                                                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                    class="h-4 w-4 mr-1"
+                                                                                    fill="none" viewBox="0 0 24 24"
+                                                                                    stroke="currentColor">
+                                                                                    <path stroke-linecap="round"
+                                                                                        stroke-linejoin="round"
+                                                                                        stroke-width="2"
+                                                                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                                                    <path stroke-linecap="round"
+                                                                                        stroke-linejoin="round"
+                                                                                        stroke-width="2"
+                                                                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                                                </svg>
+                                                                                Lihat file saat ini
+                                                                            </a>
+                                                                            <p
+                                                                                class="text-gray-500 text-xs mt-1 text-start">
+                                                                                Upload file baru untuk mengganti.</p>
+                                                                        </div>
                                                                     @endif
-                                                                    <input type="file" name="file_ktp"
-                                                                        class="w-full border rounded px-3 py-2 text-sm">
+                                                                    <input type="file" name="{{ $field }}"
+                                                                        class="w-full rounded-md border border-gray-300 bg-white text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-blue-600 file:text-white file:text-sm file:font-medium"
+                                                                        accept=".pdf,.jpg,.png">
                                                                 </div>
-
-                                                                <!-- Ijazah S1 -->
-                                                                <div>
-                                                                    <label
-                                                                        class="block font-medium mb-1 text-sm text-gray-700">Upload
-                                                                        Ijazah S1</label>
-                                                                    @if ($d->file_ijazah_s1)
-                                                                        <p class="text-sm text-green-600 mb-1">File:
-                                                                            {{ $d->file_ijazah_s1 }}</p>
-                                                                    @endif
-                                                                    <input type="file" name="file_ijazah_s1"
-                                                                        class="w-full border rounded px-3 py-2 text-sm">
-                                                                </div>
-
-                                                                <!-- Transkrip S1 -->
-                                                                <div>
-                                                                    <label
-                                                                        class="block font-medium mb-1 text-sm text-gray-700">Upload
-                                                                        Transkrip S1</label>
-                                                                    @if ($d->file_transkrip_s1)
-                                                                        <p class="text-sm text-green-600 mb-1">File:
-                                                                            {{ $d->file_transkrip_s1 }}</p>
-                                                                    @endif
-                                                                    <input type="file" name="file_transkrip_s1"
-                                                                        class="w-full border rounded px-3 py-2 text-sm">
-                                                                </div>
-
-                                                                <!-- Ijazah S2 -->
-                                                                <div>
-                                                                    <label
-                                                                        class="block font-medium mb-1 text-sm text-gray-700">Upload
-                                                                        Ijazah S2</label>
-                                                                    @if ($d->file_ijazah_s2)
-                                                                        <p class="text-sm text-green-600 mb-1">File:
-                                                                            {{ $d->file_ijazah_s2 }}</p>
-                                                                    @endif
-                                                                    <input type="file" name="file_ijazah_s2"
-                                                                        class="w-full border rounded px-3 py-2 text-sm">
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Kolom 2 -->
-                                                            <div class="space-y-4">
-                                                                <!-- Transkrip S2 -->
-                                                                <div>
-                                                                    <label
-                                                                        class="block font-medium mb-1 text-sm text-gray-700">Upload
-                                                                        Transkrip S2</label>
-                                                                    @if ($d->file_transkrip_s2)
-                                                                        <p class="text-sm text-green-600 mb-1">File:
-                                                                            {{ $d->file_transkrip_s2 }}</p>
-                                                                    @endif
-                                                                    <input type="file" name="file_transkrip_s2"
-                                                                        class="w-full border rounded px-3 py-2 text-sm">
-                                                                </div>
-
-                                                                <!-- Ijazah S3 -->
-                                                                <div>
-                                                                    <label
-                                                                        class="block font-medium mb-1 text-sm text-gray-700">Upload
-                                                                        Ijazah S3</label>
-                                                                    @if ($d->file_ijazah_s3)
-                                                                        <p class="text-sm text-green-600 mb-1">File:
-                                                                            {{ $d->file_ijazah_s3 }}</p>
-                                                                    @endif
-                                                                    <input type="file" name="file_ijazah_s3"
-                                                                        class="w-full border rounded px-3 py-2 text-sm">
-                                                                </div>
-
-                                                                <!-- Transkrip S3 -->
-                                                                <div>
-                                                                    <label
-                                                                        class="block font-medium mb-1 text-sm text-gray-700">Upload
-                                                                        Transkrip S3</label>
-                                                                    @if ($d->file_transkrip_s3)
-                                                                        <p class="text-sm text-green-600 mb-1">File:
-                                                                            {{ $d->file_transkrip_s3 }}</p>
-                                                                    @endif
-                                                                    <input type="file" name="file_transkrip_s3"
-                                                                        class="w-full border rounded px-3 py-2 text-sm">
-                                                                </div>
-
-                                                                <!-- Jafung -->
-                                                                <div>
-                                                                    <label
-                                                                        class="block font-medium mb-1 text-sm text-gray-700">Upload
-                                                                        Jafung</label>
-                                                                    @if ($d->file_jafung)
-                                                                        <p class="text-sm text-green-600 mb-1">File:
-                                                                            {{ $d->file_jafung }}</p>
-                                                                    @endif
-                                                                    <input type="file" name="file_jafung"
-                                                                        class="w-full border rounded px-3 py-2 text-sm">
-                                                                </div>
-                                                            </div>
+                                                            @endforeach
                                                         </div>
-
-                                                        <!-- Baris 2 -->
-                                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                                                            <!-- KK -->
-                                                            <div>
-                                                                <label
-                                                                    class="block font-medium mb-1 text-sm text-gray-700">Upload
-                                                                    KK</label>
-                                                                @if ($d->file_kk)
-                                                                    <p class="text-sm text-green-600 mb-1">File:
-                                                                        {{ $d->file_kk }}</p>
-                                                                @endif
-                                                                <input type="file" name="file_kk"
-                                                                    class="w-full border rounded px-3 py-2 text-sm">
-                                                            </div>
-
-                                                            <!-- Perjanjian Kerja -->
-                                                            <div>
-                                                                <label
-                                                                    class="block font-medium mb-1 text-sm text-gray-700">Upload
-                                                                    Perjanjian Kerja</label>
-                                                                @if ($d->file_perjanjian_kerja)
-                                                                    <p class="text-sm text-green-600 mb-1">File:
-                                                                        {{ $d->file_perjanjian_kerja }}</p>
-                                                                @endif
-                                                                <input type="file" name="file_perjanjian_kerja"
-                                                                    class="w-full border rounded px-3 py-2 text-sm">
-                                                            </div>
-
-                                                            <!-- SK Pengangkatan -->
-                                                            <div>
-                                                                <label
-                                                                    class="block font-medium mb-1 text-sm text-gray-700">Upload
-                                                                    SK Pengangkatan</label>
-                                                                @if ($d->file_sk_pengangkatan)
-                                                                    <p class="text-sm text-green-600 mb-1">File:
-                                                                        {{ $d->file_sk_pengangkatan }}</p>
-                                                                @endif
-                                                                <input type="file" name="file_sk_pengangkatan"
-                                                                    class="w-full border rounded px-3 py-2 text-sm">
-                                                            </div>
-                                                        </div>
-
-                                                        <!-- Baris 3 -->
-                                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                                                            <!-- Surat Pernyataan -->
-                                                            <div>
-                                                                <label
-                                                                    class="block font-medium mb-1 text-sm text-gray-700">Upload
-                                                                    Surat Pernyataan</label>
-                                                                @if ($d->file_surat_pernyataan)
-                                                                    <p class="text-sm text-green-600 mb-1">File:
-                                                                        {{ $d->file_surat_pernyataan }}</p>
-                                                                @endif
-                                                                <input type="file" name="file_surat_pernyataan"
-                                                                    class="w-full border rounded px-3 py-2 text-sm">
-                                                            </div>
-
-                                                            <!-- SKTP -->
-                                                            <div>
-                                                                <label
-                                                                    class="block font-medium mb-1 text-sm text-gray-700">Upload
-                                                                    SKTP</label>
-                                                                @if ($d->file_sktp)
-                                                                    <p class="text-sm text-green-600 mb-1">File:
-                                                                        {{ $d->file_sktp }}</p>
-                                                                @endif
-                                                                <input type="file" name="file_sktp"
-                                                                    class="w-full border rounded px-3 py-2 text-sm">
-                                                            </div>
-
-                                                            <!-- Surat Tugas -->
-                                                            <div>
-                                                                <label
-                                                                    class="block font-medium mb-1 text-sm text-gray-700">Upload
-                                                                    Surat Tugas</label>
-                                                                @if ($d->file_surat_tugas)
-                                                                    <p class="text-sm text-green-600 mb-1">File:
-                                                                        {{ $d->file_surat_tugas }}</p>
-                                                                @endif
-                                                                <input type="file" name="file_surat_tugas"
-                                                                    class="w-full border rounded px-3 py-2 text-sm">
-                                                            </div>
-                                                        </div>
-
-                                                        <!-- Baris 4 -->
-                                                        <div class="mt-4">
-                                                            <!-- SK Aktif -->
-                                                            <div>
-                                                                <label
-                                                                    class="block font-medium mb-1 text-sm text-gray-700">Upload
-                                                                    SK Aktif Tridharma</label>
-                                                                @if ($d->file_sk_aktif)
-                                                                    <p class="text-sm text-green-600 mb-1">File:
-                                                                        {{ $d->file_sk_aktif }}</p>
-                                                                @endif
-                                                                <input type="file" name="file_sk_aktif"
-                                                                    class="w-full border rounded px-3 py-2 text-sm">
-                                                            </div>
-                                                        </div>
+                                                        <p class="text-gray-500 text-xs mt-3 text-start">Format:
+                                                            <b>PDF, JPG, PNG</b> | Maksimal <b>2MB</b> per file
+                                                        </p>
                                                     </div>
 
                                                     <!-- Tombol Aksi -->
-                                                    <div class="flex justify-end space-x-2 mt-6">
+                                                    <div class="flex justify-end mt-6 gap-2 pt-6 border-t">
                                                         <button type="button" @click="openModal = false"
-                                                            class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">Batal</button>
+                                                            class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition">Batal</button>
                                                         <button type="submit"
-                                                            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Update</button>
+                                                            class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition">Update</button>
                                                     </div>
                                                 </form>
                                             </div>
@@ -1035,70 +958,143 @@
             @endif
         });
 
-        // Checkbox & Delete Selected
+        // Checkbox & Delete Selected - FIXED VERSION
         document.addEventListener('DOMContentLoaded', function() {
             const selectAll = document.getElementById('select-all');
             const checkboxes = document.querySelectorAll('.select-item');
             const deleteBtn = document.getElementById('delete-selected');
 
-            selectAll.addEventListener('change', function() {
-                checkboxes.forEach(cb => cb.checked = selectAll.checked);
-                toggleDeleteBtn();
-            });
+            // Select All functionality
+            if (selectAll) {
+                selectAll.addEventListener('change', function() {
+                    checkboxes.forEach(cb => cb.checked = this.checked);
+                    toggleDeleteBtn();
+                });
+            }
 
+            // Individual checkbox change
             checkboxes.forEach(cb => {
-                cb.addEventListener('change', toggleDeleteBtn);
+                cb.addEventListener('change', function() {
+                    toggleDeleteBtn();
+                    // Uncheck select all if any checkbox is unchecked
+                    if (selectAll && !this.checked) {
+                        selectAll.checked = false;
+                    }
+                });
             });
 
             function toggleDeleteBtn() {
+                if (!deleteBtn) return;
                 const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
                 deleteBtn.disabled = !anyChecked;
             }
 
-            deleteBtn.addEventListener('click', function() {
-                const selected = Array.from(checkboxes)
-                    .filter(cb => cb.checked)
-                    .map(cb => cb.value);
+            // Delete selected handler - IMPROVED VERSION
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', function() {
+                    const selected = Array.from(checkboxes)
+                        .filter(cb => cb.checked)
+                        .map(cb => cb.value);
 
-                if (selected.length === 0) return;
-
-                Swal.fire({
-                    title: 'Apakah anda yakin?',
-                    text: "Data yang terpilih akan dihapus!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#16a34a',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Ya, hapus!',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const form = document.createElement('form');
-                        form.method = 'POST';
-                        form.action = "{{ route('dosen.deleteSelected') }}";
-                        form.innerHTML = `
-                    @csrf
-                    @method('DELETE')
-                    ${selected.map(id => `<input type="hidden" name="selected_dosen[]" value="${id}">`).join('')}
-                `;
-                        document.body.appendChild(form);
-                        form.submit();
+                    if (selected.length === 0) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Peringatan',
+                            text: 'Tidak ada data yang dipilih!',
+                            timer: 2000
+                        });
+                        return;
                     }
+
+                    Swal.fire({
+                        title: 'Apakah anda yakin?',
+                        html: `Anda akan menghapus <strong>${selected.length} data</strong> yang terpilih!`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#dc2626',
+                        cancelButtonColor: '#6b7280',
+                        confirmButtonText: 'Ya, Hapus!',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Show loading state
+                            const originalText = deleteBtn.innerHTML;
+                            deleteBtn.disabled = true;
+                            deleteBtn.innerHTML = '<span>Menghapus...</span>';
+
+                            // Kirim data menggunakan fetch API
+                            fetch("{{ route('dosen.deleteSelected') }}", {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                        'Accept': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        selected_dosen: selected
+                                    })
+                                })
+                                .then(response => {
+                                    // Check if response is JSON
+                                    const contentType = response.headers.get('content-type');
+                                    if (!contentType || !contentType.includes(
+                                            'application/json')) {
+                                        throw new TypeError('Response bukan JSON');
+                                    }
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    if (data.success) {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Berhasil!',
+                                            text: data.message,
+                                            timer: 2000,
+                                            showConfirmButton: false
+                                        }).then(() => {
+                                            location
+                                                .reload(); // Reload halaman setelah sukses
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Gagal!',
+                                            text: data.message
+                                        });
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error!',
+                                        text: 'Terjadi kesalahan saat menghapus data: ' +
+                                            error.message
+                                    });
+                                })
+                                .finally(() => {
+                                    // Reset button state
+                                    deleteBtn.disabled = false;
+                                    deleteBtn.innerHTML = originalText;
+                                });
+                        }
+                    });
                 });
-            });
+            }
         });
     </script>
     <script>
-        function formDosenEdit(existingData, sertifikasiValue, inpasingValue) {
+        // Fungsi untuk form edit dosen
+        function formDosenEdit(pendidikanData = [], sertifikasi = 'BELUM', inpasing = 'BELUM') {
             return {
-                pendidikan: existingData.length ? existingData : [{
+                pendidikan: pendidikanData.length > 0 ? pendidikanData : [{
                     jenjang: '',
                     prodi: '',
                     tahun_lulus: '',
                     universitas: ''
                 }],
-                sertifikasi: sertifikasiValue,
-                inpasing: inpasingValue,
+                sertifikasi: sertifikasi,
+                inpasing: inpasing,
                 addPendidikan() {
                     this.pendidikan.push({
                         jenjang: '',
@@ -1111,8 +1107,120 @@
                     if (this.pendidikan.length > 1) {
                         this.pendidikan.splice(index, 1);
                     }
+                },
+                initFileValidation() {
+                    // Inisialisasi validasi file untuk modal edit
+                    const fileInputs = this.$el.querySelectorAll('input[type="file"]');
+                    fileInputs.forEach(input => {
+                        input.addEventListener('change', function(e) {
+                            const file = e.target.files[0];
+                            if (file) {
+                                // Validasi ukuran file (2MB)
+                                if (file.size > 2 * 1024 * 1024) {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'File Terlalu Besar',
+                                        text: 'Ukuran file maksimal 2MB. File Anda: ' + (file.size /
+                                            (1024 * 1024)).toFixed(2) + 'MB',
+                                        confirmButtonColor: '#3b82f6'
+                                    });
+                                    this.value = '';
+                                    return;
+                                }
+
+                                // Validasi tipe file
+                                const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg',
+                                    'image/png'
+                                ];
+                                if (!allowedTypes.includes(file.type)) {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Format File Tidak Didukung',
+                                        text: 'Hanya file PDF, JPG, dan PNG yang diizinkan.',
+                                        confirmButtonColor: '#3b82f6'
+                                    });
+                                    this.value = '';
+                                    return;
+                                }
+
+                                // Notifikasi sukses
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'File Valid',
+                                    text: 'File siap diupload: ' + file.name,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+                            }
+                        });
+                    });
                 }
             }
         }
+
+        // Validasi form edit saat submit
+        document.addEventListener('DOMContentLoaded', function() {
+            // Delegasi event untuk form edit di modal
+            document.addEventListener('submit', function(e) {
+                if (e.target.closest('form') && e.target.closest('form').getAttribute('action')?.includes(
+                        '/dosen/')) {
+                    const form = e.target;
+                    let isValid = true;
+                    let largeFiles = [];
+
+                    // Validasi field required
+                    const requiredFields = form.querySelectorAll('[required]');
+                    requiredFields.forEach(field => {
+                        if (!field.value.trim()) {
+                            isValid = false;
+                            field.classList.add('border-red-500');
+                        } else {
+                            field.classList.remove('border-red-500');
+                        }
+                    });
+
+                    // Validasi file upload
+                    const fileInputs = form.querySelectorAll('input[type="file"]');
+                    fileInputs.forEach(input => {
+                        if (input.files.length > 0) {
+                            const file = input.files[0];
+                            if (file.size > 2 * 1024 * 1024) {
+                                isValid = false;
+                                largeFiles.push({
+                                    name: file.name,
+                                    size: (file.size / (1024 * 1024)).toFixed(2)
+                                });
+                            }
+                        }
+                    });
+
+                    if (!isValid) {
+                        e.preventDefault();
+
+                        if (largeFiles.length > 0) {
+                            let errorMessage = 'File berikut melebihi 2MB:\n';
+                            largeFiles.forEach(file => {
+                                errorMessage += `• ${file.name} (${file.size}MB)\n`;
+                            });
+                            errorMessage += '\nHarap kompres file atau pilih file yang lebih kecil.';
+
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'File Terlalu Besar',
+                                text: errorMessage,
+                                confirmButtonColor: '#3b82f6'
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Data Belum Lengkap',
+                                text: 'Harap isi semua field yang wajib diisi!',
+                                confirmButtonColor: '#3b82f6'
+                            });
+                        }
+                    }
+                }
+            });
+        });
     </script>
 </x-app-layout>

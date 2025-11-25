@@ -35,7 +35,7 @@ Route::prefix('dosen')->group(function () {
     Route::get('/{id}', [DosenController::class, 'show'])->name('dosen.show');
     Route::put('/{id}', [DosenController::class, 'update'])->name('dosen.update');
     Route::delete('/{id}', [DosenController::class, 'destroy'])->name('dosen.destroy');
-    Route::delete('/delete-selected', [DosenController::class, 'deleteSelected'])->name('dosen.deleteSelected');
+    Route::post('/delete-selected', [DosenController::class, 'deleteSelected'])->name('dosen.deleteSelected');
 
     // Export Routes
     Route::get('/export/excel', [DosenController::class, 'exportExcel'])->name('dosen.export.excel');
@@ -67,7 +67,7 @@ Route::prefix('tenaga-pendidik')->group(function () {
     Route::get('/{id}/preview-pdf', [TenagaPendidikController::class, 'previewPDF'])->name('tenaga-pendidik.preview-pdf');
     Route::get('/{id}/download-pdf', [TenagaPendidikController::class, 'downloadPDF'])->name('tenaga-pendidik.download-pdf');
 
-    Route::delete('/delete-selected', [TenagaPendidikController::class, 'deleteSelected'])->name('tenaga-pendidik.deleteSelected');
+    Route::post('/delete-selected', [TenagaPendidikController::class, 'deleteSelected'])->name('tenaga-pendidik.deleteSelected');
 });
 // ==========================================
 // ROUTE UNTUK SARPRAS
@@ -81,6 +81,16 @@ Route::prefix('tenaga-pendidik')->group(function () {
 // ROUTE UNTUK RUANGAN (FIXED - PERBAIKAN UTAMA)
 // ==========================================
 Route::prefix('ruangan')->group(function () {
+    // Export dan utilitas
+    Route::get('/{ruangan}/pdf', [RuanganController::class, 'downloadPdf'])->name('ruangan.pdf');
+    Route::get('/{id}/import-barang', [RuanganController::class, 'showImportBarangForm'])->name('ruangan.import-barang-form');
+    Route::post('/{id}/import-barang', [RuanganController::class, 'importBarang'])->name('ruangan.import-barang');
+    Route::get('/{id}/download-template-barang', [RuanganController::class, 'downloadTemplateBarang'])->name('ruangan.download-template-barang');
+
+    // Routes untuk import ruangan (jika diperlukan)
+    Route::get('/import', [RuanganController::class, 'showImportForm'])->name('ruangan.import-form');
+    Route::post('/import', [RuanganController::class, 'import'])->name('ruangan.import');
+    Route::get('/download-template', [RuanganController::class, 'downloadTemplate'])->name('ruangan.download-template');
     // Route utama untuk ruangan
     Route::get('/', [RuanganController::class, 'index'])->name('ruangan.index');
     Route::get('/create', [RuanganController::class, 'create'])->name('ruangan.create');
@@ -102,8 +112,8 @@ Route::prefix('ruangan')->group(function () {
     Route::put('/{ruangan}/barang/{barang}', [RuanganController::class, 'updateBarang'])->name('ruangan.barang.update');
     Route::delete('/{ruangan}/barang/{barang}', [RuanganController::class, 'destroyBarang'])->name('ruangan.barang.destroy');
 
-    // Export dan utilitas
-    Route::get('/{ruangan}/pdf', [RuanganController::class, 'downloadPdf'])->name('ruangan.pdf');
+    Route::post('/ruangan/check-used-rooms', [RuanganController::class, 'checkUsedRooms'])->name('ruangan.checkUsedRooms');
+    Route::post('/ruangan/delete-selected', [RuanganController::class, 'deleteSelected'])->name('ruangan.deleteSelected');
 });
 
 // ==========================================
@@ -117,7 +127,7 @@ Route::prefix('arsip')->group(function () {
     Route::get('/{arsip}/edit', [ArsipController::class, 'edit'])->name('arsip.edit');
     Route::put('/{arsip}', [ArsipController::class, 'update'])->name('arsip.update');
     Route::delete('/{arsip}', [ArsipController::class, 'destroy'])->name('arsip.destroy');
-    Route::delete('/delete-selected', [ArsipController::class, 'deleteSelected'])->name('arsip.deleteSelected');
+    Route::post('/delete-selected', [ArsipController::class, 'deleteSelected'])->name('arsip.deleteSelected');
 
     // Export Routes
     Route::get('/export/excel', [ArsipController::class, 'exportExcel'])->name('arsip.export.excel');
@@ -171,20 +181,19 @@ Route::prefix('dokumen-mahasiswa')->group(function () {
     Route::get('/import', [DokumenMahasiswaController::class, 'showImportForm'])->name('dokumen-mahasiswa.import-form');
     Route::post('/import', [DokumenMahasiswaController::class, 'import'])->name('dokumen-mahasiswa.import');
     Route::get('/download-template', [DokumenMahasiswaController::class, 'downloadTemplate'])->name('dokumen-mahasiswa.download-template');
-    
+
     // Route create harus sebelum route dengan parameter
     Route::get('/create', [DokumenMahasiswaController::class, 'create'])->name('dokumen-mahasiswa.create');
     Route::post('/', [DokumenMahasiswaController::class, 'store'])->name('dokumen-mahasiswa.store');
-    
+
     // Route index
     Route::get('/', [DokumenMahasiswaController::class, 'index'])->name('dokumen-mahasiswa.index');
-    
+
     // Route dengan parameter - pastikan konsisten menggunakan {id} atau {dokumen_mahasiswa}
     Route::get('/{id}', [DokumenMahasiswaController::class, 'show'])->name('dokumen-mahasiswa.show');
     Route::get('/{id}/edit', [DokumenMahasiswaController::class, 'edit'])->name('dokumen-mahasiswa.edit');
     Route::put('/{id}', [DokumenMahasiswaController::class, 'update'])->name('dokumen-mahasiswa.update');
     Route::delete('/{id}', [DokumenMahasiswaController::class, 'destroy'])->name('dokumen-mahasiswa.destroy');
-    Route::post('/{id}/verifikasi', [DokumenMahasiswaController::class, 'verifikasi'])->name('dokumen-mahasiswa.verifikasi');
 });
 
 // ==========================================
@@ -232,12 +241,11 @@ Route::middleware(['auth'])->group(function () {
 // ==========================================
 // BULK DELETE ROUTES (AUTH ONLY)
 // ==========================================
-Route::middleware('auth')->group(function () {
-    Route::post('/ruangan/check-used-rooms', [RuanganController::class, 'checkUsedRooms'])->name('ruangan.checkUsedRooms');
-    Route::delete('/ruangan/delete-selected', [RuanganController::class, 'deleteSelected'])->name('ruangan.deleteSelected');
-    Route::delete('/dosen/delete-selected', [DosenController::class, 'deleteSelected'])->name('dosen.deleteSelected');
-    Route::delete('/arsip/delete-selected', [ArsipController::class, 'deleteSelected'])->name('arsip.deleteSelected');
-    Route::delete('/tenaga-pendidik/delete-selected', [TenagaPendidikController::class, 'deleteSelected'])->name('tenaga-pendidik.deleteSelected');
-});
+// Route::middleware('auth')->group(function () {
+//     // Route::post('/ruangan/check-used-rooms', [RuanganController::class, 'checkUsedRooms'])->name('ruangan.checkUsedRooms');
+//     // Route::post('/ruangan/delete-selected', [RuanganController::class, 'deleteSelected'])->name('ruangan.deleteSelected');
+//     // Route::delete('/dosen/delete-selected', [DosenController::class, 'deleteSelected'])->name('dosen.deleteSelected');
+//     // Route::post('/tenaga-pendidik/delete-selected', [TenagaPendidikController::class, 'deleteSelected'])->name('tenaga-pendidik.deleteSelected');
+// });
 
 require __DIR__ . '/auth.php';

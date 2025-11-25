@@ -69,8 +69,16 @@ class ArsipController extends Controller
             'nomor_dokumen' => 'nullable|string|max:100',
             'tanggal_dokumen' => 'nullable|date',
             'tahun' => 'nullable|integer|min:1900|max:2100',
-            'file_dokumen' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:5120',
+            'file_dokumen' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048',
             'keterangan' => 'nullable|string|max:500',
+        ], [
+            'file_dokumen.max' => 'Ukuran file tidak boleh lebih dari 2MB.',
+            'file_dokumen.mimes' => 'Format file harus PDF, DOC, DOCX, JPG, atau PNG.',
+            'id_kategori.required' => 'Kategori arsip wajib dipilih.',
+            'judul_dokumen.required' => 'Judul dokumen wajib diisi.',
+            'tahun.integer' => 'Tahun harus berupa angka.',
+            'tahun.min' => 'Tahun tidak boleh kurang dari 1900.',
+            'tahun.max' => 'Tahun tidak boleh lebih dari 2100.',
         ]);
 
         $data = $request->except('file_dokumen');
@@ -78,6 +86,15 @@ class ArsipController extends Controller
         // Jika ada file yang di-upload
         if ($request->hasFile('file_dokumen')) {
             $file = $request->file('file_dokumen');
+
+            // Validasi tambahan untuk memastikan ukuran file
+            if ($file->getSize() > 2 * 1024 * 1024) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Ukuran file tidak boleh lebih dari 2MB. File Anda: ' .
+                        round($file->getSize() / (1024 * 1024), 2) . 'MB');
+            }
+
             $filename = now()->format('YmdHis') . '-Arsip.' . $file->getClientOriginalExtension();
             $file->move(public_path('dokumen_arsip'), $filename);
             $data['file_dokumen'] = $filename;
@@ -102,41 +119,50 @@ class ArsipController extends Controller
             'nomor_dokumen' => 'nullable|string|max:100',
             'tanggal_dokumen' => 'nullable|date',
             'tahun' => 'nullable|integer|min:1900|max:2100',
-            'file_dokumen' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:5120',
+            'file_dokumen' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048',
             'keterangan' => 'nullable|string|max:500',
+        ], [
+            'file_dokumen.max' => 'Ukuran file tidak boleh lebih dari 2MB.',
+            'file_dokumen.mimes' => 'Format file harus PDF, DOC, DOCX, JPG, atau PNG.',
+            'id_kategori.required' => 'Kategori arsip wajib dipilih.',
+            'judul_dokumen.required' => 'Judul dokumen wajib diisi.',
+            'tahun.integer' => 'Tahun harus berupa angka.',
+            'tahun.min' => 'Tahun tidak boleh kurang dari 1900.',
+            'tahun.max' => 'Tahun tidak boleh lebih dari 2100.',
         ]);
 
-        // Ambil semua data kecuali file
         $data = $request->except('file_dokumen');
-
-        // Simpan nama file lama
         $oldFile = $arsip->file_dokumen;
 
         // Jika ada file baru
         if ($request->hasFile('file_dokumen')) {
+            $file = $request->file('file_dokumen');
+
+            // Validasi tambahan untuk memastikan ukuran file
+            if ($file->getSize() > 2 * 1024 * 1024) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Ukuran file tidak boleh lebih dari 2MB. File Anda: ' .
+                        round($file->getSize() / (1024 * 1024), 2) . 'MB');
+            }
+
             // Hapus file lama jika ada
             if ($oldFile && file_exists(public_path('dokumen_arsip/' . $oldFile))) {
                 unlink(public_path('dokumen_arsip/' . $oldFile));
             }
 
             // Simpan file baru
-            $file = $request->file('file_dokumen');
             $filename = now()->format('YmdHis') . '-Arsip.' . $file->getClientOriginalExtension();
             $file->move(public_path('dokumen_arsip'), $filename);
-
-            // Ganti nama file di data
             $data['file_dokumen'] = $filename;
         } else {
-            // Kalau tidak upload file baru, pakai file lama
             $data['file_dokumen'] = $oldFile;
         }
 
-        // Update data ke database
         $arsip->update($data);
 
         return redirect()->route('arsip.index')->with('success', 'Data arsip berhasil diperbarui.');
     }
-
     public function destroy($id)
     {
         if (!Auth::user()->canCrud('arsip')) {
@@ -154,18 +180,18 @@ class ArsipController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        $ids = $request->selected_dosen;
+        $ids = $request->selected_arsip;
         if ($ids) {
-            $dosens = Arsip::whereIn('id', $ids)->get();
-            foreach ($dosens as $d) {
-                if ($d->file_dokumen && file_exists(public_path('storage/dokumen_dosen/' . $d->file_dokumen))) {
-                    unlink(public_path('storage/dokumen_dosen/' . $d->file_dokumen));
+            $arsips = Arsip::whereIn('id', $ids)->get();
+            foreach ($arsips as $arsip) {
+                if ($arsip->file_dokumen && file_exists(public_path('dokumen_arsip/' . $arsip->file_dokumen))) {
+                    unlink(public_path('dokumen_arsip/' . $arsip->file_dokumen));
                 }
             }
             Arsip::whereIn('id', $ids)->delete();
         }
 
-        return redirect()->route('dosen.index')->with('success', 'Data dosen terpilih berhasil dihapus.');
+        return redirect()->route('arsip.index')->with('success', 'Data arsip terpilih berhasil dihapus.');
     }
 
     // ==========================================
@@ -177,6 +203,7 @@ class ArsipController extends Controller
      */
     public function previewAllPdf(Request $request)
     {
+
         $query = Arsip::with(['kategori']);
 
         // Filter berdasarkan pencarian jika ada

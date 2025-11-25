@@ -143,9 +143,9 @@
                         <th rowspan="2" class="border px-4 py-2">TMT Kerja</th>
                         <th rowspan="2" class="border px-4 py-2 text-center">NIP/NIK</th>
                         <th rowspan="2" class="border px-4 py-2 text-center">Keterangan</th>
-                        
+
                         <th rowspan="2" class="border px-4 py-2 text-center w-40">Aksi</th>
-                        
+
                     </tr>
                 </thead>
 
@@ -260,7 +260,7 @@
                                     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                                     <div @click.away="openModal = null"
                                         class="bg-white rounded-lg w-full max-w-6xl p-6 shadow-lg overflow-y-auto max-h-[90vh]"
-                                        x-data="formGolongan({{ json_encode($t->golongan_array) }})">
+                                        x-data="formGolongan({{ json_encode($t->golongan_array) }})" x-init="init()">
                                         <h2 class="text-xl font-semibold mb-5 text-gray-800 border-b pb-2">Edit Data
                                             Tenaga Pendidik</h2>
 
@@ -272,7 +272,8 @@
                                             <!-- Program Studi & Jabatan Struktural -->
                                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                                 <div>
-                                                    <label class="block font-medium mb-1 text-sm">Program Studi</label>
+                                                    <label class="block font-medium mb-1 text-sm text-start">Program
+                                                        Studi</label>
                                                     <select name="id_prodi" class="border p-2 rounded w-full text-sm">
                                                         <option value="">-- Pilih Prodi (Opsional) --</option>
                                                         @foreach ($prodi as $p)
@@ -284,7 +285,8 @@
                                                     </select>
                                                 </div>
                                                 <div>
-                                                    <label class="block font-medium mb-1 text-sm">Posisi/Jabatan
+                                                    <label
+                                                        class="block font-medium mb-1 text-sm text-start">Posisi/Jabatan
                                                         Struktural</label>
                                                     <select name="jabatan_struktural"
                                                         class="border p-2 rounded w-full text-sm">
@@ -305,7 +307,8 @@
                                                     <!-- Nama & Gelar -->
                                                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                                                         <div>
-                                                            <label class="block font-medium mb-1 text-sm">Gelar
+                                                            <label
+                                                                class="block font-medium mb-1 text-sm text-start">Gelar
                                                                 Depan</label>
                                                             <input type="text" name="gelar_depan"
                                                                 value="{{ $t->gelar_depan }}"
@@ -313,7 +316,9 @@
                                                                 placeholder="Contoh: Dr.">
                                                         </div>
                                                         <div>
-                                                            <label class="block font-medium mb-1 text-sm">Nama Tenaga
+                                                            <label
+                                                                class="block font-medium mb-1 text-sm text-start">Nama
+                                                                Tenaga
                                                                 Pendidik</label>
                                                             <input type="text" name="nama_tendik"
                                                                 value="{{ $t->nama_tendik }}"
@@ -321,7 +326,8 @@
                                                                 placeholder="Masukkan nama lengkap" required>
                                                         </div>
                                                         <div>
-                                                            <label class="block font-medium mb-1 text-sm">Gelar
+                                                            <label
+                                                                class="block font-medium mb-1 text-sm text-start">Gelar
                                                                 Belakang</label>
                                                             <input type="text" name="gelar_belakang"
                                                                 value="{{ $t->gelar_belakang }}"
@@ -333,24 +339,23 @@
                                                     <!-- Status Kepegawaian & Jenis Kelamin -->
                                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                                         <div>
-                                                            <label class="block font-medium mb-1 text-sm">Status
+                                                            <label
+                                                                class="block font-medium mb-1 text-sm text-start">Status
                                                                 Kepegawaian</label>
                                                             <select name="status_kepegawaian"
                                                                 class="border p-2 rounded w-full text-sm">
                                                                 <option value="">-- Pilih Status --</option>
-                                                                <option value="PNS"
-                                                                    {{ $t->status_kepegawaian == 'PNS' ? 'selected' : '' }}>
-                                                                    PNS</option>
-                                                                <option value="Non PNS Tetap"
-                                                                    {{ $t->status_kepegawaian == 'Non PNS Tetap' ? 'selected' : '' }}>
-                                                                    Non PNS Tetap</option>
-                                                                <option value="Non PNS Tidak Tetap"
-                                                                    {{ $t->status_kepegawaian == 'Non PNS Tidak Tetap' ? 'selected' : '' }}>
-                                                                    Non PNS Tidak Tetap</option>
+                                                                <option value="KONTRAK"
+                                                                    {{ $t->status_kepegawaian == 'KONTRAK' ? 'selected' : '' }}>
+                                                                    KONTRAK</option>
+                                                                <option value="TETAP"
+                                                                    {{ $t->status_kepegawaian == 'TETAP' ? 'selected' : '' }}>
+                                                                    TETAP</option>
                                                             </select>
                                                         </div>
                                                         <div>
-                                                            <label class="block font-medium mb-1 text-sm">Jenis
+                                                            <label
+                                                                class="block font-medium mb-1 text-sm text-start">Jenis
                                                                 Kelamin</label>
                                                             <select name="jenis_kelamin"
                                                                 class="border p-2 rounded w-full text-sm">
@@ -369,7 +374,8 @@
                                                     <!-- Tempat, Tanggal Lahir & TMT Kerja -->
                                                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                                                         <div>
-                                                            <label class="block font-medium mb-1 text-sm">Tempat
+                                                            <label
+                                                                class="block font-medium mb-1 text-sm text-start">Tempat
                                                                 Lahir</label>
                                                             <input type="text" name="tempat_lahir"
                                                                 value="{{ $t->tempat_lahir }}"
@@ -377,14 +383,16 @@
                                                                 placeholder="Tempat lahir">
                                                         </div>
                                                         <div>
-                                                            <label class="block font-medium mb-1 text-sm">Tanggal
+                                                            <label
+                                                                class="block font-medium mb-1 text-sm text-start">Tanggal
                                                                 Lahir</label>
                                                             <input type="date" name="tanggal_lahir"
                                                                 value="{{ $t->tanggal_lahir ? $t->tanggal_lahir->format('Y-m-d') : '' }}"
                                                                 class="border p-2 rounded w-full text-sm">
                                                         </div>
                                                         <div>
-                                                            <label class="block font-medium mb-1 text-sm">TMT
+                                                            <label
+                                                                class="block font-medium mb-1 text-sm text-start">TMT
                                                                 Kerja</label>
                                                             <input type="date" name="tmt_kerja"
                                                                 value="{{ $t->tmt_kerja ? $t->tmt_kerja->format('Y-m-d') : '' }}"
@@ -394,7 +402,8 @@
 
                                                     <!-- Pendidikan Terakhir -->
                                                     <div>
-                                                        <label class="block font-medium mb-1 text-sm">Pendidikan
+                                                        <label
+                                                            class="block font-medium mb-1 text-sm text-start">Pendidikan
                                                             Terakhir</label>
                                                         <select name="pendidikan_terakhir"
                                                             class="border p-2 rounded w-full text-sm">
@@ -439,14 +448,16 @@
                                                     <!-- NIP, No HP, Email -->
                                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                                         <div>
-                                                            <label class="block font-medium mb-1 text-sm">NIP</label>
+                                                            <label
+                                                                class="block font-medium mb-1 text-sm text-start">NIP</label>
                                                             <input type="text" name="nip"
                                                                 value="{{ $t->nip }}"
                                                                 class="border p-2 rounded w-full text-sm"
                                                                 placeholder="NIP">
                                                         </div>
                                                         <div>
-                                                            <label class="block font-medium mb-1 text-sm">No HP</label>
+                                                            <label class="block font-medium mb-1 text-sm text-start">No
+                                                                HP</label>
                                                             <input type="text" name="no_hp"
                                                                 value="{{ $t->no_hp }}"
                                                                 class="border p-2 rounded w-full text-sm"
@@ -455,7 +466,8 @@
                                                     </div>
 
                                                     <div>
-                                                        <label class="block font-medium mb-1 text-sm">Email</label>
+                                                        <label
+                                                            class="block font-medium mb-1 text-sm text-start">Email</label>
                                                         <input type="email" name="email"
                                                             value="{{ $t->email }}"
                                                             class="border p-2 rounded w-full text-sm"
@@ -463,7 +475,8 @@
                                                     </div>
 
                                                     <div>
-                                                        <label class="block font-medium mb-1 text-sm">Alamat</label>
+                                                        <label
+                                                            class="block font-medium mb-1 text-sm text-start">Alamat</label>
                                                         <input type="text" name="alamat"
                                                             value="{{ $t->alamat }}"
                                                             class="border p-2 rounded w-full text-sm"
@@ -473,7 +486,7 @@
                                                     <!-- Keterangan -->
                                                     <div>
                                                         <label
-                                                            class="block font-medium mb-1 text-sm">Keterangan</label>
+                                                            class="block font-medium mb-1 text-sm text-start">Keterangan</label>
                                                         <textarea name="keterangan" class="border p-2 rounded w-full text-sm" rows="3"
                                                             placeholder="Tambahkan keterangan">{{ $t->keterangan }}</textarea>
                                                     </div>
@@ -483,7 +496,8 @@
                                             <!-- Riwayat Golongan -->
                                             <div class="mt-6 border-t pt-6">
                                                 <div class="flex justify-between items-center mb-3">
-                                                    <label class="block font-medium text-sm">Riwayat Golongan</label>
+                                                    <label class="block font-medium text-sm text-start">Riwayat
+                                                        Golongan</label>
                                                     <button type="button" @click="addGolongan()"
                                                         class="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600">
                                                         + Update Riwayat
@@ -520,10 +534,11 @@
 
                                             <!-- UPLOAD BERKAS BARU -->
                                             <div class="mt-6 border-t pt-6">
-                                                <h3 class="text-lg font-semibold text-gray-800 mb-4">📎 Upload Berkas
+                                                <h3 class="text-lg font-semibold text-gray-800 mb-4 text-start">📎
+                                                    Upload Berkas
                                                 </h3>
 
-                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-start">
                                                     @php
                                                         $berkasFields = [
                                                             'file_ktp' => 'KTP',
@@ -563,7 +578,8 @@
                                                                         </svg>
                                                                         Lihat file saat ini
                                                                     </a>
-                                                                    <p class="text-gray-500 text-xs mt-1">Upload file
+                                                                    <p class="text-gray-500 text-xs mt-1 text-start">
+                                                                        Upload file
                                                                         baru untuk mengganti.</p>
                                                                 </div>
                                                             @endif
@@ -573,16 +589,18 @@
                                                         </div>
                                                     @endforeach
                                                 </div>
-                                                <p class="text-gray-500 text-xs mt-3">Format: <b>PDF, JPG, PNG</b> |
+                                                <p class="text-gray-500 text-xs mt-3 text-start">Format: <b>PDF, JPG,
+                                                        PNG</b> |
                                                     Maksimal <b>2MB</b> per file</p>
                                             </div>
 
                                             <!-- Upload File Utama (Lama) -->
-                                            <div class="mt-6 border-t pt-6">
-                                                <label for="file" class="block font-medium mb-1 text-sm">Upload
+                                            <div class="mt-6 border-t pt-6 text-start">
+                                                <label for="file"
+                                                    class="block font-medium mb-1 text-sm text-start">Upload
                                                     File Dokumen Lainnya</label>
                                                 @if ($t->file)
-                                                    <div class="mb-2">
+                                                    <div class="mb-2 text-start">
                                                         <a href="{{ asset('dokumen_tendik/' . $t->file) }}"
                                                             target="_blank"
                                                             class="text-blue-600 hover:underline text-sm inline-flex items-center">
@@ -598,17 +616,20 @@
                                                             </svg>
                                                             {{ $t->file }}
                                                         </a>
-                                                        <p class="text-gray-500 text-xs mt-1">Upload file baru untuk
+                                                        <p class="text-gray-500 text-xs mt-1 text-start">Upload file
+                                                            baru untuk
                                                             mengganti yang lama.</p>
                                                     </div>
                                                 @else
-                                                    <p class="text-gray-500 italic text-sm mb-2">Belum ada file.</p>
+                                                    <p class="text-gray-500 italic text-sm mb-2 text-start">Belum ada
+                                                        file.</p>
                                                 @endif
 
                                                 <input type="file" name="file" id="file"
                                                     class="flex w-full rounded-md border border-blue-300 bg-white text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-blue-600 file:text-white file:text-sm file:font-medium"
                                                     accept=".pdf,.doc,.docx,.jpg,.png" />
-                                                <p class="text-gray-500 text-xs mt-1">Format: <b>PDF, DOC, DOCX, JPG,
+                                                <p class="text-gray-500 text-xs mt-1 text-start">Format: <b>PDF, DOC,
+                                                        DOCX, JPG,
                                                         PNG</b> | Max 2MB</p>
                                             </div>
 
@@ -640,7 +661,161 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function untuk validasi file di modal edit
+            function validateFileEdit(input) {
+                const file = input.files[0];
+                if (!file) return true;
+
+                // Validate file size (2MB)
+                if (file.size > 2 * 1024 * 1024) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'File Terlalu Besar',
+                        text: 'Ukuran file maksimal 2MB. File Anda: ' + (file.size / (1024 * 1024)).toFixed(
+                            2) + 'MB',
+                        confirmButtonText: 'Mengerti'
+                    });
+                    input.value = '';
+                    return false;
+                }
+
+                // Validate file type
+                const allowedTypes = ['application/pdf', 'application/msword',
+                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    'image/jpeg', 'image/jpg', 'image/png'
+                ];
+                if (!allowedTypes.includes(file.type)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Format File Tidak Didukung',
+                        text: 'Hanya file PDF, DOC, DOCX, JPG, dan PNG yang diizinkan.',
+                        confirmButtonText: 'Mengerti'
+                    });
+                    input.value = '';
+                    return false;
+                }
+
+                return true;
+            }
+
+            // Function untuk inisialisasi modal edit
+            function initEditModal() {
+                // Attach event listeners untuk semua file inputs dalam modal
+                const modalFileInputs = document.querySelectorAll('input[type="file"]');
+                modalFileInputs.forEach(input => {
+                    // Hapus event listener lama jika ada
+                    input.removeEventListener('change', handleFileChange);
+                    // Tambahkan event listener baru
+                    input.addEventListener('change', handleFileChange);
+                });
+
+                // Form validation untuk modal edit
+                const editForm = document.querySelector('form[action*="tenaga-pendidik"]');
+                if (editForm) {
+                    editForm.addEventListener('submit', function(e) {
+                        const namaTendik = this.querySelector('input[name="nama_tendik"]');
+
+                        // Validasi nama wajib diisi
+                        if (!namaTendik || !namaTendik.value.trim()) {
+                            e.preventDefault();
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Data Belum Lengkap',
+                                text: 'Nama Tenaga Pendidik wajib diisi!',
+                                confirmButtonText: 'Mengerti'
+                            });
+                            return;
+                        }
+
+                        // Validasi semua file inputs sebelum submit
+                        const fileInputs = this.querySelectorAll('input[type="file"]');
+                        let allFilesValid = true;
+
+                        fileInputs.forEach(input => {
+                            if (input.files.length > 0) {
+                                if (!validateFileEdit(input)) {
+                                    allFilesValid = false;
+                                }
+                            }
+                        });
+
+                        if (!allFilesValid) {
+                            e.preventDefault();
+                        }
+                    });
+                }
+
+                // Auto-capitalize untuk nama
+                const namaInput = document.querySelector('input[name="nama_tendik"]');
+                if (namaInput) {
+                    namaInput.addEventListener('blur', function() {
+                        this.value = this.value.replace(/\w\S*/g, function(txt) {
+                            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+                        });
+                    });
+                }
+            }
+
+            // Function untuk handle file change
+            function handleFileChange(e) {
+                validateFileEdit(this);
+            }
+
+            // Observer untuk modal yang muncul (karena menggunakan Alpine.js)
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    mutation.addedNodes.forEach(function(node) {
+                        if (node.nodeType === 1) { // Element node
+                            // Cek jika modal muncul
+                            if (node.hasAttribute && (node.hasAttribute('x-show') || node
+                                    .querySelector('[x-show]'))) {
+                                setTimeout(() => {
+                                    initEditModal();
+                                }, 100);
+                            }
+                        }
+                    });
+                });
+            });
+
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+
+            // Inisialisasi awal untuk modal yang sudah ada
+            initEditModal();
+        });
+
+        // Function untuk form golongan (Alpine.js)
+        function formGolongan(initialData = []) {
+            return {
+                golongan: initialData.length > 0 ? initialData : [{
+                    tahun: '',
+                    golongan: ''
+                }],
+                addGolongan() {
+                    this.golongan.push({
+                        tahun: '',
+                        golongan: ''
+                    });
+                },
+                removeGolongan(index) {
+                    if (this.golongan.length > 1) {
+                        this.golongan.splice(index, 1);
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        // Function untuk form golongan (Alpine.js)
         function formGolongan(initialData = []) {
             return {
                 golongan: initialData.length > 0 ? initialData : [{
@@ -662,6 +837,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+            // SweetAlert untuk delete confirmation
             const deleteButtons = document.querySelectorAll('.btn-delete');
             deleteButtons.forEach(button => {
                 button.addEventListener('click', function() {
@@ -683,6 +859,93 @@
                 });
             });
 
+            // Checkbox & Delete Selected
+            const selectAll = document.getElementById('select-all');
+            const checkboxes = document.querySelectorAll('.select-item');
+            const deleteBtn = document.getElementById('delete-selected');
+
+            // Select All functionality
+            if (selectAll) {
+                selectAll.addEventListener('change', function() {
+                    checkboxes.forEach(cb => cb.checked = this.checked);
+                    toggleDeleteBtn();
+                });
+            }
+
+            // Individual checkbox change
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', function() {
+                    toggleDeleteBtn();
+                    // Uncheck select all if any checkbox is unchecked
+                    if (selectAll && !this.checked) {
+                        selectAll.checked = false;
+                    }
+                });
+            });
+
+            function toggleDeleteBtn() {
+                if (!deleteBtn) return;
+                const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+                deleteBtn.disabled = !anyChecked;
+            }
+
+            // Delete selected handler
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', function() {
+                    const selected = Array.from(checkboxes)
+                        .filter(cb => cb.checked)
+                        .map(cb => cb.value);
+
+                    if (selected.length === 0) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Peringatan',
+                            text: 'Tidak ada data yang dipilih!',
+                            timer: 2000
+                        });
+                        return;
+                    }
+
+                    Swal.fire({
+                        title: 'Apakah anda yakin?',
+                        html: `Anda akan menghapus <strong>${selected.length} data</strong> yang terpilih!`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#dc2626',
+                        cancelButtonColor: '#6b7280',
+                        confirmButtonText: 'Ya, Hapus!',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Create form dynamically
+                            const form = document.createElement('form');
+                            form.method = 'POST';
+                            form.action = "{{ route('tenaga-pendidik.deleteSelected') }}";
+
+                            // Add CSRF token
+                            const csrfInput = document.createElement('input');
+                            csrfInput.type = 'hidden';
+                            csrfInput.name = '_token';
+                            csrfInput.value = '{{ csrf_token() }}';
+                            form.appendChild(csrfInput);
+
+                            // Add selected items
+                            selected.forEach(id => {
+                                const input = document.createElement('input');
+                                input.type = 'hidden';
+                                input.name = 'selected_tendik[]';
+                                input.value = id;
+                                form.appendChild(input);
+                            });
+
+                            // Submit form
+                            document.body.appendChild(form);
+                            form.submit();
+                        }
+                    });
+                });
+            }
+
             @if (session('success'))
                 Swal.fire({
                     icon: 'success',
@@ -694,52 +957,22 @@
             @endif
         });
 
-        // Checkbox & Delete Selected
-        const selectAll = document.getElementById('select-all');
-        const checkboxes = document.querySelectorAll('.select-item');
-        const deleteBtn = document.getElementById('delete-selected');
-
-        selectAll.addEventListener('change', function() {
-            checkboxes.forEach(cb => cb.checked = selectAll.checked);
-            toggleDeleteBtn();
-        });
-
-        checkboxes.forEach(cb => {
-            cb.addEventListener('change', toggleDeleteBtn);
-        });
-
-        function toggleDeleteBtn() {
-            const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
-            deleteBtn.disabled = !anyChecked;
-        }
-
-        deleteBtn.addEventListener('click', function() {
-            const selected = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
-            if (selected.length === 0) return;
-
-            Swal.fire({
-                title: 'Apakah anda yakin?',
-                text: "Data yang terpilih akan dihapus!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#16a34a',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Ya, hapus!',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = "{{ route('tenaga-pendidik.deleteSelected') }}";
-                    form.innerHTML = `
-                        @csrf
-                        @method('DELETE')
-                        ${selected.map(id => `<input type="hidden" name="selected_tendik[]" value="${id}">`).join('')}
-                    `;
-                    document.body.appendChild(form);
-                    form.submit();
+        // Auto-capitalize untuk nama di modal edit
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('modalEdit', () => ({
+                init() {
+                    // Auto-capitalize untuk input nama
+                    const namaInput = this.$el.querySelector('input[name="nama_tendik"]');
+                    if (namaInput) {
+                        namaInput.addEventListener('blur', function() {
+                            this.value = this.value.replace(/\w\S*/g, function(txt) {
+                                return txt.charAt(0).toUpperCase() + txt.substr(1)
+                                    .toLowerCase();
+                            });
+                        });
+                    }
                 }
-            });
+            }));
         });
     </script>
 </x-app-layout>

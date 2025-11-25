@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('id_prodi')->constrained('prodi')->onUpdate('cascade')->onDelete('cascade');
             $table->string('nama_tendik');
             $table->string('nip')->nullable();
-            $table->enum('status_kepegawaian', ['PNS', 'Honorer', 'Kontrak'])->default('Honorer');
+            $table->enum('status_kepegawaian', ['KONTRAK', 'TETAP'])->default('KONTRAK');
             $table->string('pendidikan_terakhir')->nullable();
             $table->enum('jenis_kelamin', ['laki-laki', 'perempuan'])->nullable();
             $table->string('no_hp')->unique()->nullable();

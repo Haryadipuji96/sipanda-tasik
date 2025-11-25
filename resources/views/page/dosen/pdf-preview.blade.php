@@ -159,6 +159,11 @@
             text-align: center;
         }
 
+        .col-status-dosen {
+            width: 6%;
+            text-align: center;
+        }
+
         tr {
             page-break-inside: avoid;
         }
@@ -306,6 +311,7 @@
                 <th class="col-pangkat">Pangkat/Gol</th>
                 <th class="col-sertifikasi">Sertifikasi</th>
                 <th class="col-inpasing">Inpasing</th>
+                <th class="col-status-dosen">Status Dosen</th>
             </tr>
         </thead>
         <tbody>
@@ -362,6 +368,25 @@
                             @endif
                         </div>
                     </td>
+                    <td class="col-status-dosen">
+                        <div style="text-align: center;">
+                            <span
+                                style="font-size: 6px; padding: 2px 4px; border-radius: 2px; font-weight: bold;
+                        {{ $d->status_dosen == 'DOSEN_TETAP' ? 'background-color: #dcfce7; color: #166534;' : '' }}
+                        {{ $d->status_dosen == 'DOSEN_TIDAK_TETAP' ? 'background-color: #fef3c7; color: #92400e;' : '' }}
+                        {{ $d->status_dosen == 'PNS' ? 'background-color: #dbeafe; color: #1e40af;' : '' }}">
+                                @if ($d->status_dosen == 'DOSEN_TETAP')
+                                    TETAP
+                                @elseif($d->status_dosen == 'DOSEN_TIDAK_TETAP')
+                                    TDK TETAP
+                                @elseif($d->status_dosen == 'PNS')
+                                    PNS
+                                @else
+                                    {{ $d->status_dosen }}
+                                @endif
+                            </span>
+                        </div>
+                    </td>
                 </tr>
             @empty
                 <tr>
@@ -390,6 +415,7 @@
             @endif
 
             <!-- Additional Stats - PERBAIKI BAGIAN INI -->
+            <!-- Additional Stats -->
             <div style="margin-top: 4px;">
                 <strong>Detail:</strong>
                 Gelar:
@@ -399,6 +425,13 @@
                 File KTP: <strong>{{ $dosen->whereNotNull('file_ktp')->count() }}</strong> |
                 File Sertif:
                 <strong>{{ $dosen->where('sertifikasi', 'SUDAH')->whereNotNull('file_sertifikasi')->count() }}</strong>
+                <!-- ========== TAMBAHKAN STATISTIK STATUS DOSEN ========== -->
+                |
+                Status:
+                <strong>Tetap: {{ $dosen->where('status_dosen', 'DOSEN_TETAP')->count() }}</strong>,
+                <strong>Tdk Tetap: {{ $dosen->where('status_dosen', 'DOSEN_TIDAK_TETAP')->count() }}</strong>,
+                <strong>PNS: {{ $dosen->where('status_dosen', 'PNS')->count() }}</strong>
+                <!-- ========== END STATISTIK STATUS DOSEN ========== -->
             </div>
         </div>
     @endif

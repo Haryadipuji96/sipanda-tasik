@@ -1,113 +1,341 @@
-<!DOCTYPE html>
-<html lang="id">
+<x-app-layout>
+    <x-slot name="title">Tambah Prodi</x-slot>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tambah Prodi</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-</head>
+    <style>
+        .form-section {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+        }
 
-<body class="bg-gray-50">
-    <div class="min-h-screen">
-        <!-- Header/Navbar -->
-        <header class="bg-white shadow-sm">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 flex items-center">
-                            <i class="fas fa-graduation-cap text-blue-600 text-xl mr-2"></i>
-                            <span class="font-semibold text-xl text-gray-800">Sistem Akademik</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header>
+        .form-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+        }
 
-        <!-- Main Content -->
-        <div class="py-6">
-            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="bg-white shadow-xl rounded-2xl p-4 sm:p-6 md:p-8 w-full border border-gray-100">
-                    <!-- Header -->
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 pb-4 border-b">
-                        <div class="flex items-center space-x-3 mb-3 sm:mb-0">
-                            <div class="bg-green-100 text-blue-600 p-2 rounded-full">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 4v16m8-8H4" />
-                                </svg>
+        .form-body {
+            padding: 1.5rem;
+        }
+
+        .info-box {
+            background-color: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+
+        .btn-secondary {
+            background-color: #6b7280;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background-color: #4b5563;
+        }
+
+        @media (max-width: 768px) {
+            .form-body {
+                padding: 1rem;
+            }
+            
+            .form-header {
+                padding: 1rem;
+            }
+        }
+    </style>
+
+    <div class="p-4 sm:p-6">
+        <div class="max-w-3xl mx-auto">
+            <div class="form-section">
+                <!-- Header -->
+                <div class="form-header">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="bg-white bg-opacity-20 p-2 rounded-full">
+                                <i class="fas fa-graduation-cap text-white text-lg sm:text-xl"></i>
                             </div>
-                            <h1 class="text-xl sm:text-2xl font-semibold text-gray-800">Tambah Prodi</h1>
+                            <div>
+                                <h1 class="text-lg sm:text-xl font-semibold">Tambah Program Studi Baru</h1>
+                                <p class="text-blue-100 text-xs sm:text-sm mt-1">
+                                    Input data program studi dan informasi fakultas
+                                </p>
+                            </div>
                         </div>
-                        <a href="{{ route('prodi.index') }}"
-                            class="text-sm text-gray-600 hover:text-gray-800 transition flex items-center space-x-1 self-start sm:self-auto">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 19l-7-7 7-7" />
-                            </svg>
-                            <span>Kembali</span>
+                        <a href="{{ route('prodi.index') }}" 
+                           class="text-white hover:text-blue-100 transition flex items-center space-x-2 self-start sm:self-auto">
+                            <i class="fas fa-arrow-left text-sm"></i>
+                            <span class="text-sm">Kembali</span>
                         </a>
                     </div>
+                </div>
 
-                    <form action="{{ route('prodi.store') }}" method="POST">
-                        @csrf
+                <!-- Form -->
+                <form action="{{ route('prodi.store') }}" method="POST" id="prodiForm">
+                    @csrf
 
-                        <div class="mb-4">
-                            <label class="block font-medium mb-1 text-sm sm:text-base">Fakultas</label>
-                            <select name="id_fakultas" class="w-full border rounded px-3 py-2 text-sm sm:text-base"
-                                required>
-                                <option value="">-- Pilih Fakultas --</option>
-                                @foreach ($fakultas as $f)
-                                    <option value="{{ $f->id }}">{{ $f->nama_fakultas }}</option>
-                                @endforeach
-                            </select>
+                    <div class="form-body">
+                        <!-- Informasi Program Studi -->
+                        <div class="mb-6 sm:mb-8">
+                            <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+                                <i class="fas fa-info-circle mr-2 text-blue-500"></i>
+                                Informasi Program Studi
+                            </h3>
+
+                            <div class="info-box">
+                                <div class="flex items-start">
+                                    <i class="fas fa-info-circle text-blue-500 mt-0.5 mr-3 text-sm"></i>
+                                    <div>
+                                        <h4 class="font-medium text-blue-800 mb-1 text-sm sm:text-base">Informasi Input</h4>
+                                        <p class="text-blue-700 text-xs sm:text-sm">
+                                            • Isi data program studi dengan lengkap dan benar<br>
+                                            • Field bertanda <span class="text-red-500">*</span> wajib diisi
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-4 sm:space-y-6">
+                                <!-- Fakultas -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Fakultas <span class="text-red-500">*</span>
+                                    </label>
+                                    <select name="id_fakultas" 
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                            required>
+                                        <option value="">-- Pilih Fakultas --</option>
+                                        @foreach ($fakultas as $f)
+                                            <option value="{{ $f->id }}" {{ old('id_fakultas') == $f->id ? 'selected' : '' }}>
+                                                {{ $f->nama_fakultas }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('id_fakultas')
+                                        <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <!-- Nama Program Studi -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Nama Program Studi <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" 
+                                           name="nama_prodi" 
+                                           value="{{ old('nama_prodi') }}"
+                                           class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                           placeholder="Contoh: Teknik Informatika"
+                                           required
+                                           maxlength="255">
+                                    @error('nama_prodi')
+                                        <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <!-- Jenjang -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Jenjang <span class="text-red-500">*</span>
+                                    </label>
+                                    <select name="jenjang" 
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                            required>
+                                        <option value="">-- Pilih Jenjang --</option>
+                                        <option value="S1" {{ old('jenjang') == 'S1' ? 'selected' : '' }}>S1 - Sarjana</option>
+                                        <option value="S2" {{ old('jenjang') == 'S2' ? 'selected' : '' }}>S2 - Magister</option>
+                                        <option value="S3" {{ old('jenjang') == 'S3' ? 'selected' : '' }}>S3 - Doktor</option>
+                                        <option value="D3" {{ old('jenjang') == 'D3' ? 'selected' : '' }}>D3 - Diploma</option>
+                                        <option value="D4" {{ old('jenjang') == 'D4' ? 'selected' : '' }}>D4 - Diploma IV</option>
+                                        <option value="Prof" {{ old('jenjang') == 'Prof' ? 'selected' : '' }}>Profesi</option>
+                                        <option value="Lainnya" {{ old('jenjang') == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
+                                    </select>
+                                    @error('jenjang')
+                                        <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <!-- Ketua Prodi -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Ketua Program Studi
+                                    </label>
+                                    <input type="text" 
+                                           name="ketua_prodi" 
+                                           value="{{ old('ketua_prodi') }}"
+                                           class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                           placeholder="Contoh: Dr. Ahmad S.T., M.T."
+                                           maxlength="255">
+                                    <p class="text-gray-500 text-xs mt-1">
+                                        Nama ketua program studi (opsional)
+                                    </p>
+                                    @error('ketua_prodi')
+                                        <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <!-- Deskripsi -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Deskripsi Program Studi
+                                    </label>
+                                    <textarea name="deskripsi" 
+                                              rows="4"
+                                              class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition resize-none"
+                                              placeholder="Masukkan deskripsi singkat tentang program studi...">{{ old('deskripsi') }}</textarea>
+                                    <p class="text-gray-500 text-xs mt-1">
+                                        Deskripsi opsional tentang visi, misi, atau informasi tambahan program studi
+                                    </p>
+                                    @error('deskripsi')
+                                        <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="mb-4">
-                            <label class="block font-medium mb-1 text-sm sm:text-base">Nama Program Studi</label>
-                            <input type="text" name="nama_prodi"
-                                class="w-full border rounded px-3 py-2 text-sm sm:text-base" required
-                                placeholder="Masukkan nama program studi">
+                        <!-- Informasi Tambahan -->
+                        <div class="mb-6 sm:mb-8">
+                            <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+                                <i class="fas fa-cogs mr-2 text-green-500"></i>
+                                Informasi Tambahan
+                            </h3>
+
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-calendar text-blue-500 mr-2 text-sm"></i>
+                                        <span class="text-gray-600">Dibuat pada:</span>
+                                        <span class="ml-2 font-medium">{{ now()->format('d/m/Y') }}</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-database text-green-500 mr-2 text-sm"></i>
+                                        <span class="text-gray-600">Status:</span>
+                                        <span class="ml-2 font-medium text-green-600">Aktif</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="mb-4">
-                            <label class="block font-medium mb-1 text-sm sm:text-base">Jenjang</label>
-                            <select name="jenjang" class="w-full border rounded px-3 py-2 text-sm sm:text-base">
-                                <option value="">-- Pilih Jenjang --</option>
-                                <option value="S1">S1</option>
-                                <option value="S2">S2</option>
-                                <option value="S3">S3</option>
-                                <option value="D3">D3</option>
-                                <option value="D4">D4</option>
-                                <option value="Prof">Prof</option>
-                                <option value="Lainnya">Lainnya</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-6">
-                            <label class="block font-medium mb-1 text-sm sm:text-base">Deskripsi</label>
-                            <textarea name="deskripsi" rows="3" class="w-full border rounded px-3 py-2 text-sm sm:text-base"
-                                placeholder="Masukkan deskripsi program studi (opsional)"></textarea>
-                        </div>
-
-                        <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2">
-                            <a href="{{ route('prodi.index') }}"
-                                class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-center transition">
+                        <!-- Tombol -->
+                        <div class="flex flex-col sm:flex-row justify-end gap-3 pt-4 sm:pt-6 border-t">
+                            <a href="{{ route('prodi.index') }}" 
+                               class="btn-secondary text-center order-2 sm:order-1 px-4 py-2 text-sm sm:text-base">
+                                <i class="fas fa-times mr-2"></i>
                                 Batal
                             </a>
-                            <button type="submit"
-                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition">
-                                Simpan
+                            <button type="submit" 
+                                    class="btn-primary flex items-center justify-center order-1 sm:order-2 px-4 py-2 text-sm sm:text-base">
+                                <i class="fas fa-save mr-2"></i>
+                                Simpan Program Studi
                             </button>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-</body>
 
-</html>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Form validation
+            const form = document.getElementById('prodiForm');
+            form.addEventListener('submit', function(e) {
+                const namaProdi = document.querySelector('input[name="nama_prodi"]').value.trim();
+                const fakultas = document.querySelector('select[name="id_fakultas"]').value;
+                const jenjang = document.querySelector('select[name="jenjang"]').value;
+                
+                if (!namaProdi || !fakultas || !jenjang) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Data belum lengkap',
+                        text: 'Harap lengkapi semua field yang wajib diisi!'
+                    });
+                    return;
+                }
+            });
+
+            // Auto-capitalize first letter of each word for nama_prodi
+            const namaProdiInput = document.querySelector('input[name="nama_prodi"]');
+            namaProdiInput.addEventListener('blur', function() {
+                this.value = this.value.replace(/\w\S*/g, function(txt) {
+                    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+                });
+            });
+
+            // Auto-capitalize for ketua_prodi
+            const ketuaProdiInput = document.querySelector('input[name="ketua_prodi"]');
+            ketuaProdiInput.addEventListener('blur', function() {
+                this.value = this.value.replace(/\w\S*/g, function(txt) {
+                    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+                });
+            });
+
+            // NOTIFIKASI SUKSES
+            @if (session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: "{{ session('success') }}",
+                    timer: 3000,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = "{{ route('prodi.index') }}";
+                });
+            @endif
+
+            // NOTIFIKASI ERROR VALIDATION
+            @if ($errors->any())
+                @if(!session('success'))
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Terjadi Kesalahan!',
+                        html: `@foreach ($errors->all() as $error)
+                                <p>• {{ $error }}</p>
+                               @endforeach`,
+                        timer: 5000,
+                        showConfirmButton: true
+                    });
+                @endif
+            @endif
+        });
+
+        // Responsive behavior
+        function handleResize() {
+            const formBody = document.querySelector('.form-body');
+            if (window.innerWidth < 640) {
+                formBody.classList.add('px-2');
+            } else {
+                formBody.classList.remove('px-2');
+            }
+        }
+
+        // Initial call
+        handleResize();
+        // Add resize listener
+        window.addEventListener('resize', handleResize);
+    </script>
+</x-app-layout>

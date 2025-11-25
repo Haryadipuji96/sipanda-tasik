@@ -75,9 +75,8 @@
                                 <td class="border px-4 py-3">
                                     <span
                                         class="px-2 py-1 rounded-full text-xs font-medium
-                                        {{ $tenagaPendidik->status_kepegawaian == 'PNS' ? 'bg-green-100 text-green-800' : '' }}
-                                        {{ $tenagaPendidik->status_kepegawaian == 'Honorer' ? 'bg-yellow-100 text-yellow-800' : '' }}
-                                        {{ $tenagaPendidik->status_kepegawaian == 'Kontrak' ? 'bg-blue-100 text-blue-800' : '' }}">
+                                        {{ $tenagaPendidik->status_kepegawaian == 'KONTRAK' ? 'bg-yellow-100 text-yellow-800' : '' }}
+                                        {{ $tenagaPendidik->status_kepegawaian == 'TETAP' ? 'bg-blue-100 text-blue-800' : '' }}">
                                         {{ $tenagaPendidik->status_kepegawaian ?? '-' }}
                                     </span>
                                 </td>

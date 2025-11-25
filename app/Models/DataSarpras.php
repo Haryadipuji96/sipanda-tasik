@@ -27,11 +27,14 @@ class DataSarpras extends Model
         'file_dokumen',
         'lokasi_lain',
         'harga', 
+        
     ];
 
     protected $casts = [
         'tanggal_pengadaan' => 'date',
+        'tahun' => 'integer',
         'jumlah' => 'integer'
+
     ];
 
     public function prodi()
