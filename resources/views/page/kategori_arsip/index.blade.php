@@ -39,6 +39,60 @@
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
         }
+
+        /* =======================
+           Zebra Stripe Table - DIPERBARUI
+        ======================= */
+        .table-custom {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .table-custom thead {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        }
+
+        .table-custom th {
+            border-right: 1px solid #93c5fd;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            color: white;
+            padding: 12px 16px;
+        }
+
+        .table-custom th:last-child {
+            border-right: none;
+        }
+
+        .table-custom td {
+            border-right: 1px solid #e5e7eb;
+            vertical-align: top;
+            padding: 12px 16px;
+        }
+
+        .table-custom td:last-child {
+            border-right: none;
+        }
+
+        /* Zebra striping untuk baris - DIPERBARUI */
+        .table-custom tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+            /* Putih untuk baris ganjil */
+        }
+
+        .table-custom tbody tr:nth-child(even) {
+            background-color: #e3f4ff;
+            /* Biru sangat muda untuk baris genap */
+        }
+
+
+
+        /* Styling untuk sel aksi */
+        .table-custom .action-cell {
+            background-color: transparent !important;
+        }
     </style>
 
     <div class="p-6">
@@ -57,7 +111,7 @@
 
         <!-- Table -->
         <div class="table-wrapper border border-gray-200 rounded-lg">
-            <table class="w-full border text-sm bg-white">
+            <table class="table-custom">
                 <thead class="bg-blue-500 text-white">
                     <tr>
                         <th class="border px-3 py-2 text-left">No</th>
@@ -74,15 +128,15 @@
                             <td class="border px-3 py-2">{{ $k->deskripsi }}</td>
                             <td class="border px-3 py-2 text-center flex justify-center gap-2">
                                 <!-- Tombol Edit -->
-                                <button @click="openModal = true"
-                                    class="p-2 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-full transition"
+                                <a href="{{ route('kategori-arsip.edit', $k->id) }}"
+                                    class="p-2 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-full transition duration-200 shadow-sm"
                                     title="Edit">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
                                         viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round"
                                             d="M11 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z" />
                                     </svg>
-                                </button>
+                                </a>
 
                                 <!-- Tombol Hapus -->
                                 <form action="{{ route('kategori-arsip.destroy', $k->id) }}" method="POST"
@@ -99,49 +153,6 @@
                                         </svg>
                                     </button>
                                 </form>
-
-                                <!-- Modal Edit -->
-                                <div x-show="openModal" x-cloak x-transition.opacity
-                                    class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-                                    <div @click.away="openModal = false" x-transition.scale
-                                        class="relative bg-white rounded-xl shadow-xl w-full max-w-lg p-6 mx-4">
-
-                                        <button @click="openModal = false"
-                                            class="absolute top-3 right-3 text-gray-400 hover:text-gray-600">
-                                            ✕
-                                        </button>
-
-                                        <h1 class="text-xl font-semibold mb-5 text-gray-800 border-b pb-2 text-start">
-                                            Edit Kategori Arsip
-                                        </h1>
-
-                                        <form action="{{ route('kategori-arsip.update', $k->id) }}" method="POST"
-                                            class="edit-form">
-                                            @csrf
-                                            @method('PUT')
-
-                                            <div class="mb-4">
-                                                <label class="block font-medium mb-1">Nama Kategori</label>
-                                                <input type="text" name="nama_kategori"
-                                                    value="{{ $k->nama_kategori }}"
-                                                    class="w-full border rounded px-3 py-2" required>
-                                            </div>
-
-                                            <div class="mb-4">
-                                                <label class="block font-medium mb-1">Deskripsi</label>
-                                                <textarea name="deskripsi" rows="3" class="w-full border rounded px-3 py-2">{{ $k->deskripsi }}</textarea>
-                                            </div>
-
-                                            <div class="flex justify-end space-x-2">
-                                                <button type="button" @click="openModal = false"
-                                                    class="bg-red-500 text-white px-4 py-2 rounded">Batal</button>
-                                                <button type="submit"
-                                                    class="bg-blue-600 text-white px-4 py-2 rounded">Update</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                                <!-- End Modal -->
                             </td>
                         </tr>
                     @empty

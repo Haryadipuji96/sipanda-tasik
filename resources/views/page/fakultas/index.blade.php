@@ -69,6 +69,58 @@
                 box-shadow: none;
             }
         }
+
+        /* =======================
+           Zebra Stripe Table - DIPERBARUI
+        ======================= */
+        .table-custom {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .table-custom thead {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        }
+
+        .table-custom th {
+            border-right: 1px solid #93c5fd;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            color: white;
+            padding: 12px 16px;
+        }
+
+        .table-custom th:last-child {
+            border-right: none;
+        }
+
+        .table-custom td {
+            border-right: 1px solid #e5e7eb;
+            vertical-align: top;
+            padding: 12px 16px;
+        }
+
+        .table-custom td:last-child {
+            border-right: none;
+        }
+
+        /* Zebra striping untuk baris - DIPERBARUI */
+        .table-custom tbody tr:nth-child(odd) {
+            background-color: #ffffff; /* Putih untuk baris ganjil */
+        }
+
+        .table-custom tbody tr:nth-child(even) {
+            background-color: #e3f4ff; /* Biru sangat muda untuk baris genap */
+        }
+
+       
+
+        /* Styling untuk sel aksi */
+        .table-custom .action-cell {
+            background-color: transparent !important;
+        }
     </style>
 
     <div class="p-6">
@@ -85,15 +137,15 @@
 
         <x-search-bar route="fakultas.index" placeholder="Cari nama fakultas/ dekan..." />
 
-        <div class="table-wrapper border border-gray-200 rounded-lg">
-            <table class="w-full border text-sm bg-white">
+        <div class="table-wrapper border border-gray-200 rounded-lg shadow-sm">
+            <table class="table-custom">
                 <thead class="bg-blue-500 text-white">
                     <tr>
-                        <th class="border px-3 py-2 text-left">No</th>
-                        <th class="border px-3 py-2 text-left">Nama Fakultas</th>
-                        <th class="border px-3 py-2 text-left">Dekan</th>
-                        <th class="border px-3 py-2 text-left">Deskripsi</th>
-                        <th class="border px-3 py-2 text-center">Aksi</th>
+                        <th class="px-4 py-3 text-left">No</th>
+                        <th class="px-4 py-3 text-left">Nama Fakultas</th>
+                        <th class="px-4 py-3 text-left">Dekan</th>
+                        <th class="px-4 py-3 text-left">Deskripsi</th>
+                        <th class="px-4 py-3 text-center">Aksi</th>
                     </tr>
                 </thead>
                 @php
@@ -102,7 +154,6 @@
                         if (!$search) {
                             return e($text);
                         }
-                        // Hanya ini yang diganti:
                         return preg_replace(
                             '/(' . preg_quote($search, '/') . ')/i',
                             '<span class="highlight">$1</span>',
@@ -113,23 +164,35 @@
 
                 <tbody>
                     @forelse ($fakultas as $index => $f)
-                        <tr x-data="{ openModal: false }">
-                            <td class="border px-3 py-2">{{ $index + $fakultas->firstItem() }}</td>
-                            <td class="border px-3 py-2">{!! highlight($f->nama_fakultas, request('search')) !!}</td>
-                            <td class="border px-3 py-2">{!! highlight($f->dekan, request('search')) !!}</td>
-                            <td class="border px-3 py-2">{{ $f->deskripsi }}</td>
-                            <td class="border px-3 py-2 text-center space-x-2">
+                        <tr class="hover:bg-gray-50 transition-colors duration-150">
+                            <td class="px-4 py-3 font-medium text-gray-700">{{ $index + $fakultas->firstItem() }}</td>
+                            <td class="px-4 py-3">
+                                <div class="font-semibold text-gray-900">
+                                    {!! highlight($f->nama_fakultas, request('search')) !!}
+                                </div>
+                            </td>
+                            <td class="px-4 py-3">
+                                <div class="text-gray-700">
+                                    {!! highlight($f->dekan, request('search')) !!}
+                                </div>
+                            </td>
+                            <td class="px-4 py-3">
+                                <div class="text-gray-600 text-sm max-w-xs">
+                                    {{ $f->deskripsi ?: '-' }}
+                                </div>
+                            </td>
+                            <td class="px-4 py-3 text-center action-cell">
                                 <div class="flex items-center justify-center gap-2">
                                     <!-- Tombol Edit -->
-                                    <button @click="openModal = true"
-                                        class="p-2 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-full transition"
+                                    <a href="{{ route('fakultas.edit', $f->id) }}"
+                                        class="p-2 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-full transition duration-200 shadow-sm"
                                         title="Edit">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
                                             viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                 d="M11 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z" />
                                         </svg>
-                                    </button>
+                                    </a>
 
                                     <!-- Tombol Hapus -->
                                     <form action="{{ route('fakultas.destroy', $f->id) }}" method="POST"
@@ -137,9 +200,9 @@
                                         @csrf
                                         @method('DELETE')
                                         <button type="button"
-                                            class="p-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-full transition btn-delete"
+                                            class="p-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-full transition duration-200 shadow-sm btn-delete"
                                             title="Hapus">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
                                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round"
                                                     d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4h6v3m-9 0h12" />
@@ -147,73 +210,19 @@
                                         </button>
                                     </form>
                                 </div>
-
-                                <!-- MODAL EDIT -->
-                                <div x-show="openModal" x-cloak x-transition.opacity
-                                    class="!fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm"
-                                    style="position: fixed !important; inset: 0; margin: 0; padding: 0; width: 100vw; height: 100vh; left: 0; top: 0;">
-
-                                    <div @click.away="openModal = false" x-transition.scale
-                                        class="relative bg-white rounded-xl shadow-xl w-full max-w-lg p-6 mx-4">
-
-                                        <button @click="openModal = false"
-                                            class="absolute top-3 right-3 text-gray-400 hover:text-gray-600">
-                                            ✕
-                                        </button>
-
-                                        <h1 class="text-xl font-semibold mb-5 text-gray-800 border-b pb-2 text-start">
-                                            Edit
-                                            Fakultas
-                                        </h1>
-
-                                        <form action="{{ route('fakultas.update', $f->id) }}" method="POST"
-                                            class="space-y-4">
-                                            @csrf
-                                            @method('PUT')
-
-                                            <div>
-                                                <label
-                                                    class="block text-sm font-medium text-gray-700 mb-1 text-start">Nama
-                                                    Fakultas</label>
-                                                <input type="text" name="nama_fakultas"
-                                                    value="{{ $f->nama_fakultas }}"
-                                                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                                                    required>
-                                            </div>
-
-                                            <div>
-                                                <label
-                                                    class="block text-sm font-medium text-gray-700 mb-1  text-start">Dekan</label>
-                                                <input type="text" name="dekan" value="{{ $f->dekan }}"
-                                                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
-                                            </div>
-
-                                            <div>
-                                                <label
-                                                    class="block text-sm font-medium text-gray-700 mb-1 text-start">Deskripsi</label>
-                                                <textarea name="deskripsi" rows="3"
-                                                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500">{{ $f->deskripsi }}</textarea>
-                                            </div>
-
-                                            <div class="flex justify-end space-x-3 pt-3 border-t">
-                                                <button type="button" @click="openModal = false"
-                                                    class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition">
-                                                    Batal
-                                                </button>
-                                                <button type="submit"
-                                                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition">
-                                                    Update
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                                <!-- END MODAL -->
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="text-center py-3">Belum ada data fakultas.</td>
+                            <td colspan="5" class="px-4 py-6 text-center text-gray-500 bg-white">
+                                <div class="flex flex-col items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2M4 13h2m8-8V4a1 1 0 00-1-1h-2a1 1 0 00-1 1v1M9 7h6" />
+                                    </svg>
+                                    <span class="text-lg font-medium">Belum ada data fakultas</span>
+                                    <p class="text-sm text-gray-400 mt-1">Klik tombol "Tambah" untuk menambahkan data baru</p>
+                                </div>
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -250,14 +259,6 @@
                             form.submit();
                         }
                     });
-                });
-            });
-
-            // UPDATE / EDIT
-            const editForms = document.querySelectorAll('.edit-form');
-            editForms.forEach(form => {
-                form.addEventListener('submit', function(e) {
-                    // optional: bisa tampil alert sebelum submit, tapi disini kita biar sukses setelah reload
                 });
             });
 

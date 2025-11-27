@@ -40,6 +40,18 @@ class DosenController extends Controller
         return view('page.dosen.index', compact('dosen', 'prodi'));
     }
 
+    public function edit($id)
+    {
+        if (!Auth::user()->canCrud('dosen')) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $dosen = Dosen::with('prodi.fakultas')->findOrFail($id);
+        $prodi = Prodi::with('fakultas')->get();
+
+        return view('page.dosen.edit', compact('dosen', 'prodi'));
+    }
+
     public function create()
     {
         if (!Auth::user()->canCrud('dosen')) {

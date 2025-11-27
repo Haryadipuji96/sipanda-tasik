@@ -33,7 +33,7 @@ class DashboardController extends Controller
         $chartData = [
             'dosenPerProdi' => $this->getSafeDosenData(),
             'arsipPerBulan' => $this->getSafeArsipData(),
-            'ruanganPerTipe' => $this->getSafeRuanganPerTipe(), // GANTI: dari barangPerKategori ke ruanganPerTipe
+            'ruanganPerTipe' => $this->getSafeRuanganPerTipe(),
             'kondisiBarang' => $this->getSafeKondisiData(),
         ];
 
@@ -49,8 +49,8 @@ class DashboardController extends Controller
                 FROM dosen 
                 GROUP BY program_studi
             ");
-            
-            return collect($results)->map(function($item) {
+
+            return collect($results)->map(function ($item) {
                 return [
                     'prodi' => $item->prodi ?: 'Tidak Ada Prodi',
                     'total' => $item->total
@@ -78,8 +78,8 @@ class DashboardController extends Controller
                 GROUP BY YEAR(created_at), MONTH(created_at)
                 ORDER BY tahun ASC, bulan ASC
             ");
-            
-            return collect($results)->map(function($item) {
+
+            return collect($results)->map(function ($item) {
                 $date = Carbon::createFromDate($item->tahun, $item->bulan, 1);
                 return [
                     'bulan' => $date->format('M Y'),
@@ -104,13 +104,14 @@ class DashboardController extends Controller
     {
         try {
             $results = DB::select("
-                SELECT tipe_ruangan, COUNT(*) as total 
-                FROM ruangan 
-                GROUP BY tipe_ruangan
-            ");
-            
-            return collect($results)->map(function($item) {
-                $label = $item->tipe_ruangan == 'akademik' ? 'Akademik' : 'Umum';
+            SELECT tipe_ruangan, COUNT(*) as total 
+            FROM ruangan 
+            GROUP BY tipe_ruangan
+        ");
+
+            return collect($results)->map(function ($item) {
+                // UBAH: sesuaikan label dengan tipe yang baru
+                $label = $item->tipe_ruangan == 'sarana' ? 'Sarana' : 'Prasarana';
                 return [
                     'tipe' => $label,
                     'total' => $item->total
@@ -120,8 +121,8 @@ class DashboardController extends Controller
             // Fallback data
             $totalRuangan = Ruangan::count();
             return collect([
-                ['tipe' => 'Akademik', 'total' => ceil($totalRuangan / 2)],
-                ['tipe' => 'Umum', 'total' => floor($totalRuangan / 2)]
+                ['tipe' => 'Sarana', 'total' => ceil($totalRuangan / 2)],
+                ['tipe' => 'Prasarana', 'total' => floor($totalRuangan / 2)]
             ]);
         }
     }
@@ -134,8 +135,8 @@ class DashboardController extends Controller
                 FROM data_sarpras 
                 GROUP BY kondisi
             ");
-            
-            return collect($results)->map(function($item) {
+
+            return collect($results)->map(function ($item) {
                 return [
                     'kondisi' => $item->kondisi,
                     'total' => $item->total

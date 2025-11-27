@@ -30,7 +30,7 @@ class SarprasExport implements FromCollection, WithHeadings, WithMapping, WithSt
      */
     public function collection()
     {
-        $query = DataSarpras::with(['prodi.fakultas', 'ruangan']);
+        $query = DataSarpras::with(['ruangan.prodi.fakultas']);
 
         // Filter berdasarkan pencarian jika ada
         if (!empty($this->search)) {
@@ -40,11 +40,17 @@ class SarprasExport implements FromCollection, WithHeadings, WithMapping, WithSt
                   ->orWhere('kategori_barang', 'like', "%{$search}%")
                   ->orWhere('merk_barang', 'like', "%{$search}%")
                   ->orWhere('kode_seri', 'like', "%{$search}%")
-                  ->orWhereHas('prodi', function($q) use ($search) {
-                      $q->where('nama_prodi', 'like', "%{$search}%");
-                  })
+                  ->orWhere('spesifikasi', 'like', "%{$search}%")
+                  ->orWhere('keterangan', 'like', "%{$search}%")
                   ->orWhereHas('ruangan', function($q) use ($search) {
-                      $q->where('nama_ruangan', 'like', "%{$search}%");
+                      $q->where('nama_ruangan', 'like', "%{$search}%")
+                        ->orWhere('unit_prasarana', 'like', "%{$search}%")
+                        ->orWhereHas('prodi', function($q) use ($search) {
+                            $q->where('nama_prodi', 'like', "%{$search}%")
+                              ->orWhereHas('fakultas', function($q) use ($search) {
+                                  $q->where('nama_fakultas', 'like', "%{$search}%");
+                              });
+                        });
                   });
             });
         }
@@ -64,10 +70,10 @@ class SarprasExport implements FromCollection, WithHeadings, WithMapping, WithSt
     {
         return [
             'No',
-            'Program Studi',
+            'Tipe Ruangan',
             'Fakultas',
+            'Program Studi / Unit',
             'Ruangan',
-            'Kategori Ruangan',
             'Nama Barang',
             'Kategori Barang',
             'Merk Barang',
@@ -76,11 +82,12 @@ class SarprasExport implements FromCollection, WithHeadings, WithMapping, WithSt
             'Harga (Rp)',
             'Kondisi',
             'Tanggal Pengadaan',
+            'Tahun Pengadaan',
             'Spesifikasi',
-            'Kode Seri',
-            'Sumber',
-            'Keterangan',
-            'Lokasi Lain'
+            'Kode/Seri Barang',
+            'Sumber Barang',
+            'Lokasi Lain',
+            'Keterangan'
         ];
     }
 
@@ -92,25 +99,42 @@ class SarprasExport implements FromCollection, WithHeadings, WithMapping, WithSt
         static $no = 0;
         $no++;
 
+        // Tentukan lokasi berdasarkan tipe ruangan
+        $fakultas = '-';
+        $programStudiUnit = '-';
+        
+        if ($sarpras->ruangan) {
+            if ($sarpras->ruangan->tipe_ruangan == 'sarana') {
+                // Sarana: Prodi -> Fakultas
+                $fakultas = $sarpras->ruangan->prodi->fakultas->nama_fakultas ?? '-';
+                $programStudiUnit = $sarpras->ruangan->prodi->nama_prodi ?? '-';
+            } else {
+                // Prasarana: Unit Prasarana
+                $fakultas = 'Unit Umum';
+                $programStudiUnit = $sarpras->ruangan->unit_prasarana ?? '-';
+            }
+        }
+
         return [
             $no,
-            $sarpras->prodi->nama_prodi ?? 'Unit Umum',
-            $sarpras->prodi->fakultas->nama_fakultas ?? '-',
-            $sarpras->nama_ruangan,
-            $sarpras->kategori_ruangan,
+            $sarpras->ruangan->tipe_ruangan == 'sarana' ? 'Sarana' : 'Prasarana',
+            $fakultas,
+            $programStudiUnit,
+            $sarpras->ruangan->nama_ruangan ?? '-',
             $sarpras->nama_barang,
             $sarpras->kategori_barang,
-            $sarpras->merk_barang ?? '-',
+            $sarpras->merk_barang ?? '-', // Bisa null
             $sarpras->jumlah,
             $sarpras->satuan,
-            $sarpras->harga ?: 0,
+            $sarpras->harga ?: 0, // Bisa null
             $sarpras->kondisi,
-            $sarpras->tanggal_pengadaan ? \Carbon\Carbon::parse($sarpras->tanggal_pengadaan)->format('d-m-Y') : '-',
+            $sarpras->tanggal_pengadaan ? \Carbon\Carbon::parse($sarpras->tanggal_pengadaan)->format('d-m-Y') : '-', // Bisa null
+            $sarpras->tahun ?? '-', // Bisa null
             $sarpras->spesifikasi,
             $sarpras->kode_seri,
             $sarpras->sumber,
-            $sarpras->keterangan ?? '-',
-            $sarpras->lokasi_lain ?? '-'
+            $sarpras->lokasi_lain ?? '-', // Bisa null
+            $sarpras->keterangan ?? '-' // Bisa null
         ];
     }
 
@@ -121,6 +145,7 @@ class SarprasExport implements FromCollection, WithHeadings, WithMapping, WithSt
     {
         return [
             'K' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Format harga
+            'N' => NumberFormat::FORMAT_NUMBER, // Format tahun
         ];
     }
 
@@ -131,23 +156,24 @@ class SarprasExport implements FromCollection, WithHeadings, WithMapping, WithSt
     {
         return [
             'A' => 5,   // No
-            'B' => 20,  // Program Studi
+            'B' => 12,  // Tipe Ruangan
             'C' => 20,  // Fakultas
-            'D' => 20,  // Ruangan
-            'E' => 15,  // Kategori Ruangan
+            'D' => 25,  // Program Studi / Unit
+            'E' => 20,  // Ruangan
             'F' => 25,  // Nama Barang
-            'G' => 15,  // Kategori Barang
+            'G' => 20,  // Kategori Barang
             'H' => 15,  // Merk Barang
             'I' => 8,   // Jumlah
             'J' => 8,   // Satuan
             'K' => 15,  // Harga
             'L' => 12,  // Kondisi
             'M' => 15,  // Tanggal Pengadaan
-            'N' => 40,  // Spesifikasi
-            'O' => 20,  // Kode Seri
-            'P' => 12,  // Sumber
-            'Q' => 25,  // Keterangan
-            'R' => 20,  // Lokasi Lain
+            'N' => 12,  // Tahun Pengadaan
+            'O' => 40,  // Spesifikasi
+            'P' => 20,  // Kode/Seri Barang
+            'Q' => 12,  // Sumber Barang
+            'R' => 15,  // Lokasi Lain
+            'S' => 25,  // Keterangan
         ];
     }
 
@@ -157,7 +183,7 @@ class SarprasExport implements FromCollection, WithHeadings, WithMapping, WithSt
     public function styles(Worksheet $sheet)
     {
         // Style untuk header (baris 1)
-        $sheet->getStyle('A1:R1')->applyFromArray([
+        $sheet->getStyle('A1:S1')->applyFromArray([
             'font' => [
                 'bold' => true, 
                 'size' => 11,
@@ -181,7 +207,7 @@ class SarprasExport implements FromCollection, WithHeadings, WithMapping, WithSt
         ]);
 
         // Style untuk data
-        $sheet->getStyle('A2:R' . ($sheet->getHighestRow()))
+        $sheet->getStyle('A2:S' . ($sheet->getHighestRow()))
               ->getAlignment()
               ->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP)
               ->setWrapText(true);
@@ -201,14 +227,19 @@ class SarprasExport implements FromCollection, WithHeadings, WithMapping, WithSt
               ->getAlignment()
               ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
+        // Style khusus untuk kolom tahun (rata tengah)
+        $sheet->getStyle('N2:N' . ($sheet->getHighestRow()))
+              ->getAlignment()
+              ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
         // Border untuk semua data
-        $sheet->getStyle('A1:R' . ($sheet->getHighestRow()))
+        $sheet->getStyle('A1:S' . ($sheet->getHighestRow()))
               ->getBorders()
               ->getAllBorders()
               ->setBorderStyle(Border::BORDER_THIN);
 
         // Auto filter
-        $sheet->setAutoFilter('A1:R' . ($sheet->getHighestRow()));
+        $sheet->setAutoFilter('A1:S' . ($sheet->getHighestRow()));
 
         // Freeze panes (header tetap terlihat saat scroll)
         $sheet->freezePane('A2');

@@ -7,7 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ $title ?? config('app.name', 'SIPANDA') }}</title>
-
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <!-- Fonts -->
     <link rel="icon" href="{{ asset('images/Logo-IAIT.png') }}" type="image/png">
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -85,7 +85,7 @@
         /* HEADER STYLES */
         .page-header {
             background: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .header-container {
@@ -242,7 +242,7 @@
                 justify-content: center;
                 border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             }
-            
+
             .footer-links a:last-child {
                 border-bottom: none;
             }
@@ -289,10 +289,21 @@
             background: #f8c300;
         }
 
-        .facebook:hover { background: #3b5998 !important; }
-        .instagram:hover { background: #e4405f !important; }
-        .youtube:hover { background: #cd201f !important; }
-        .twitter:hover { background: #1da1f2 !important; }
+        .facebook:hover {
+            background: #3b5998 !important;
+        }
+
+        .instagram:hover {
+            background: #e4405f !important;
+        }
+
+        .youtube:hover {
+            background: #cd201f !important;
+        }
+
+        .twitter:hover {
+            background: #1da1f2 !important;
+        }
 
         .footer-contact h5 {
             color: #f8c300;
@@ -366,7 +377,7 @@
                 color: #f8c300;
                 transform: translateX(0.5rem);
             }
-            
+
             .social-link:active {
                 transform: translateY(-0.25rem);
                 background: #f8c300;
@@ -457,7 +468,8 @@
             <!-- Copyright -->
             <div class="footer-bottom">
                 <div class="footer-bottom-container">
-                    <p>&copy; {{ date('Y') }} SIPANDA - Sistem Informasi Pangkalan Arsip dan Data. IAIT Tasikmalaya. All rights reserved.</p>
+                    <p>&copy; {{ date('Y') }} SIPANDA - Sistem Informasi Pangkalan Arsip dan Data. IAIT Tasikmalaya.
+                        All rights reserved.</p>
                     <div class="footer-credits">
                         <span>Developed by IT Team IAIT Tasikmalaya</span>
                     </div>

@@ -11,11 +11,18 @@ return new class extends Migration
         Schema::create('data_sarpras', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('id_prodi')->nullable();
+            $table->unsignedBigInteger('ruangan_id')->nullable();
+            $table->string('nama_ruangan', 255)->default('Ruangan Default');
+            $table->string('kategori_ruangan', 100)->default('ruang_kelas');
             $table->string('nama_barang', 255);
-            $table->string('kategori', 100);
+            $table->string('merk_barang', 100)->nullable();
             $table->integer('jumlah');
+            $table->string('satuan', 50)->default('unit');
+            $table->decimal('harga', 15, 2)->nullable();
+            $table->string('kategori_barang', 100)->default('Umum');
             $table->string('kondisi', 50);
-            $table->date('tanggal_pengadaan');
+            $table->date('tanggal_pengadaan')->nullable();
+            $table->year('tahun')->nullable();
             $table->text('spesifikasi');
             $table->string('kode_seri', 100);
             $table->enum('sumber', ['HIBAH', 'LEMBAGA', 'YAYASAN']);
@@ -25,6 +32,8 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('id_prodi')->references('id')->on('prodi')->onDelete('set null');
+            // ❌ COMMENT/HAPUS SEMENTARA foreign key ke ruangan
+            // $table->foreign('ruangan_id')->references('id')->on('ruangan')->onDelete('set null');
         });
     }
 

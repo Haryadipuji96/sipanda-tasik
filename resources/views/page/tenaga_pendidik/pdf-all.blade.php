@@ -21,7 +21,7 @@
             position: relative;
             border-bottom: 2px solid #000;
             margin-bottom: 8px;
-            padding-bottom: 8px;
+            padding: 10px 0;
         }
 
         .kop::after {
@@ -37,14 +37,18 @@
         .logo {
             position: absolute;
             left: 10px;
-            top: 8px;
-            width: 60px;
-            height: 60px;
+            top: 10px;
+            width: 45px;
+            height: 45px;
+            object-fit: contain;
         }
 
         .kop-text {
             text-align: center;
             flex: 1;
+            margin-left: 60px;
+            /* Sesuaikan dengan lebar logo + margin */
+            margin-right: 10px;
         }
 
         .kop-text h1 {
@@ -52,12 +56,6 @@
             font-size: 14px;
             font-weight: bold;
             text-transform: uppercase;
-        }
-
-        .kop-text h2 {
-            margin: 1px 0;
-            font-size: 11px;
-            font-weight: bold;
         }
 
         .kop-text p {
@@ -113,16 +111,12 @@
         .summary-container {
             display: flex;
             flex-direction: column;
-            /* Ubah dari row ke column */
             align-items: flex-start;
-            /* Rata kiri */
         }
 
         .summary-item {
             text-align: left;
-            /* Rata kiri */
             margin-bottom: 5px;
-            /* Beri jarak antar item */
             display: flex;
             align-items: center;
         }
@@ -131,7 +125,6 @@
             font-weight: bold;
             font-size: 11px;
             margin-right: 5px;
-            /* Jarak antara angka dan label */
         }
 
         .summary-label {
@@ -166,7 +159,6 @@
         <img class="logo" src="{{ public_path('images/Logo-IAIT.png') }}" alt="Logo IAIT">
         <div class="kop-text">
             <h1>INSTITUT AGAMA ISLAM TASIKMALAYA</h1>
-            <h2>SEKOLAH TINGGI AGAMA ISLAM</h2>
             <p>Jl. Noenoeng Tisnasaputra No.16, Kahuripan, Tawang, Tasikmalaya</p>
             <p>Telepon: (0265) 331501 | Email: iaitasik@iaitasik.ac.id | Website: www.iaitasik.ac.id</p>
         </div>
@@ -174,12 +166,11 @@
 
     <!-- INFORMASI DOKUMEN -->
     <div class="document-info">
-        <strong>DATA TENAGA PENDIDIK / TENAGA KEPENDIDIKAN</strong><br>
+        <strong>DATA TENAGA KEPENDIDIKAN</strong><br>
         Dicetak pada: {{ date('d-m-Y H:i:s') }}
     </div>
 
     @if (isset($tenaga) && $tenaga->count() > 0)
-
         <table>
             <thead>
                 <tr>
@@ -244,15 +235,13 @@
                     <span class="summary-number">{{ $tenaga->count() }}</span>
                     <span class="summary-label">TOTAL TENAGA</span>
                 </div>
-            
+
                 <div class="summary-item">
-                    <span
-                        class="summary-number">{{ $tenaga->where('status_kepegawaian', 'KONTRAK')->count() }}</span>
+                    <span class="summary-number">{{ $tenaga->where('status_kepegawaian', 'KONTRAK')->count() }}</span>
                     <span class="summary-label">KONTRAK</span>
                 </div>
                 <div class="summary-item">
-                    <span
-                        class="summary-number">{{ $tenaga->where('status_kepegawaian', 'TETAP')->count() }}</span>
+                    <span class="summary-number">{{ $tenaga->where('status_kepegawaian', 'TETAP')->count() }}</span>
                     <span class="summary-label">TETAP</span>
                 </div>
             </div>
@@ -272,7 +261,6 @@
             <strong>DOKUMEN RESMI - INSTITUT AGAMA ISLAM TASIKMALAYA</strong><br>
             Status: Tidak ada data yang ditemukan
         </div>
-
     @endif
 
 </body>

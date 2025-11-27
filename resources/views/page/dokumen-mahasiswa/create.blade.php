@@ -42,7 +42,7 @@
         }
 
         .btn-secondary {
-            background-color: #6b7280;
+            background-color: #ff0000;
             color: white;
             padding: 0.5rem 1rem;
             border-radius: 0.375rem;
@@ -51,7 +51,7 @@
         }
 
         .btn-secondary:hover {
-            background-color: #4b5563;
+            background-color: #cc0000;
         }
 
         .file-upload {

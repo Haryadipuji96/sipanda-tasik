@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Prodi;
 use App\Models\Fakultas;
+use App\Models\Dosen; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -15,10 +16,12 @@ class ProdiController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-
+        
         $prodi = Prodi::with('fakultas')->latest()->paginate(15);
         $fakultas = Fakultas::all(); // <-- tambahkan ini
-        return view('page.prodi.index', compact('prodi', 'fakultas'));
+        $dosen = Dosen::all();
+        
+        return view('page.prodi.index', compact('prodi', 'fakultas', 'dosen'));
     }
 
 
@@ -29,7 +32,8 @@ class ProdiController extends Controller
         }
 
         $fakultas = Fakultas::all();
-        return view('page.prodi.create', compact('fakultas'));
+         $dosen = Dosen::all();
+        return view('page.prodi.create', compact('fakultas', 'dosen'));
     }
 
     public function store(Request $request)
@@ -43,7 +47,7 @@ class ProdiController extends Controller
             'id_fakultas' => 'required|exists:fakultas,id',
             'nama_prodi' => 'required|string|max:255',
             'jenjang' => 'nullable|string|max:50',
-            'ketua_prodi' => 'nullable|string|max:255',
+            'ketua_prodi' => 'nullable|exists:dosen,id', 
             'deskripsi' => 'nullable|string',
         ]);
 
@@ -59,7 +63,8 @@ class ProdiController extends Controller
 
         $prodi = Prodi::findOrFail($id);
         $fakultas = Fakultas::all();
-        return view('page.prodi.edit', compact('prodi', 'fakultas'));
+         $dosen = Dosen::all();
+        return view('page.prodi.edit', compact('prodi', 'fakultas', 'dosen'));
     }
 
     public function update(Request $request, $id)
@@ -73,7 +78,7 @@ class ProdiController extends Controller
                 'id_fakultas' => 'required|exists:fakultas,id', // PERBAIKAN: exists:fakultas,id
                 'nama_prodi' => 'required|string|max:255',
                 'jenjang' => 'nullable|string|max:50',
-                'ketua_prodi' => 'nullable|string|max:255',
+                'ketua_prodi' => 'nullable|exists:dosen,id',
                 'deskripsi' => 'nullable|string',
             ]);
 

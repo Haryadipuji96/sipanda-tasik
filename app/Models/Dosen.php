@@ -24,11 +24,12 @@ class Dosen extends Model
         'pendidikan_terakhir',
         'pendidikan_data',
         'jabatan',
-        'tmt_kerja',
+        'tmt_kerja', // ✅ varchar di database, tetap string
         'masa_kerja_tahun',
         'masa_kerja_bulan',
         'pangkat_golongan',
         'jabatan_fungsional',
+        'golongan', // ✅ DITAMBAHKAN
         'masa_kerja_golongan_tahun',
         'masa_kerja_golongan_bulan',
         'no_sk',
@@ -36,8 +37,7 @@ class Dosen extends Model
         'file_dokumen',
         'sertifikasi',
         'inpasing',
-        'status_dosen', // ✅ SUDAH ADA
-        // File upload baru
+        'status_dosen',
         'file_sertifikasi',
         'file_inpasing',
         'file_ktp',
@@ -57,7 +57,6 @@ class Dosen extends Model
         'file_sk_aktif',
     ];
 
-    // ✅ METHOD OPTIONS SUDAH BENAR
     public static function getStatusDosenOptions()
     {
         return [
@@ -69,14 +68,13 @@ class Dosen extends Model
 
     protected $casts = [
         'tanggal_lahir' => 'date',
-        'tmt_kerja' => 'date', // ⚠️ TAMBAHKAN INI
+        // ❌ 'tmt_kerja' => 'date', // DIHAPUS karena di database varchar
     ];
 
     protected $attributes = [
-        'status_dosen' => 'DOSEN_TETAP', // ✅ OPTIONAL: DEFAULT VALUE
+        'status_dosen' => 'DOSEN_TETAP',
     ];
 
-    // ✅ ACCESSOR SUDAH BENAR
     public function getStatusDosenTextAttribute()
     {
         return self::getStatusDosenOptions()[$this->status_dosen] ?? $this->status_dosen;
@@ -87,13 +85,16 @@ class Dosen extends Model
         return $this->belongsTo(Prodi::class, 'id_prodi', 'id');
     }
 
-    // Helper untuk decode pendidikan JSON
+    public function prodiKetua()
+    {
+        return $this->hasOne(Prodi::class, 'ketua_prodi', 'id');
+    }
+
     public function getPendidikanArrayAttribute()
     {
         return $this->pendidikan_data ? json_decode($this->pendidikan_data, true) : [];
     }
 
-    // ⚠️ PERBAIKI ACCESSOR INI
     public function getTempatTanggalLahirAttribute()
     {
         $tempat = $this->tempat_lahir;
@@ -110,7 +111,6 @@ class Dosen extends Model
         return '-';
     }
 
-    // Helper untuk nama lengkap dengan gelar
     public function getNamaLengkapAttribute()
     {
         $nama = $this->nama;
@@ -121,5 +121,10 @@ class Dosen extends Model
             $nama = $nama . ', ' . $this->gelar_belakang;
         }
         return $nama;
+    }
+
+    public function getIsKetuaProdiAttribute()
+    {
+        return $this->prodiKetua()->exists();
     }
 }

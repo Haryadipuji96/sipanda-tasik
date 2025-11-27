@@ -10,10 +10,10 @@ return new class extends Migration
     {
         Schema::create('tenaga_pendidik', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_prodi')->constrained('prodi')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreignId('id_prodi')->nullable()->constrained('prodi')->onUpdate('cascade')->onDelete('cascade');
             $table->string('nama_tendik');
             $table->string('nip')->nullable();
-            $table->enum('status_kepegawaian', ['KONTRAK', 'TETAP'])->default('KONTRAK');
+            $table->string('status_kepegawaian', 50)->nullable(); // Changed to string based on database
             $table->string('pendidikan_terakhir')->nullable();
             $table->enum('jenis_kelamin', ['laki-laki', 'perempuan'])->nullable();
             $table->string('no_hp')->unique()->nullable();
@@ -25,8 +25,23 @@ return new class extends Migration
             $table->string('tempat_lahir')->nullable();
             $table->date('tanggal_lahir')->nullable();
             $table->date('tmt_kerja')->nullable();
-            $table->text('golongan_history')->nullable(); // JSON
+            $table->text('golongan_history')->nullable();
             $table->string('file')->nullable();
+            
+            // Kolom tambahan dari migration kedua
+            $table->string('jabatan_struktural')->nullable();
+            $table->string('file_ktp')->nullable();
+            $table->string('file_ijazah_s1')->nullable();
+            $table->string('file_transkrip_s1')->nullable();
+            $table->string('file_ijazah_s2')->nullable();
+            $table->string('file_transkrip_s2')->nullable();
+            $table->string('file_ijazah_s3')->nullable();
+            $table->string('file_transkrip_s3')->nullable();
+            $table->string('file_kk')->nullable();
+            $table->string('file_perjanjian_kerja')->nullable();
+            $table->string('file_sk')->nullable();
+            $table->string('file_surat_tugas')->nullable();
+            
             $table->timestamps();
         });
     }

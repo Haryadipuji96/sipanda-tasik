@@ -284,122 +284,241 @@
             background-color: #fecaca;
             transform: scale(1.05);
         }
+
+        /* =======================
+           Zebra Stripe Table - DIPERBARUI
+        ======================= */
+        .table-custom {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .table-custom thead {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        }
+
+        .table-custom th {
+            border-right: 1px solid #93c5fd;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            color: white;
+            padding: 12px 16px;
+        }
+
+        .table-custom th:last-child {
+            border-right: none;
+        }
+
+        .table-custom td {
+            border-right: 1px solid #e5e7eb;
+            vertical-align: top;
+            padding: 12px 16px;
+        }
+
+        .table-custom td:last-child {
+            border-right: none;
+        }
+
+        /* Zebra striping untuk baris - DIPERBARUI */
+        .table-custom tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+            /* Putih untuk baris ganjil */
+        }
+
+        .table-custom tbody tr:nth-child(even) {
+            background-color: #e3f4ff;
+            /* Biru sangat muda untuk baris genap */
+        }
+
+
+
+        /* Styling untuk sel aksi */
+        .table-custom .action-cell {
+            background-color: transparent !important;
+        }
     </style>
 
     <div class="p-6">
-        <div class="flex justify-between items-center mb-4">
-            <h1 class="text-xl font-semibold">Data Sarpras</h1>
-            @canCrud('ruangan')
-            <button onclick="window.location='{{ route('ruangan.create') }}'" class="cssbuttons-io-button">
-                <svg height="18" width="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M0 0h24v24H0z" fill="none"></path>
-                    <path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z" fill="currentColor"></path>
-                </svg>
-                <span>Tambah</span>
-            </button>
-            @endcanCrud
-        </div>
+        <div class="space-y-4">
+            <!-- Header Section -->
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+                <!-- Title -->
+                <h1 class="text-xl font-semibold text-gray-800 text-center sm:text-left">Data Sarpras</h1>
 
-        <!-- Filter Section -->
-        <div class="bg-gray-50 p-4 rounded-lg mb-6 border border-gray-200">
-            <form method="GET" action="{{ route('ruangan.index') }}">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <!-- Search Ruangan -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Pencarian Ruangan</label>
-                        <input type="text" name="search" value="{{ request('search') }}"
-                            class="w-full border rounded px-3 py-2 text-sm" placeholder="Cari nama ruangan...">
-                    </div>
-
-                    <!-- Search Barang -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Pencarian Barang</label>
-                        <input type="text" name="search_barang" value="{{ request('search_barang') }}"
-                            class="w-full border rounded px-3 py-2 text-sm" placeholder="Cari nama barang...">
-                    </div>
-
-                    <!-- Filter Tipe Ruangan -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Tipe Ruangan</label>
-                        <select name="tipe_ruangan" class="w-full border rounded px-3 py-2 text-sm">
-                            <option value="">Semua Tipe</option>
-                            <option value="sarana" {{ request('tipe_ruangan') == 'sarana' ? 'selected' : '' }}>
-                                Sarana</option>
-                            <option value="prasarana" {{ request('tipe_ruangan') == 'prasarana' ? 'selected' : '' }}>
-                                Prasarana
-                            </option>
-                        </select>
-                    </div>
-
-                    <!-- Filter Kondisi -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Kondisi Ruangan</label>
-                        <select name="kondisi" class="w-full border rounded px-3 py-2 text-sm">
-                            <option value="">Semua Kondisi</option>
-                            <option value="Baik" {{ request('kondisi') == 'Baik' ? 'selected' : '' }}>Baik</option>
-                            <option value="Rusak Ringan" {{ request('kondisi') == 'Rusak Ringan' ? 'selected' : '' }}>
-                                Rusak Ringan</option>
-                            <option value="Rusak Berat" {{ request('kondisi') == 'Rusak Berat' ? 'selected' : '' }}>
-                                Rusak Berat</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="flex flex-col sm:flex-row gap-3 mt-4">
-                    <div class="flex gap-2 order-2 sm:order-1">
-                        <a href="{{ route('ruangan.index') }}"
-                            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm flex items-center transition duration-200">
-                            <i class="fas fa-refresh mr-2"></i>
-                            Reset
-                        </a>
-                        <button type="submit"
-                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm flex items-center transition duration-200">
-                            <i class="fas fa-search mr-2"></i>
-                            Cari
+                <!-- Buttons Container -->
+                <div class="flex flex-col xs:flex-row gap-2 w-full sm:w-auto">
+                    @if (auth()->check() && auth()->user()->canCrud('ruangan'))
+                        <button onclick="window.location='{{ route('ruangan.create') }}'"
+                            class="cssbuttons-io-button flex items-center justify-center order-1 xs:order-2 sm:order-2">
+                            <svg height="18" width="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
+                                class="flex-shrink-0">
+                                <path d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z" fill="currentColor"></path>
+                            </svg>
+                            <span class="whitespace-nowrap">Tambah</span>
                         </button>
-                    </div>
-
-                    <!-- Button Hapus Terpilih -->
-                    <button id="delete-selected"
-                        class="order-1 sm:order-2 px-4 py-2 text-sm rounded-lg font-medium text-white bg-red-600 hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition duration-200 flex items-center justify-center"
-                        disabled>
-                        <i class="fas fa-trash mr-2"></i>
-                        <span>Hapus Terpilih</span>
-                    </button>
+                    @endif
                 </div>
+            </div>
 
-                <!-- Info Pencarian Barang -->
-                @if (request('search_barang'))
-                    <div class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                        <div class="flex items-center">
-                            <i class="fas fa-info-circle text-blue-500 mr-2"></i>
-                            <span class="text-blue-700 text-sm">
-                                Menampilkan ruangan yang memiliki barang dengan kata kunci:
-                                <strong>"{{ request('search_barang') }}"</strong>
-                            </span>
-                        </div>
+            <!-- Filter Section -->
+            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <form method="GET" action="{{ route('ruangan.index') }}">
+                    <!-- Search Bar -->
+                    <div class="mb-4">
+                        <x-search-bar-ruangan route="ruangan.index"
+                            placeholder="Cari nama ruangan, barang, kondisi, atau lokasi..." />
                     </div>
-                @endif
-            </form>
+
+                    <!-- Filter Controls -->
+                    <div class="space-y-4">
+                        <!-- Filter Inputs -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                            <!-- Filter Tipe Ruangan -->
+                            <div class="lg:col-span-1">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Tipe Ruangan</label>
+                                <select name="tipe_ruangan"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <option value="">Semua Tipe</option>
+                                    <option value="sarana" {{ request('tipe_ruangan') == 'sarana' ? 'selected' : '' }}>
+                                        Sarana
+                                    </option>
+                                    <option value="prasarana"
+                                        {{ request('tipe_ruangan') == 'prasarana' ? 'selected' : '' }}>
+                                        Prasarana
+                                    </option>
+                                </select>
+                            </div>
+
+                            <!-- Filter Kondisi Ruangan -->
+                            <div class="lg:col-span-1">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Kondisi Ruangan</label>
+                                <select name="kondisi"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <option value="">Semua Kondisi</option>
+                                    <option value="Baik" {{ request('kondisi') == 'Baik' ? 'selected' : '' }}>Baik
+                                    </option>
+                                    <option value="Rusak Ringan"
+                                        {{ request('kondisi') == 'Rusak Ringan' ? 'selected' : '' }}>
+                                        Rusak Ringan
+                                    </option>
+                                    <option value="Rusak Berat"
+                                        {{ request('kondisi') == 'Rusak Berat' ? 'selected' : '' }}>
+                                        Rusak Berat
+                                    </option>
+                                </select>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="flex flex-col xs:flex-row gap-2 lg:col-span-2">
+                                <button type="submit"
+                                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm flex items-center justify-center transition duration-200 shadow-sm hover:shadow-md flex-1">
+                                    <i class="fas fa-search mr-2"></i>
+                                    Terapkan Filter
+                                </button>
+                                <a href="{{ route('ruangan.index') }}"
+                                    class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm flex items-center justify-center transition duration-200 shadow-sm hover:shadow-md flex-1">
+                                    <i class="fas fa-refresh mr-2"></i>
+                                    Reset
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Delete Selected Button & Download PDF -->
+                        @if (auth()->check() && auth()->user()->canCrud('ruangan'))
+                            <div class="flex flex-col sm:flex-row gap-3 justify-end">
+                                <!-- Tombol Download All PDF -->
+                                <a href="{{ route('ruangan.download-all-pdf') }}"
+                                    class="inline-flex items-center justify-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition duration-200 shadow-sm hover:shadow-md order-1 sm:order-1"
+                                    title="Download PDF Semua Ruangan">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2 flex-shrink-0"
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    <span class="whitespace-nowrap">Download PDF</span>
+                                </a>
+
+                                <!-- Tombol Hapus Terpilih -->
+                                <button id="delete-selected"
+                                    class="inline-flex items-center justify-center px-4 py-2 text-sm rounded-lg font-medium text-white bg-red-600 hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition duration-200 shadow-sm hover:shadow-md order-2 sm:order-2"
+                                    disabled>
+                                    <i class="fas fa-trash mr-2"></i>
+                                    <span>Hapus Terpilih</span>
+                                </button>
+                            </div>
+                        @endif
+                    </div>
+
+                    <!-- Active Search Info -->
+                    @if (request('search'))
+                        <div class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                            <div class="flex items-center">
+                                <i class="fas fa-search text-blue-500 mr-2"></i>
+                                <span class="text-blue-700 text-sm">
+                                    Pencarian: <strong>"{{ request('search') }}"</strong>
+                                    (termasuk ruangan, barang, kondisi, dan lokasi)
+                                </span>
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Active Filter Info -->
+                    @if (request('tipe_ruangan') || request('kondisi') || request('prodi'))
+                        <div class="mt-2 p-2 bg-green-50 border border-green-200 rounded-lg">
+                            <div class="flex items-center flex-wrap gap-2">
+                                <i class="fas fa-filter text-green-500 mr-1"></i>
+                                <span class="text-green-700 text-sm">Filter aktif:</span>
+
+                                @if (request('tipe_ruangan'))
+                                    <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
+                                        Tipe: {{ request('tipe_ruangan') == 'sarana' ? 'Sarana' : 'Prasarana' }}
+                                    </span>
+                                @endif
+
+                                @if (request('kondisi'))
+                                    <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
+                                        Kondisi: {{ request('kondisi') }}
+                                    </span>
+                                @endif
+
+                                @if (request('prodi'))
+                                    @php
+                                        $selectedProdi = $prodi->firstWhere('id', request('prodi'));
+                                    @endphp
+                                    @if ($selectedProdi)
+                                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
+                                            Prodi: {{ $selectedProdi->nama_prodi }}
+                                        </span>
+                                    @endif
+                                @endif
+                            </div>
+                        </div>
+                    @endif
+                </form>
+            </div>
         </div>
 
         <!-- Table -->
         <div class="table-wrapper border border-gray-200 rounded-lg">
-            <table class="w-full border text-sm bg-white">
+            <table class="table-custom">
                 <thead class="bg-blue-500 text-white">
                     <tr>
-                        @canCrud('ruangan')
-                        <th rowspan="2" class="px-4 py-2 border text-center w-12">
-                            <input type="checkbox" id="select-all">
-                        </th>
-                        @endcanCrud
+                        @if (auth()->check() && auth()->user()->canCrud('ruangan'))
+                            <th rowspan="2" class="px-4 py-2 border text-center w-12">
+                                <input type="checkbox" id="select-all">
+                            </th>
+                        @endif
                         <th class="border px-3 py-2 text-left">No</th>
                         <th class="border px-3 py-2 text-left">Tipe</th>
+                        <th class="border px-3 py-2 text-left">Tanggal Dibuat</th>
                         <th class="border px-3 py-2 text-left">Lokasi</th>
                         <th class="border px-3 py-2 text-left">Nama Ruangan</th>
                         <th class="border px-3 py-2 text-left">Kondisi</th>
                         <th class="border px-3 py-2 text-left">Barang</th>
-                        <th class="border px-3 py-2 text-left">Tanggal Dibuat</th>
+
                         <th class="border px-3 py-2 text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -415,16 +534,19 @@
                             e($text),
                         );
                     }
+
+                    // Gunakan unified search untuk semua highlight
+                    $searchTerm = request('search');
                 @endphp
                 <tbody>
                     @forelse($ruangan as $index => $item)
                         <tr>
-                            @canCrud('ruangan')
-                            <td class="border px-3 py-2 text-center">
-                                <input type="checkbox" class="select-item" name="selected_ruangan[]"
-                                    value="{{ $item->id }}">
-                            </td>
-                            @endcanCrud
+                            @if (auth()->check() && auth()->user()->canCrud('ruangan'))
+                                <td class="border px-3 py-2 text-center">
+                                    <input type="checkbox" class="select-item" name="selected_ruangan[]"
+                                        value="{{ $item->id }}">
+                                </td>
+                            @endif
                             <td class="border px-3 py-2">{{ $ruangan->firstItem() + $index }}</td>
 
                             <!-- Tipe Ruangan -->
@@ -439,6 +561,8 @@
                                     </span>
                                 @endif
                             </td>
+
+                            <td class="border px-3 py-2">{{ $item->created_at->format('d/m/Y') }}</td>
 
                             <!-- Lokasi -->
                             <td class="border px-3 py-2">
@@ -474,6 +598,7 @@
                             </td>
 
                             <!-- Kolom Barang - DIPERBAIKI -->
+                            <!-- Kolom Barang - DIPERBAIKI -->
                             <td class="border px-3 py-2">
                                 <div class="barang-container">
                                     @if ($item->sarpras->count() > 0)
@@ -481,10 +606,13 @@
                                             $barangCount = $item->sarpras->count();
                                             $filteredBarang = $item->sarpras;
 
-                                            // Filter barang berdasarkan pencarian
-                                            if (request('search_barang')) {
-                                                $filteredBarang = $item->sarpras->filter(function ($barang) {
-                                                    return stripos($barang->nama_barang, request('search_barang')) !== false;
+                                            // Filter barang berdasarkan unified search
+                                            if ($searchTerm) {
+                                                $filteredBarang = $item->sarpras->filter(function ($barang) use (
+                                                    $searchTerm,
+                                                ) {
+                                                    return stripos($barang->nama_barang, $searchTerm) !== false ||
+                                                        stripos($barang->kondisi, $searchTerm) !== false;
                                                 });
                                             }
                                         @endphp
@@ -494,7 +622,7 @@
                                                 <span class="barang-count">
                                                     Total: {{ $barangCount }} barang
                                                 </span>
-                                                @if (request('search_barang') && $filteredBarang->count() > 0)
+                                                @if ($searchTerm && $filteredBarang->count() > 0)
                                                     <span class="search-result-badge">
                                                         {{ $filteredBarang->count() }} cocok
                                                     </span>
@@ -507,16 +635,17 @@
                                                         <div class="barang-item">
                                                             <div class="barang-details">
                                                                 <div class="barang-name">
-                                                                    {!! highlight($barang->nama_barang, request('search_barang')) !!}
+                                                                    {!! highlight($barang->nama_barang, $searchTerm) !!}
                                                                 </div>
                                                                 <div class="barang-specs">
                                                                     <span>{{ $barang->jumlah }} unit</span>
                                                                     <span>•</span>
-                                                                    <span class="barang-kondisi 
-                                                                        {{ $barang->kondisi == 'Baik' ? 'kondisi-baik' : '' }}
-                                                                        {{ $barang->kondisi == 'Rusak Ringan' ? 'kondisi-ringan' : '' }}
-                                                                        {{ $barang->kondisi == 'Rusak Berat' ? 'kondisi-berat' : '' }}">
-                                                                        {{ $barang->kondisi }}
+                                                                    <span
+                                                                        class="barang-kondisi 
+                                            {{ $barang->kondisi == 'Baik' ? 'kondisi-baik' : '' }}
+                                            {{ $barang->kondisi == 'Rusak Ringan' ? 'kondisi-ringan' : '' }}
+                                            {{ $barang->kondisi == 'Rusak Berat' ? 'kondisi-berat' : '' }}">
+                                                                        {!! highlight($barang->kondisi, $searchTerm) !!}
                                                                     </span>
                                                                 </div>
                                                             </div>
@@ -531,7 +660,11 @@
                                                 @endif
                                             @else
                                                 <div class="text-gray-400 text-sm text-center py-2">
-                                                    Tidak ada barang yang cocok
+                                                    @if ($searchTerm)
+                                                        Tidak ada barang yang cocok
+                                                    @else
+                                                        Klik untuk lihat detail
+                                                    @endif
                                                 </div>
                                             @endif
                                         </div>
@@ -541,70 +674,74 @@
                                 </div>
                             </td>
 
-                            <td class="border px-3 py-2">{{ $item->created_at->format('d/m/Y') }}</td>
-                            
+
+
                             <!-- Kolom Aksi - DITAMBAH ICON DETAIL -->
                             <td class="border px-3 py-2">
-                                <div class="action-buttons">
-                                    <!-- Tombol Detail -->
-                                    <a href="{{ route('ruangan.show', $item->id) }}"
-                                        class="btn-action btn-detail"
-                                        title="Detail Ruangan">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                        </svg>
-                                    </a>
-
-                                    @canCrud('ruangan')
-                                    <!-- Tombol Tambah Barang -->
-                                    <a href="{{ route('ruangan.tambah-barang', $item->id) }}"
-                                        class="btn-action btn-add-item"
-                                        title="Tambah Barang">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                                        </svg>
-                                    </a>
-
-                                    <!-- Tombol Edit -->
-                                    <a href="{{ route('ruangan.edit', $item->id) }}"
-                                        class="btn-action btn-edit"
-                                        title="Edit Ruangan">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                d="M11 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z" />
-                                        </svg>
-                                    </a>
-
-                                    <!-- Tombol Hapus -->
-                                    <form action="{{ route('ruangan.destroy', $item->id) }}" method="POST"
-                                        class="inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="button"
-                                            class="btn-action btn-delete delete-btn"
-                                            title="Hapus">
+                                <div class="action-buttons flex items-center justify-center h-full min-h-[60px]">
+                                    <!-- Container untuk semua tombol -->
+                                    <div class="flex flex-col sm:flex-row gap-2 items-center justify-center">
+                                        <!-- Tombol Detail -->
+                                        <a href="{{ route('ruangan.show', $item->id) }}"
+                                            class="btn-action btn-detail" title="Detail Ruangan">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
                                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round"
-                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4h6v3m-9 0h12" />
+                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                             </svg>
-                                        </button>
-                                    </form>
-                                    @endcanCrud
+                                        </a>
+
+                                        @if (auth()->check() && auth()->user()->canCrud('ruangan'))
+                                            <!-- Tombol Tambah Barang -->
+                                            <a href="{{ route('ruangan.tambah-barang', $item->id) }}"
+                                                class="btn-action btn-add-item" title="Tambah Barang">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4"
+                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                                    stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M12 4v16m8-8H4" />
+                                                </svg>
+                                            </a>
+
+                                            <!-- Tombol Edit -->
+                                            <a href="{{ route('ruangan.edit', $item->id) }}"
+                                                class="btn-action btn-edit" title="Edit Ruangan">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4"
+                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                                    stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M11 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                                </svg>
+                                            </a>
+
+                                            <!-- Tombol Hapus -->
+                                            <form action="{{ route('ruangan.destroy', $item->id) }}" method="POST"
+                                                class="inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button" class="btn-action btn-delete delete-btn"
+                                                    title="Hapus">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4"
+                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                                        stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4h6v3m-9 0h12" />
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
                                 </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="{{ canCrud('ruangan') ? 9 : 8 }}" class="text-center py-3">
-                                @if (request('search_barang'))
-                                    Tidak ditemukan ruangan dengan barang "{{ request('search_barang') }}"
+                            <td colspan="{{ auth()->check() && auth()->user()->canCrud('ruangan') ? 9 : 8 }}"
+                                class="text-center py-3">
+                                @if (request('search'))
+                                    Tidak ditemukan ruangan dengan kata kunci "{{ request('search') }}"
                                 @else
                                     Belum ada data ruangan.
                                 @endif

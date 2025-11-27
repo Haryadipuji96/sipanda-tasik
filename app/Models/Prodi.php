@@ -16,7 +16,7 @@ class Prodi extends Model
         'id_fakultas',
         'nama_prodi',
         'jenjang',
-        'ketua_prodi',
+        'ketua_prodi', // ID dosen yang menjadi ketua
         'deskripsi',
     ];
 
@@ -38,5 +38,15 @@ class Prodi extends Model
         return $this->hasMany(DataSarpras::class, 'id_prodi');
     }
 
-    
+    // ✅ RELASI BARU: Relasi ke dosen sebagai ketua prodi
+    public function ketuaProdi()
+    {
+        return $this->belongsTo(Dosen::class, 'ketua_prodi', 'id');
+    }
+
+    // ✅ RELASI BARU: Relasi ke semua dosen di prodi ini
+    public function dosen()
+    {
+        return $this->hasMany(Dosen::class, 'id_prodi');
+    }
 }

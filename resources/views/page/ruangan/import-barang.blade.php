@@ -48,7 +48,7 @@
                         <li>Gunakan dropdown untuk memilih Kategori, Satuan, Kondisi, dan Sumber Barang</li>
                         <li>Pastikan format data sesuai dengan contoh</li>
                         <li>File harus berformat .xlsx, .xls, atau .csv</li>
-                        <li>Maksimal ukuran file: 10MB</li>
+                        <li>Maksimal ukuran file: 2MB</li>
                         <li>Semua barang akan otomatis masuk ke ruangan: <strong>{{ $ruangan->nama_ruangan }}</strong></li>
                     </ul>
                 </div>

@@ -69,21 +69,75 @@
                 box-shadow: none;
             }
         }
+
+        /* =======================
+           Zebra Stripe Table - DIPERBARUI
+        ======================= */
+        .table-custom {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .table-custom thead {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        }
+
+        .table-custom th {
+            border-right: 1px solid #93c5fd;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            color: white;
+            padding: 12px 16px;
+        }
+
+        .table-custom th:last-child {
+            border-right: none;
+        }
+
+        .table-custom td {
+            border-right: 1px solid #e5e7eb;
+            vertical-align: top;
+            padding: 12px 16px;
+        }
+
+        .table-custom td:last-child {
+            border-right: none;
+        }
+
+        /* Zebra striping untuk baris - DIPERBARUI */
+        .table-custom tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+            /* Putih untuk baris ganjil */
+        }
+
+        .table-custom tbody tr:nth-child(even) {
+            background-color: #e3f4ff;
+            /* Biru sangat muda untuk baris genap */
+        }
+
+
+
+        /* Styling untuk sel aksi */
+        .table-custom .action-cell {
+            background-color: transparent !important;
+        }
     </style>
 
     <div class="p-6">
         <!-- Header -->
         <div class="flex justify-between items-center mb-4">
             <h1 class="text-xl font-semibold">Data Arsip</h1>
-            @canCrud('arsip')
-            <button onclick="window.location='{{ route('arsip.create') }}'" class="cssbuttons-io-button">
-                <svg height="18" width="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M0 0h24v24H0z" fill="none"></path>
-                    <path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z" fill="currentColor"></path>
-                </svg>
-                <span>Tambah</span>
-            </button>
-            @endcanCrud
+            @if (auth()->check() && auth()->user()->canCrud('arsip'))
+                <button onclick="window.location='{{ route('arsip.create') }}'" class="cssbuttons-io-button">
+                    <svg height="18" width="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0 0h24v24H0z" fill="none"></path>
+                        <path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z" fill="currentColor"></path>
+                    </svg>
+                    <span>Tambah</span>
+                </button>
+            @endif
         </div>
 
         <x-search-bar route="arsip.index" placeholder="Cari judul / kategori..." />
@@ -91,14 +145,14 @@
 
         <!-- Letakkan setelah button "Hapus Terpilih" dan sebelum tabel -->
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2 mb-4">
-            @canCrud('arsip')
-            <!-- Button Hapus Terpilih -->
-            <button id="delete-selected"
-                class="order-2 sm:order-1 px-3 py-1.5 text-sm rounded-full font-medium text-white bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-center sm:w-auto"
-                disabled>
-                <span>Hapus Terpilih</span>
-            </button>
-            @endcanCrud
+            @if (auth()->check() && auth()->user()->canCrud('arsip'))
+                <!-- Button Hapus Terpilih -->
+                <button id="delete-selected"
+                    class="order-2 sm:order-1 px-3 py-1.5 text-sm rounded-full font-medium text-white bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-center sm:w-auto"
+                    disabled>
+                    <span>Hapus Terpilih</span>
+                </button>
+            @endif
 
             <!-- Export Buttons -->
             <div class="order-1 sm:order-2 flex gap-2">
@@ -132,14 +186,14 @@
 
         <!-- Tabel Arsip -->
         <div class="table-wrapper border border-gray-200 rounded-lg">
-            <table class="w-full border text-sm bg-white">
+            <table class="table-custom">
                 <thead class="bg-blue-500 text-white">
                     <tr>
-                        @canCrud('arsip')
-                        <th class="px-4 py-2 border text-center w-12" rowspan="2">
-                            <input type="checkbox" id="select-all">
-                        </th>
-                        @endcanCrud
+                        @if (auth()->check() && auth()->user()->canCrud('arsip'))
+                            <th class="px-4 py-2 border text-center w-12" rowspan="2">
+                                <input type="checkbox" id="select-all">
+                            </th>
+                        @endif
                         <th class="border px-3 py-2 text-center w-12">No</th>
                         <th class="border px-3 py-2 text-left">Judul Dokumen</th>
                         <th class="border px-3 py-2 text-left">Nomor Dokumen</th>
@@ -170,12 +224,12 @@
                     @forelse ($arsip as $index => $a)
                         <tr class="hover:bg-gray-50">
                             <!-- Di dalam tabel, ganti name="selected_dosen[]" menjadi name="selected_arsip[]" -->
-                            @canCrud('arsip')
-                            <td class="border px-3 py-2 text-center">
-                                <input type="checkbox" class="select-item" name="selected_arsip[]"
-                                    value="{{ $a->id }}">
-                            </td>
-                            @endcanCrud
+                            @if (auth()->check() && auth()->user()->canCrud('arsip'))
+                                <td class="border px-3 py-2 text-center">
+                                    <input type="checkbox" class="select-item" name="selected_arsip[]"
+                                        value="{{ $a->id }}">
+                                </td>
+                            @endif
                             <td class="border px-3 py-2 text-center">{{ $index + $arsip->firstItem() }}</td>
                             <td class="border px-3 py-2">{!! highlight($a->judul_dokumen, request('search')) !!}</td>
                             <td class="border px-3 py-2">{{ $a->nomor_dokumen ?? '-' }}</td>
@@ -204,150 +258,36 @@
                             </td>
                             <td class="border px-3 py-2 text-center">
                                 <div class="flex items-center justify-center gap-2">
-                                    <div x-data="{ openModal: false }">
-                                        @canCrud('arsip')
-                                        <!-- Tombol Edit -->
-                                        <button @click="openModal = true"
-                                            class="p-2 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-full transition"
-                                            title="Edit">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    d="M11 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z" />
-                                            </svg>
-                                        </button>
-                                        @endcanCrud
-
-                                        <form action="{{ route('arsip.destroy', $a->id) }}" method="POST"
-                                            class="inline delete-form">
-                                            @csrf
-                                            @method('DELETE')
-                                            @canCrud('arsip')
-                                            <button type="button"
-                                                class="p-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-full transition btn-delete"
-                                                title="Hapus">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5"
-                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                                                    stroke-width="2">
+                                    <div class="flex items-center justify-center gap-2">
+                                        @if (auth()->check() && auth()->user()->canCrud('arsip'))
+                                            <!-- Tombol Edit -->
+                                            <a href="{{ route('arsip.edit', $a->id) }}"
+                                                class="p-2 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-full transition duration-200 shadow-sm"
+                                                title="Edit">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
-                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4h6v3m-9 0h12" />
+                                                        d="M11 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z" />
                                                 </svg>
-                                            </button>
-                                            @endcanCrud
-                                        </form>
-                                        <!-- Modal Edit -->
-                                        <div x-show="openModal" x-cloak
-                                            class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-                                            <div @click.away="openModal = false"
-                                                class="relative bg-white rounded-xl shadow-xl w-full max-w-3xl p-6 mx-4 overflow-y-auto max-h-[90vh]">
-                                                <button @click="openModal = false"
-                                                    class="absolute top-3 right-3 text-gray-400 hover:text-gray-600">✕</button>
-                                                <h1
-                                                    class="text-xl font-semibold mb-5 text-gray-800 border-b pb-2 text-start">
-                                                    Edit Data Arsip
-                                                </h1>
+                                            </a>
 
-                                                <form action="{{ route('arsip.update', $a->id) }}" method="POST"
-                                                    enctype="multipart/form-data">
-                                                    @csrf
-                                                    @method('PUT')
-
-                                                    {{-- Kategori Arsip --}}
-                                                    <div class="mb-4">
-                                                        <label class="block font-medium mb-1 text-start">Kategori
-                                                            Arsip</label>
-                                                        <select name="id_kategori"
-                                                            class="w-full border rounded px-3 py-2" required>
-                                                            @foreach ($kategori as $k)
-                                                                <option value="{{ $k->id }}"
-                                                                    {{ $k->id == $a->id_kategori ? 'selected' : '' }}>
-                                                                    {{ $k->nama_kategori }}
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-
-
-                                                    {{-- Judul --}}
-                                                    <div class="mb-4">
-                                                        <label class="block font-medium mb-1 text-start">Judul
-                                                            Dokumen</label>
-                                                        <input type="text" name="judul_dokumen"
-                                                            value="{{ $a->judul_dokumen }}"
-                                                            class="w-full border rounded px-3 py-2" required>
-                                                    </div>
-
-                                                    {{-- Nomor & Tanggal --}}
-                                                    <div class="mb-4 grid grid-cols-2 gap-4">
-                                                        <div>
-                                                            <label class="block font-medium mb-1 text-start">Nomor
-                                                                Dokumen</label>
-                                                            <input type="text" name="nomor_dokumen"
-                                                                value="{{ $a->nomor_dokumen }}"
-                                                                class="w-full border rounded px-3 py-2">
-                                                        </div>
-                                                        <div>
-                                                            <label class="block font-medium mb-1 text-start">Tanggal
-                                                                Dokumen</label>
-                                                            <input type="date" name="tanggal_dokumen"
-                                                                value="{{ $a->tanggal_dokumen }}"
-                                                                class="w-full border rounded px-3 py-2">
-                                                        </div>
-                                                    </div>
-
-                                                    {{-- Tahun --}}
-                                                    <div class="mb-4">
-                                                        <label class="block font-medium mb-1 text-start">Tahun</label>
-                                                        <input type="text" name="tahun"
-                                                            value="{{ $a->tahun }}"
-                                                            class="w-full border rounded px-3 py-2">
-                                                    </div>
-
-
-                                                    {{-- 🔹 File Dokumen Saat Ini --}}
-                                                    <!-- GANTI bagian file info di modal edit -->
-                                                    <div
-                                                        class="grid w-full max-w-xs items-start gap-1.5 mb-4 text-start">
-                                                        <label class="text-sm text-gray-400 font-medium leading-none">
-                                                            File Dokumen Saat Ini
-                                                        </label>
-
-                                                        @if ($a->file_dokumen)
-                                                            <a href="{{ asset('dokumen_arsip/' . $a->file_dokumen) }}"
-                                                                target="_blank" class="text-blue-600 hover:underline">
-                                                                {{ $a->file_dokumen }}
-                                                            </a>
-                                                            <p class="text-gray-500 text-xs mt-1">
-                                                                Upload file baru untuk mengganti yang lama.
-                                                                <strong>Maks. 2MB</strong> <!-- TAMBAHKAN INI -->
-                                                            </p>
-                                                        @else
-                                                            <p class="text-gray-500 italic text-sm">Belum ada file.</p>
-                                                        @endif
-
-                                                        <input type="file" name="file_dokumen" id="file_dokumen"
-                                                            class="flex w-full rounded-md border border-blue-300 bg-white text-sm text-gray-400 file:border-0 file:bg-blue-600 file:text-white file:text-sm file:font-medium"
-                                                            accept=".pdf,.doc,.docx,.jpg,.png" />
-                                                        <p class="text-gray-500 text-xs">Format: PDF, DOC, DOCX, JPG,
-                                                            PNG - Maks. 2MB</p> <!-- TAMBAHKAN INI -->
-                                                    </div>
-                                                    {{-- Keterangan --}}
-                                                    <div class="mb-4">
-                                                        <label
-                                                            class="block font-medium mb-1 text-start">Keterangan</label>
-                                                        <textarea name="keterangan" rows="3" class="w-full border rounded px-3 py-2">{{ $a->keterangan }}</textarea>
-                                                    </div>
-
-                                                    {{-- Tombol --}}
-                                                    <div class="flex justify-end space-x-2">
-                                                        <a href="{{ route('arsip.index') }}"
-                                                            class="bg-red-500 text-white px-4 py-2 rounded">Batal</a>
-                                                        <button type="submit"
-                                                            class="bg-blue-600 text-white px-4 py-2 rounded">Update</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
+                                            <!-- Tombol Hapus -->
+                                            <form action="{{ route('arsip.destroy', $a->id) }}" method="POST"
+                                                class="inline delete-form">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button"
+                                                    class="p-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-full transition duration-200 shadow-sm btn-delete"
+                                                    title="Hapus">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4"
+                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                                        stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4h6v3m-9 0h12" />
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                        @endif
                                     </div>
                                 </div>
                             </td>
@@ -495,72 +435,73 @@
     </script>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // File validation untuk modal edit
-        const editFileInput = document.getElementById('file_dokumen');
-        if (editFileInput) {
-            editFileInput.addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    // Validate file size (2MB)
-                    if (file.size > 2 * 1024 * 1024) {
+        document.addEventListener('DOMContentLoaded', function() {
+            // File validation untuk modal edit
+            const editFileInput = document.getElementById('file_dokumen');
+            if (editFileInput) {
+                editFileInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        // Validate file size (2MB)
+                        if (file.size > 2 * 1024 * 1024) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'File Terlalu Besar',
+                                text: 'Ukuran file maksimal 2MB. File Anda: ' + (file.size / (1024 *
+                                    1024)).toFixed(2) + 'MB'
+                            });
+                            this.value = '';
+                            return;
+                        }
+
+                        // Validate file type
+                        const allowedTypes = ['application/pdf', 'application/msword',
+                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                            'image/jpeg', 'image/jpg', 'image/png'
+                        ];
+                        if (!allowedTypes.includes(file.type)) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Format File Tidak Didukung',
+                                text: 'Hanya file PDF, DOC, DOCX, JPG, dan PNG yang diizinkan.'
+                            });
+                            this.value = '';
+                            return;
+                        }
+
+                        // Show success message
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'File Valid',
+                            text: 'File siap diupload: ' + file.name,
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
+                });
+            }
+
+            // Form validation untuk modal edit
+            const editForm = document.querySelector('form[action*="arsip"]');
+            if (editForm) {
+                editForm.addEventListener('submit', function(e) {
+                    const kategori = this.querySelector('select[name="id_kategori"]');
+                    const judulDokumen = this.querySelector('input[name="judul_dokumen"]');
+
+                    if (!kategori || !judulDokumen) return;
+
+                    if (!kategori.value || !judulDokumen.value.trim()) {
+                        e.preventDefault();
                         Swal.fire({
                             icon: 'error',
-                            title: 'File Terlalu Besar',
-                            text: 'Ukuran file maksimal 2MB. File Anda: ' + (file.size / (1024 * 1024)).toFixed(2) + 'MB'
+                            title: 'Data Belum Lengkap',
+                            text: 'Kategori Arsip dan Judul Dokumen wajib diisi!'
                         });
-                        this.value = '';
                         return;
                     }
-
-                    // Validate file type
-                    const allowedTypes = ['application/pdf', 'application/msword',
-                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                        'image/jpeg', 'image/jpg', 'image/png'
-                    ];
-                    if (!allowedTypes.includes(file.type)) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Format File Tidak Didukung',
-                            text: 'Hanya file PDF, DOC, DOCX, JPG, dan PNG yang diizinkan.'
-                        });
-                        this.value = '';
-                        return;
-                    }
-
-                    // Show success message
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'File Valid',
-                        text: 'File siap diupload: ' + file.name,
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
-                }
-            });
-        }
-
-        // Form validation untuk modal edit
-        const editForm = document.querySelector('form[action*="arsip"]');
-        if (editForm) {
-            editForm.addEventListener('submit', function(e) {
-                const kategori = this.querySelector('select[name="id_kategori"]');
-                const judulDokumen = this.querySelector('input[name="judul_dokumen"]');
-                
-                if (!kategori || !judulDokumen) return;
-
-                if (!kategori.value || !judulDokumen.value.trim()) {
-                    e.preventDefault();
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Data Belum Lengkap',
-                        text: 'Kategori Arsip dan Judul Dokumen wajib diisi!'
-                    });
-                    return;
-                }
-            });
-        }
-    });
-</script>
+                });
+            }
+        });
+    </script>
 
 </x-app-layout>

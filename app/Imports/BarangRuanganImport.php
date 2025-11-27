@@ -27,18 +27,18 @@ class BarangRuanganImport implements ToModel, WithHeadingRow, WithValidation, Sk
         return new DataSarpras([
             'nama_barang' => $row['nama_barang'],
             'kategori_barang' => $row['kategori_barang'],
-            'merk_barang' => $row['merk_barang'] ?? null,
-            'harga' => $this->cleanNumber($row['harga_rp'] ?? null),
+            'merk_barang' => $this->cleanString($row['merk_barang'] ?? null), // BISA NULL
+            'harga' => $this->cleanNumber($row['harga_rp'] ?? null), // BISA NULL
             'jumlah' => (int) $row['jumlah'],
             'satuan' => $row['satuan'],
             'kondisi' => $row['kondisi'],
-            'tanggal_pengadaan' => $this->cleanDate($row['tanggal_pengadaan'] ?? null),
-            'tahun' => $row['tahun_pengadaan'] ? (int) $row['tahun_pengadaan'] : null,
+            'tanggal_pengadaan' => $this->cleanDate($row['tanggal_pengadaan'] ?? null), // BISA NULL
+            'tahun' => $this->cleanYear($row['tahun_pengadaan'] ?? null), // BISA NULL
             'sumber' => $row['sumber_barang'],
             'spesifikasi' => $row['spesifikasi'],
             'kode_seri' => $row['kodeseri_barang'],
-            'lokasi_lain' => $row['lokasi_lain'] ?? null,
-            'keterangan' => $row['keterangan'] ?? null,
+            'lokasi_lain' => $this->cleanString($row['lokasi_lain'] ?? null), // BISA NULL
+            'keterangan' => $this->cleanString($row['keterangan'] ?? null), // BISA NULL
             'ruangan_id' => $this->ruanganId,
         ]);
     }
@@ -48,16 +48,18 @@ class BarangRuanganImport implements ToModel, WithHeadingRow, WithValidation, Sk
         return [
             'nama_barang' => 'required|string|max:255',
             'kategori_barang' => 'required|in:PERABOTAN & FURNITURE,ELEKTRONIK & TEKNOLOGI,PERALATAN LABORATORIUM,PERALATAN KANTOR,ALAT KOMUNIKASI,LAINNYA',
-            'merk_barang' => 'nullable|string|max:100',
-            'harga_rp' => 'nullable|numeric|min:0',
+            'merk_barang' => 'nullable|string|max:255', // UBAH MENJADI NULLABLE
+            'harga_rp' => 'nullable|numeric|min:0', // UBAH MENJADI NULLABLE
             'jumlah' => 'required|integer|min:1',
             'satuan' => 'required|in:unit,buah,set,lusin,paket',
             'kondisi' => 'required|in:Baik Sekali,Baik,Cukup,Rusak Ringan,Rusak Berat',
-            'tanggal_pengadaan' => 'nullable|date',
-            'tahun_pengadaan' => 'nullable|integer|min:2000|max:' . date('Y'),
+            'tanggal_pengadaan' => 'nullable|date', // UBAH MENJADI NULLABLE
+            'tahun_pengadaan' => 'nullable|integer|min:2000|max:' . date('Y'), // UBAH MENJADI NULLABLE
             'sumber_barang' => 'required|in:HIBAH,LEMBAGA,YAYASAN',
             'spesifikasi' => 'required|string|max:1000',
             'kodeseri_barang' => 'required|string|max:100',
+            'lokasi_lain' => 'nullable|string|max:255', // UBAH MENJADI NULLABLE
+            'keterangan' => 'nullable|string|max:1000', // UBAH MENJADI NULLABLE
         ];
     }
 
@@ -83,7 +85,7 @@ class BarangRuanganImport implements ToModel, WithHeadingRow, WithValidation, Sk
 
     private function cleanNumber($value)
     {
-        if (empty($value)) {
+        if (empty($value) || $value === '' || $value === '-') {
             return null;
         }
 
@@ -105,7 +107,7 @@ class BarangRuanganImport implements ToModel, WithHeadingRow, WithValidation, Sk
 
     private function cleanDate($value)
     {
-        if (empty($value)) {
+        if (empty($value) || $value === '' || $value === '-') {
             return null;
         }
 
@@ -122,5 +124,30 @@ class BarangRuanganImport implements ToModel, WithHeadingRow, WithValidation, Sk
         } catch (\Exception $e) {
             return null;
         }
+    }
+
+    private function cleanYear($value)
+    {
+        if (empty($value) || $value === '' || $value === '-') {
+            return null;
+        }
+
+        $year = (int) $value;
+        $currentYear = date('Y');
+
+        if ($year >= 2000 && $year <= $currentYear) {
+            return $year;
+        }
+
+        return null;
+    }
+
+    private function cleanString($value)
+    {
+        if (empty($value) || $value === '' || $value === '-') {
+            return null;
+        }
+
+        return trim($value);
     }
 }

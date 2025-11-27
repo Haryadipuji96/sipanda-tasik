@@ -33,6 +33,7 @@ Route::prefix('dosen')->group(function () {
     Route::get('/create', [DosenController::class, 'create'])->name('dosen.create');
     Route::post('/store', [DosenController::class, 'store'])->name('dosen.store');
     Route::get('/{id}', [DosenController::class, 'show'])->name('dosen.show');
+    Route::get('/dosen/{id}/edit', [DosenController::class, 'edit'])->name('dosen.edit');
     Route::put('/{id}', [DosenController::class, 'update'])->name('dosen.update');
     Route::delete('/{id}', [DosenController::class, 'destroy'])->name('dosen.destroy');
     Route::post('/delete-selected', [DosenController::class, 'deleteSelected'])->name('dosen.deleteSelected');
@@ -62,6 +63,7 @@ Route::prefix('tenaga-pendidik')->group(function () {
 
     // Dynamic routes - HARUS DITARUH DI BAWAH
     Route::get('/{id}', [TenagaPendidikController::class, 'show'])->name('tenaga-pendidik.show');
+    Route::get('/tenaga-pendidik/{id}/edit', [TenagaPendidikController::class, 'edit'])->name('tenaga-pendidik.edit');
     Route::put('/{id}', [TenagaPendidikController::class, 'update'])->name('tenaga-pendidik.update');
     Route::delete('/{id}', [TenagaPendidikController::class, 'destroy'])->name('tenaga-pendidik.destroy');
     Route::get('/{id}/preview-pdf', [TenagaPendidikController::class, 'previewPDF'])->name('tenaga-pendidik.preview-pdf');
@@ -83,6 +85,8 @@ Route::prefix('tenaga-pendidik')->group(function () {
 Route::prefix('ruangan')->group(function () {
     // Export dan utilitas
     Route::get('/{ruangan}/pdf', [RuanganController::class, 'downloadPdf'])->name('ruangan.pdf');
+    // routes/web.php
+    Route::get('/ruangan/download-all-pdf', [RuanganController::class, 'downloadAllPdf'])->name('ruangan.download-all-pdf');
     Route::get('/{id}/import-barang', [RuanganController::class, 'showImportBarangForm'])->name('ruangan.import-barang-form');
     Route::post('/{id}/import-barang', [RuanganController::class, 'importBarang'])->name('ruangan.import-barang');
     Route::get('/{id}/download-template-barang', [RuanganController::class, 'downloadTemplateBarang'])->name('ruangan.download-template-barang');

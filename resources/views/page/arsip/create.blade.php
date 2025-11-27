@@ -42,7 +42,7 @@
         }
 
         .btn-secondary {
-            background-color: #6b7280;
+            background-color: #ff0000;
             color: white;
             padding: 0.5rem 1rem;
             border-radius: 0.375rem;
@@ -51,7 +51,7 @@
         }
 
         .btn-secondary:hover {
-            background-color: #4b5563;
+            background-color: #cc0000;
         }
 
         .file-upload {
@@ -307,8 +307,7 @@
                         <!-- Tombol -->
                         <div class="flex flex-col sm:flex-row justify-end gap-3 pt-4 sm:pt-6 border-t">
                             <a href="{{ route('arsip.index') }}"
-                                class="btn-secondary text-center order-2 sm:order-1 px-4 py-2 text-sm sm:text-base">
-                                <i class="fas fa-times mr-2"></i>
+                                class="btn-secondary text-center order-2 sm:order-1">
                                 Batal
                             </a>
                             <button type="submit"

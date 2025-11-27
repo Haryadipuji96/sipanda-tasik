@@ -2,6 +2,32 @@
     <x-slot name="title">Tambah Barang - {{ $ruangan->nama_ruangan }}</x-slot>
 
     <style>
+        .form-section {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+        }
+
+        .form-body {
+            padding: 1.5rem;
+        }
+
+        .info-box {
+            background-color: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
         .btn-primary {
             background-color: #3b82f6;
             color: white;
@@ -16,7 +42,7 @@
         }
 
         .btn-secondary {
-            background-color: #6b7280;
+            background-color: #ff0000;
             color: white;
             padding: 0.5rem 1rem;
             border-radius: 0.375rem;
@@ -25,7 +51,7 @@
         }
 
         .btn-secondary:hover {
-            background-color: #4b5563;
+            background-color: #cc0000;
         }
 
         .btn-success {
@@ -40,30 +66,54 @@
         .btn-success:hover {
             background-color: #059669;
         }
+
+        .btn-warning {
+            background-color: #f59e0b;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-warning:hover {
+            background-color: #d97706;
+        }
+
+        @media (max-width: 768px) {
+            .form-body {
+                padding: 1rem;
+            }
+
+            .form-header {
+                padding: 1rem;
+            }
+        }
     </style>
 
-    <div class="p-6">
+    <div class="p-4 sm:p-6">
         <div class="max-w-4xl mx-auto">
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <div class="form-section">
                 <!-- Header -->
-                <div class="flex items-center justify-between mb-6 pb-4 border-b">
-                    <div>
-                        <h1 class="text-xl font-semibold text-gray-800">Tambah Barang ke Ruangan</h1>
-                        <p class="text-gray-600 mt-1">
-                            <strong>Ruangan:</strong> {{ $ruangan->nama_ruangan }}
-                            @if ($ruangan->prodi)
-                                | <strong>Prodi:</strong> {{ $ruangan->prodi->nama_prodi }}
-                                | <strong>Fakultas:</strong> {{ $ruangan->prodi->fakultas->nama_fakultas }}
-                            @else
-                                | <strong>Unit Umum</strong>
-                            @endif
-                        </p>
+                <div class="form-header">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="bg-white bg-opacity-20 p-2 rounded-full">
+                                <i class="fas fa-box text-white text-lg sm:text-xl"></i>
+                            </div>
+                            <div>
+                                <h1 class="text-lg sm:text-xl font-semibold">Tambah Barang ke Ruangan</h1>
+                                <p class="text-blue-100 text-xs sm:text-sm mt-1">
+                                    Input data barang untuk ruangan {{ $ruangan->nama_ruangan }}
+                                </p>
+                            </div>
+                        </div>
+                        <a href="{{ route('ruangan.show', $ruangan->id) }}"
+                            class="text-white hover:text-blue-100 transition flex items-center space-x-2 self-start sm:self-auto">
+                            <i class="fas fa-arrow-left text-sm"></i>
+                            <span class="text-sm">Kembali ke Ruangan</span>
+                        </a>
                     </div>
-                    <a href="{{ route('ruangan.show', $ruangan->id) }}"
-                        class="text-gray-600 hover:text-gray-800 transition flex items-center space-x-1">
-                        <i class="fas fa-arrow-left mr-1"></i>
-                        <span>Kembali ke Ruangan</span>
-                    </a>
                 </div>
 
                 <!-- Form -->
@@ -71,332 +121,367 @@
                     enctype="multipart/form-data" id="formTambahBarang">
                     @csrf
 
-                    <!-- Informasi Ruangan (Readonly) -->
-                    <div class="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                        <h3 class="text-lg font-semibold text-blue-800 mb-2">
-                            <i class="fas fa-map-marker-alt mr-2"></i>Informasi Ruangan
-                        </h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-blue-700 mb-1">Nama Ruangan</label>
-                                <input type="text" value="{{ $ruangan->nama_ruangan }}"
-                                    class="w-full bg-blue-100 border border-blue-300 rounded px-3 py-2" readonly>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-blue-700 mb-1">Lokasi</label>
-                                <input type="text"
-                                    value="{{ $ruangan->prodi ? $ruangan->prodi->nama_prodi . ' - ' . $ruangan->prodi->fakultas->nama_fakultas : 'Unit Umum' }}"
-                                    class="w-full bg-blue-100 border border-blue-300 rounded px-3 py-2" readonly>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="form-body">
+                        <!-- Informasi Ruangan -->
+                        <div class="mb-6 sm:mb-8">
+                            <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+                                <i class="fas fa-map-marker-alt mr-2 text-blue-500"></i>
+                                Informasi Ruangan
+                            </h3>
 
-                    <!-- Data Barang -->
-                    <div class="mb-6 p-4 bg-green-50 rounded-lg border border-green-200">
-                        <h3 class="text-lg font-semibold text-green-800 mb-4">
-                            <i class="fas fa-box mr-2"></i>Data Barang
-                        </h3>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <!-- Nama Barang -->
-                            <div>
-                                <label class="block font-medium mb-1 text-gray-700">
-                                    <i class="fas fa-tag mr-1 text-blue-500"></i>Nama Barang <span
-                                        class="text-red-500">*</span>
-                                </label>
-                                <input type="text" name="nama_barang" value="{{ old('nama_barang') }}"
-                                    class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-                                    placeholder="Contoh: Meja Kantor, Kursi Plastik, PC Desktop" required>
-                                @error('nama_barang')
-                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                                @enderror
+                            <div class="info-box">
+                                <div class="flex items-start">
+                                    <i class="fas fa-info-circle text-blue-500 mt-0.5 mr-3 text-sm"></i>
+                                    <div>
+                                        <h4 class="font-medium text-blue-800 mb-1 text-sm sm:text-base">Informasi Lokasi
+                                        </h4>
+                                        <p class="text-blue-700 text-xs sm:text-sm">
+                                            • Barang akan ditambahkan ke ruangan:
+                                            <strong>{{ $ruangan->nama_ruangan }}</strong><br>
+                                            • Lokasi:
+                                            <strong>{{ $ruangan->prodi ? $ruangan->prodi->nama_prodi . ' - ' . $ruangan->prodi->fakultas->nama_fakultas : 'Unit Umum' }}</strong><br>
+                                            • Field bertanda <span class="text-red-500">*</span> wajib diisi
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
 
-                            <!-- Kategori Barang -->
-                            <div>
-                                <label class="block font-medium mb-1 text-gray-700">
-                                    <i class="fas fa-list mr-1 text-blue-500"></i>Kategori Barang <span
-                                        class="text-red-500">*</span>
-                                </label>
-                                <select name="kategori_barang"
-                                    class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-                                    required>
-                                    <option value="">-- Pilih Kategori Barang --</option>
-                                    <option value="PERABOTAN & FURNITURE"
-                                        {{ old('kategori_barang') == 'PERABOTAN & FURNITURE' ? 'selected' : '' }}>
-                                        PERABOTAN & FURNITURE (Meja, Kursi, Lemari, Rak, Sofa, dll)
-                                    </option>
-                                    <option value="ELEKTRONIK & TEKNOLOGI"
-                                        {{ old('kategori_barang') == 'ELEKTRONIK & TEKNOLOGI' ? 'selected' : '' }}>
-                                        ELEKTRONIK & TEKNOLOGI (Komputer, Laptop, Printer, Proyektor, AC, TV, Lampu,
-                                        dll)
-                                    </option>
-                                    <option value="PERALATAN LABORATORIUM"
-                                        {{ old('kategori_barang') == 'PERALATAN LABORATORIUM' ? 'selected' : '' }}>
-                                        PERALATAN LABORATORIUM (Mikroskop, Alat Kimia, Alat Biologi, Alat Fisika, dll)
-                                    </option>
-                                    <option value="PERALATAN KANTOR"
-                                        {{ old('kategori_barang') == 'PERALATAN KANTOR' ? 'selected' : '' }}>
-                                        PERALATAN KANTOR (Mesin Ketik, Mesin Fax, Mesin Fotocopy, Stapler, Calculator,
-                                        dll)
-                                    </option>
-                                    <option value="ALAT KOMUNIKASI"
-                                        {{ old('kategori_barang') == 'ALAT KOMUNIKASI' ? 'selected' : '' }}>
-                                        ALAT KOMUNIKASI (Telepon, Handy Talky, Pager, dll)
-                                    </option>
-                                    <option value="LAINNYA"
-                                        {{ old('kategori_barang') == 'LAINNYA' ? 'selected' : '' }}>
-                                        LAINNYA (Barang tidak termasuk kategori di atas)
-                                    </option>
-                                </select>
-                                @error('kategori_barang')
-                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                                @enderror
+                            <div
+                                class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                                <div>
+                                    <label class="block text-sm font-medium text-blue-700 mb-1">Nama Ruangan</label>
+                                    <input type="text" value="{{ $ruangan->nama_ruangan }}"
+                                        class="w-full bg-blue-100 border border-blue-300 rounded-lg px-3 py-2 text-sm"
+                                        readonly>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-blue-700 mb-1">Lokasi</label>
+                                    <input type="text"
+                                        value="{{ $ruangan->prodi ? $ruangan->prodi->nama_prodi . ' - ' . $ruangan->prodi->fakultas->nama_fakultas : 'Unit Umum' }}"
+                                        class="w-full bg-blue-100 border border-blue-300 rounded-lg px-3 py-2 text-sm"
+                                        readonly>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <!-- Merk Barang -->
-                            <div>
-                                <label class="block font-medium mb-1 text-gray-700">
-                                    <i class="fas fa-barcode mr-1 text-blue-500"></i>Merk Barang
-                                </label>
-                                <input type="text" name="merk_barang" value="{{ old('merk_barang') }}"
-                                    class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-                                    placeholder="Contoh: Samsung, IKEA, Local Brand">
-                                @error('merk_barang')
-                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                                @enderror
-                            </div>
+                        <!-- Data Barang -->
+                        <div class="mb-6 sm:mb-8">
+                            <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+                                <i class="fas fa-info-circle mr-2 text-blue-500"></i>
+                                Informasi Barang
+                            </h3>
 
-                            <!-- Harga Barang -->
-                            <div>
-                                <label class="block font-medium mb-1 text-gray-700">
-                                    <i class="fas fa-money-bill-wave mr-1 text-blue-500"></i>Harga Barang (Rp)
-                                </label>
-                                <input type="number" name="harga" value="{{ old('harga') }}"
-                                    class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-                                    placeholder="0" min="0" step="0.01">
-                                @error('harga')
-                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                                @enderror
+                            <div class="space-y-4 sm:space-y-6">
+                                <!-- Nama Barang & Kategori -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Nama Barang <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text" name="nama_barang" value="{{ old('nama_barang') }}"
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                            placeholder="Contoh: Meja Kantor, Kursi Plastik, PC Desktop" required>
+                                        @error('nama_barang')
+                                            <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Kategori Barang <span class="text-red-500">*</span>
+                                        </label>
+                                        <select name="kategori_barang"
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                            required>
+                                            <option value="">-- Pilih Kategori Barang --</option>
+                                            <option value="PERABOTAN & FURNITURE"
+                                                {{ old('kategori_barang') == 'PERABOTAN & FURNITURE' ? 'selected' : '' }}>
+                                                PERABOTAN & FURNITURE
+                                            </option>
+                                            <option value="ELEKTRONIK & TEKNOLOGI"
+                                                {{ old('kategori_barang') == 'ELEKTRONIK & TEKNOLOGI' ? 'selected' : '' }}>
+                                                ELEKTRONIK & TEKNOLOGI
+                                            </option>
+                                            <option value="PERALATAN LABORATORIUM"
+                                                {{ old('kategori_barang') == 'PERALATAN LABORATORIUM' ? 'selected' : '' }}>
+                                                PERALATAN LABORATORIUM
+                                            </option>
+                                            <option value="PERALATAN KANTOR"
+                                                {{ old('kategori_barang') == 'PERALATAN KANTOR' ? 'selected' : '' }}>
+                                                PERALATAN KANTOR
+                                            </option>
+                                            <option value="ALAT KOMUNIKASI"
+                                                {{ old('kategori_barang') == 'ALAT KOMUNIKASI' ? 'selected' : '' }}>
+                                                ALAT KOMUNIKASI
+                                            </option>
+                                            <option value="LAINNYA"
+                                                {{ old('kategori_barang') == 'LAINNYA' ? 'selected' : '' }}>
+                                                LAINNYA
+                                            </option>
+                                        </select>
+                                        @error('kategori_barang')
+                                            <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <!-- Merk & Harga -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Merk Barang
+                                        </label>
+                                        <input type="text" name="merk_barang" value="{{ old('merk_barang') }}"
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                            placeholder="Contoh: Samsung, IKEA, Local Brand">
+                                        @error('merk_barang')
+                                            <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Harga Barang (Rp)
+                                        </label>
+                                        <input type="number" name="harga" value="{{ old('harga') }}"
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                            placeholder="0" min="0" step="0.01">
+                                        @error('harga')
+                                            <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <!-- Jumlah, Satuan, Kondisi -->
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Jumlah <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="number" name="jumlah" value="{{ old('jumlah', 1) }}"
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                            min="1" required>
+                                        @error('jumlah')
+                                            <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Satuan <span class="text-red-500">*</span>
+                                        </label>
+                                        <select name="satuan"
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                            required>
+                                            <option value="">-- Pilih Satuan --</option>
+                                            <option value="unit" {{ old('satuan') == 'unit' ? 'selected' : '' }}>Unit
+                                            </option>
+                                            <option value="buah" {{ old('satuan') == 'buah' ? 'selected' : '' }}>Buah
+                                            </option>
+                                            <option value="set" {{ old('satuan') == 'set' ? 'selected' : '' }}>Set
+                                            </option>
+                                            <option value="lusin" {{ old('satuan') == 'lusin' ? 'selected' : '' }}>
+                                                Lusin</option>
+                                            <option value="paket" {{ old('satuan') == 'paket' ? 'selected' : '' }}>
+                                                Paket</option>
+                                        </select>
+                                        @error('satuan')
+                                            <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Kondisi <span class="text-red-500">*</span>
+                                        </label>
+                                        <select name="kondisi"
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                            required>
+                                            <option value="">-- Pilih Kondisi --</option>
+                                            <option value="Baik Sekali"
+                                                {{ old('kondisi') == 'Baik Sekali' ? 'selected' : '' }}>Baik Sekali
+                                            </option>
+                                            <option value="Baik" {{ old('kondisi') == 'Baik' ? 'selected' : '' }}>
+                                                Baik</option>
+                                            <option value="Cukup" {{ old('kondisi') == 'Cukup' ? 'selected' : '' }}>
+                                                Cukup</option>
+                                            <option value="Rusak Ringan"
+                                                {{ old('kondisi') == 'Rusak Ringan' ? 'selected' : '' }}>Rusak Ringan
+                                            </option>
+                                            <option value="Rusak Berat"
+                                                {{ old('kondisi') == 'Rusak Berat' ? 'selected' : '' }}>Rusak Berat
+                                            </option>
+                                        </select>
+                                        @error('kondisi')
+                                            <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <!-- Tanggal & Tahun Pengadaan -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Tanggal Pengadaan
+                                        </label>
+                                        <input type="date" name="tanggal_pengadaan"
+                                            value="{{ old('tanggal_pengadaan') }}"
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                                        @error('tanggal_pengadaan')
+                                            <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Tahun Pengadaan
+                                        </label>
+                                        <input type="text" name="tahun" value="{{ old('tahun') }}"
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                            placeholder="Contoh: 2024" maxlength="4">
+                                        @error('tahun')
+                                            <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <!-- Sumber Barang -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Sumber Barang <span class="text-red-500">*</span>
+                                    </label>
+                                    <select name="sumber"
+                                        class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                        required>
+                                        <option value="">-- Pilih Sumber --</option>
+                                        <option value="HIBAH" {{ old('sumber') == 'HIBAH' ? 'selected' : '' }}>HIBAH
+                                        </option>
+                                        <option value="LEMBAGA" {{ old('sumber') == 'LEMBAGA' ? 'selected' : '' }}>
+                                            LEMBAGA</option>
+                                        <option value="YAYASAN" {{ old('sumber') == 'YAYASAN' ? 'selected' : '' }}>
+                                            YAYASAN</option>
+                                    </select>
+                                    @error('sumber')
+                                        <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <!-- Spesifikasi -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Spesifikasi Barang <span class="text-red-500">*</span>
+                                    </label>
+                                    <textarea name="spesifikasi" rows="3"
+                                        class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition resize-none"
+                                        placeholder="Deskripsikan spesifikasi barang..." required>{{ old('spesifikasi') }}</textarea>
+                                    @error('spesifikasi')
+                                        <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <!-- Kode Seri & Lokasi Lain -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Kode / Seri Barang <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text" name="kode_seri" value="{{ old('kode_seri') }}"
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                            placeholder="Contoh: PC-001, FURN-2024" required>
+                                        @error('kode_seri')
+                                            <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Lokasi Lain (Opsional)
+                                        </label>
+                                        <input type="text" name="lokasi_lain" value="{{ old('lokasi_lain') }}"
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                            placeholder="Misal: Gedung C Lantai 2">
+                                        @error('lokasi_lain')
+                                            <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <!-- File Dokumen -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        File Dokumen
+                                    </label>
+                                    <input type="file" name="file_dokumen" id="file_dokumen"
+                                        class="w-full rounded-md border border-gray-300 bg-white text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-blue-600 file:text-white file:text-sm file:font-medium"
+                                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                                    <p class="text-gray-500 text-xs mt-1">
+                                        Format: <b>PDF, DOC, DOCX, JPG, PNG</b> | Maksimal <b>2MB</b>
+                                    </p>
+                                    @error('file_dokumen')
+                                        <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <!-- Keterangan -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Keterangan (Opsional)
+                                    </label>
+                                    <textarea name="keterangan" rows="2"
+                                        class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition resize-none"
+                                        placeholder="Tambahkan keterangan tambahan...">{{ old('keterangan') }}</textarea>
+                                    @error('keterangan')
+                                        <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                            <!-- Jumlah -->
-                            <div>
-                                <label class="block font-medium mb-1 text-gray-700">
-                                    <i class="fas fa-calculator mr-1 text-blue-500"></i>Jumlah <span
-                                        class="text-red-500">*</span>
-                                </label>
-                                <input type="number" name="jumlah" value="{{ old('jumlah', 1) }}"
-                                    class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-                                    min="1" required>
-                                @error('jumlah')
-                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                                @enderror
-                            </div>
+                        <!-- Informasi Tambahan -->
+                        <div class="mb-6 sm:mb-8">
+                            <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+                                <i class="fas fa-cogs mr-2 text-green-500"></i>
+                                Informasi Tambahan
+                            </h3>
 
-                            <!-- Satuan -->
-                            <div>
-                                <label class="block font-medium mb-1 text-gray-700">
-                                    <i class="fas fa-balance-scale mr-1 text-blue-500"></i>Satuan <span
-                                        class="text-red-500">*</span>
-                                </label>
-                                <select name="satuan"
-                                    class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-                                    required>
-                                    <option value="">-- Pilih Satuan --</option>
-                                    <option value="unit" {{ old('satuan') == 'unit' ? 'selected' : '' }}>Unit
-                                    </option>
-                                    <option value="buah" {{ old('satuan') == 'buah' ? 'selected' : '' }}>Buah
-                                    </option>
-                                    <option value="set" {{ old('satuan') == 'set' ? 'selected' : '' }}>Set</option>
-                                    <option value="lusin" {{ old('satuan') == 'lusin' ? 'selected' : '' }}>Lusin
-                                    </option>
-                                    <option value="paket" {{ old('satuan') == 'paket' ? 'selected' : '' }}>Paket
-                                    </option>
-                                </select>
-                                @error('satuan')
-                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <!-- Kondisi -->
-                            <div>
-                                <label class="block font-medium mb-1 text-gray-700">
-                                    <i class="fas fa-heartbeat mr-1 text-blue-500"></i>Kondisi <span
-                                        class="text-red-500">*</span>
-                                </label>
-                                <select name="kondisi"
-                                    class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-                                    required>
-                                    <option value="">-- Pilih Kondisi --</option>
-                                    <option value="Baik Sekali"
-                                        {{ old('kondisi') == 'Baik Sekali' ? 'selected' : '' }}>Baik Sekali</option>
-                                    <option value="Baik" {{ old('kondisi') == 'Baik' ? 'selected' : '' }}>Baik
-                                    </option>
-                                    <option value="Cukup" {{ old('kondisi') == 'Cukup' ? 'selected' : '' }}>Cukup
-                                    </option>
-                                    <option value="Rusak Ringan"
-                                        {{ old('kondisi') == 'Rusak Ringan' ? 'selected' : '' }}>Rusak Ringan</option>
-                                    <option value="Rusak Berat"
-                                        {{ old('kondisi') == 'Rusak Berat' ? 'selected' : '' }}>Rusak Berat</option>
-                                </select>
-                                @error('kondisi')
-                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                                @enderror
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-calendar text-blue-500 mr-2 text-sm"></i>
+                                        <span class="text-gray-600">Dibuat pada:</span>
+                                        <span class="ml-2 font-medium">{{ now()->format('d/m/Y') }}</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-database text-green-500 mr-2 text-sm"></i>
+                                        <span class="text-gray-600">Status:</span>
+                                        <span class="ml-2 font-medium text-green-600">Aktif</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <!-- Tanggal Pengadaan -->
-                            <div>
-                                <label class="block font-medium mb-1 text-gray-700">
-                                    <i class="fas fa-calendar-alt mr-1 text-blue-500"></i>Tanggal Pengadaan
-                                    <!-- HAPUS tanda bintang merah -->
-                                </label>
-                                <input type="date" name="tanggal_pengadaan"
-                                    value="{{ old('tanggal_pengadaan') }}"
-                                    class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
-                                <!-- HAPUS: required -->
-                                @error('tanggal_pengadaan')
-                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <div>
-                                <label class="block font-medium mb-1 text-gray-700">
-                                    <i class="fas fa-calendar mr-1 text-blue-500"></i>Tahun Pengadaan
-                                </label>
-                                <input type="text" name="tahun" value="{{ old('tahun') }}"
-                                    class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-                                    placeholder="Contoh: 2024" maxlength="4">
-                                @error('tahun')
-                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <!-- Sumber -->
-                            <div>
-                                <label class="block font-medium mb-1 text-gray-700">
-                                    <i class="fas fa-gift mr-1 text-blue-500"></i>Sumber Barang <span
-                                        class="text-red-500">*</span>
-                                </label>
-                                <select name="sumber"
-                                    class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-                                    required>
-                                    <option value="">-- Pilih Sumber --</option>
-                                    <option value="HIBAH" {{ old('sumber') == 'HIBAH' ? 'selected' : '' }}>HIBAH
-                                    </option>
-                                    <option value="LEMBAGA" {{ old('sumber') == 'LEMBAGA' ? 'selected' : '' }}>LEMBAGA
-                                    </option>
-                                    <option value="YAYASAN" {{ old('sumber') == 'YAYASAN' ? 'selected' : '' }}>YAYASAN
-                                    </option>
-                                </select>
-                                @error('sumber')
-                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                                @enderror
-                            </div>
+                        <!-- Tombol -->
+                        <div class="flex flex-col sm:flex-row justify-end gap-3 pt-4 sm:pt-6 border-t">
+                            <a href="{{ route('ruangan.import-barang-form', $ruangan->id) }}"
+                                class="btn-success flex items-center justify-center order-2 sm:order-1 px-4 py-2 text-sm sm:text-base">
+                                <i class="fas fa-file-import mr-2"></i>
+                                Import Barang Massal
+                            </a>
+                            <a href="{{ route('ruangan.index') }}"
+                                class="btn-secondary text-center order-2 sm:order-1">
+                                Batal
+                            </a>
+                            <button type="submit" name="add_another" value="1"
+                                class="btn-warning flex items-center justify-center order-1 sm:order-3 px-4 py-2 text-sm sm:text-base">
+                                <i class="fas fa-plus-circle mr-2"></i>
+                                Simpan & Tambah Lagi
+                            </button>
+                            <button type="submit"
+                                class="btn-primary flex items-center justify-center order-4 px-4 py-2 text-sm sm:text-base">
+                                <i class="fas fa-save mr-2"></i>
+                                Simpan Barang
+                            </button>
                         </div>
-
-                        <!-- Spesifikasi -->
-                        <div class="mb-4">
-                            <label class="block font-medium mb-1 text-gray-700">
-                                <i class="fas fa-info-circle mr-1 text-blue-500"></i>Spesifikasi Barang <span
-                                    class="text-red-500">*</span>
-                            </label>
-                            <textarea name="spesifikasi" rows="3"
-                                class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-                                placeholder="Deskripsikan spesifikasi barang..." required>{{ old('spesifikasi') }}</textarea>
-                            @error('spesifikasi')
-                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <!-- Kode Seri -->
-                            <div>
-                                <label class="block font-medium mb-1 text-gray-700">
-                                    <i class="fas fa-hashtag mr-1 text-blue-500"></i>Kode / Seri Barang <span
-                                        class="text-red-500">*</span>
-                                </label>
-                                <input type="text" name="kode_seri" value="{{ old('kode_seri') }}"
-                                    class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-                                    placeholder="Contoh: PC-001, FURN-2024" required>
-                                @error('kode_seri')
-                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <!-- Lokasi Lain -->
-                            <div>
-                                <label class="block font-medium mb-1 text-gray-700">
-                                    <i class="fas fa-map-marker-alt mr-1 text-blue-500"></i>Lokasi Lain (Opsional)
-                                </label>
-                                <input type="text" name="lokasi_lain" value="{{ old('lokasi_lain') }}"
-                                    class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-                                    placeholder="Misal: Gedung C Lantai 2">
-                                @error('lokasi_lain')
-                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <!-- File Dokumen -->
-                        <div class="mb-4">
-                            <label class="block font-medium mb-1 text-gray-700">
-                                <i class="fas fa-file-upload mr-1 text-blue-500"></i>File Dokumen
-                            </label>
-                            <input type="file" name="file_dokumen" id="file_dokumen"
-                                class="flex w-full rounded-md border border-blue-300 bg-white text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-blue-600 file:text-white file:text-sm file:font-medium"
-                                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
-                            <p class="text-gray-500 text-xs mt-1">
-                                Format: PDF, DOC, DOCX, JPG, JPEG, PNG | Maksimal: 2MB
-                            </p>
-                            @error('file_dokumen')
-                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <!-- Keterangan -->
-                        <div class="mb-4">
-                            <label class="block font-medium mb-1 text-gray-700">
-                                <i class="fas fa-sticky-note mr-1 text-blue-500"></i>Keterangan (Opsional)
-                            </label>
-                            <textarea name="keterangan" rows="2"
-                                class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-                                placeholder="Tambahkan keterangan tambahan...">{{ old('keterangan') }}</textarea>
-                            @error('keterangan')
-                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-                    </div>
-
-
-                    <!-- Tambahkan di bagian tombol form -->
-                    <div class="flex flex-col sm:flex-row justify-end gap-2 pt-4 border-t">
-                        <!-- Tombol Import -->
-                        <a href="{{ route('ruangan.import-barang-form', $ruangan->id) }}"
-                            class="btn-success px-6 py-2 transition flex items-center justify-center order-1 sm:order-1 mb-2 sm:mb-0">
-                            <i class="fas fa-file-import mr-2"></i>Import Barang Massal
-                        </a>
-
-                        <a href="{{ route('ruangan.show', $ruangan->id) }}"
-                            class="btn-secondary px-6 py-2 text-center transition order-3 sm:order-2">
-                            <i class="fas fa-times mr-2"></i>Batal
-                        </a>
-
-                        <button type="submit" name="add_another" value="1"
-                            class="btn-warning px-6 py-2 transition flex items-center justify-center order-2 sm:order-3 mb-2 sm:mb-0">
-                            <i class="fas fa-plus-circle mr-2"></i>Simpan & Tambah Lagi
-                        </button>
-
-                        <button type="submit"
-                            class="btn-primary px-6 py-2 transition flex items-center justify-center order-4">
-                            <i class="fas fa-save mr-2"></i>Simpan Barang
-                        </button>
                     </div>
                 </form>
             </div>
@@ -405,8 +490,24 @@
 
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // NOTIFIKASI ERROR VALIDATION
+            @if ($errors->any())
+                let errorMessage = '';
+                @foreach ($errors->all() as $error)
+                    errorMessage += `• {{ $error }}\n`;
+                @endforeach
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Terjadi Kesalahan!',
+                    text: errorMessage,
+                    confirmButtonColor: '#3b82f6'
+                });
+            @endif
+
             // Validasi file upload
             const fileInput = document.getElementById('file_dokumen');
             if (fileInput) {
@@ -419,100 +520,87 @@
                                 icon: 'error',
                                 title: 'File Terlalu Besar',
                                 text: 'Ukuran file maksimal 2MB. File Anda: ' + (file.size / (1024 *
-                                    1024)).toFixed(2) + 'MB'
+                                    1024)).toFixed(2) + 'MB',
+                                confirmButtonColor: '#3b82f6'
                             });
                             this.value = '';
                             return;
                         }
 
                         // Validate file type
-                        const allowedTypes = ['application/pdf', 'application/msword',
+                        const allowedTypes = [
+                            'application/pdf',
+                            'application/msword',
                             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                            'image/jpeg', 'image/jpg', 'image/png'
+                            'image/jpeg',
+                            'image/jpg',
+                            'image/png'
                         ];
                         if (!allowedTypes.includes(file.type)) {
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Format File Tidak Didukung',
-                                text: 'Hanya file PDF, DOC, DOCX, JPG, dan PNG yang diizinkan.'
+                                text: 'Hanya file PDF, DOC, DOCX, JPG, dan PNG yang diizinkan.',
+                                confirmButtonColor: '#3b82f6'
                             });
                             this.value = '';
                             return;
                         }
-
-                        // Show success message
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'File Valid',
-                            text: 'File siap diupload: ' + file.name,
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
                     }
                 });
             }
 
-            // NOTIFIKASI SUKSES - BAHASA INDONESIA
-            @if (session('success'))
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil!',
-                    text: "{{ session('success') }}",
-                    timer: 3000,
-                    showConfirmButton: false
-                });
-            @endif
-
-            // NOTIFIKASI ERROR - BAHASA INDONESIA
-            @if (session('error'))
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal!',
-                    text: "{{ session('error') }}",
-                    timer: 4000,
-                    showConfirmButton: true
-                });
-            @endif
-
-            // VALIDASI FORM SEBELUM SUBMIT - BAHASA INDONESIA
+            // Validasi form
             const form = document.getElementById('formTambahBarang');
             if (form) {
                 form.addEventListener('submit', function(e) {
-                    const requiredFields = form.querySelectorAll('[required]');
                     let isValid = true;
+                    const requiredFields = form.querySelectorAll('[required]');
 
+                    // Reset error styles
+                    requiredFields.forEach(field => {
+                        field.classList.remove('border-red-500', 'border-2');
+                    });
+
+                    // Check required fields
                     requiredFields.forEach(field => {
                         if (!field.value.trim()) {
                             isValid = false;
-                            field.classList.add('border-red-500');
-                        } else {
-                            field.classList.remove('border-red-500');
+                            field.classList.add('border-red-500', 'border-2');
+
+                            // Scroll to first error
+                            if (!form.querySelector('.border-red-500')) {
+                                field.scrollIntoView({
+                                    behavior: 'smooth',
+                                    block: 'center'
+                                });
+                            }
                         }
                     });
-
-                    // Validasi file size sebelum submit (double check)
-                    const fileInput = document.getElementById('file_dokumen');
-                    if (fileInput && fileInput.files.length > 0) {
-                        const file = fileInput.files[0];
-                        if (file.size > 2 * 1024 * 1024) {
-                            isValid = false;
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'File Terlalu Besar',
-                                text: 'Ukuran file maksimal 2MB. File Anda: ' + (file.size / (1024 *
-                                    1024)).toFixed(2) + 'MB'
-                            });
-                        }
-                    }
 
                     if (!isValid) {
                         e.preventDefault();
                         Swal.fire({
                             icon: 'warning',
                             title: 'Data Belum Lengkap',
-                            text: 'Harap isi semua field yang wajib diisi dan pastikan file tidak melebihi 2MB!',
+                            text: 'Harap isi semua field yang wajib diisi!',
                             confirmButtonColor: '#3b82f6'
                         });
+                        return;
+                    }
+
+                    // Show loading indicator
+                    const submitButton = e.submitter;
+                    if (submitButton) {
+                        const originalText = submitButton.innerHTML;
+                        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Menyimpan...';
+                        submitButton.disabled = true;
+
+                        // Re-enable button after 5 seconds (safety measure)
+                        setTimeout(() => {
+                            submitButton.innerHTML = originalText;
+                            submitButton.disabled = false;
+                        }, 5000);
                     }
                 });
             }

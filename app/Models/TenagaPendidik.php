@@ -36,8 +36,8 @@ class TenagaPendidik extends Model
         'file_transkrip_s1',
         'file_ijazah_s2',
         'file_transkrip_s2',
-        'file_ijazah_s3',
-        'file_transkrip_s3',
+        'file_ijazah_s3', // ✅ DITAMBAHKAN
+        'file_transkrip_s3', // ✅ DITAMBAHKAN
         'file_kk',
         'file_perjanjian_kerja',
         'file_sk',
@@ -50,13 +50,11 @@ class TenagaPendidik extends Model
         'golongan_history' => 'array',
     ];
 
-    // Relasi ke tabel prodi - TETAP tapi nullable
     public function prodi()
     {
         return $this->belongsTo(Prodi::class, 'id_prodi', 'id');
     }
 
-    // Nama lengkap dengan gelar
     public function getNamaLengkapAttribute(): string
     {
         $nama = [];
@@ -66,7 +64,6 @@ class TenagaPendidik extends Model
         return implode(' ', $nama);
     }
 
-    // DAFTAR JABATAN STRUKTURAL SESUAI STRUKTUR ORGANISASI
     public static function getJabatanStrukturalOptions(): array
     {
         return [
@@ -109,7 +106,6 @@ class TenagaPendidik extends Model
         ];
     }
 
-    // PERBAIKAN: Fix type hinting untuk golongan array
     public function getGolonganArrayAttribute(): array
     {
         if (empty($this->golongan_history)) {
@@ -124,7 +120,6 @@ class TenagaPendidik extends Model
         return is_array($decoded) ? $decoded : [];
     }
 
-    // Golongan terakhir
     public function getGolonganTerakhirAttribute(): string
     {
         $history = $this->golongan_array;
@@ -136,7 +131,6 @@ class TenagaPendidik extends Model
         return ($last['golongan'] ?? '-') . ' (' . ($last['tahun'] ?? '-') . ')';
     }
 
-    // Tempat & Tanggal Lahir
     public function getTempatTanggalLahirAttribute(): string
     {
         if ($this->tempat_lahir && $this->tanggal_lahir) {
@@ -145,13 +139,11 @@ class TenagaPendidik extends Model
         return $this->tempat_lahir ?? '-';
     }
 
-    // Status label (untuk status_kepegawaian)
     public function getStatusKepegawaianLabelAttribute(): string
     {
         return $this->status_kepegawaian ?? '-';
     }
 
-    // Jenis kelamin label
     public function getJenisKelaminLabelAttribute(): string
     {
         return $this->jenis_kelamin ? ucfirst($this->jenis_kelamin) : '-';

@@ -13,12 +13,12 @@ class Ruangan extends Model
     
     protected $fillable = [
         'id_prodi',
-        'tipe_ruangan',  // sekarang: sarana/prasarana
-        'unit_prasarana', // renamed dari unit_umum
+        'tipe_ruangan',
+        'unit_prasarana',
+        'kapasitas', // ✅ DITAMBAHKAN
+        'fasilitas', // ✅ DITAMBAHKAN
         'nama_ruangan', 
         'kondisi_ruangan',
-        'kapasitas',
-        'fasilitas'
     ];
 
     protected $casts = [
@@ -45,13 +45,11 @@ class Ruangan extends Model
         return $this->hasMany(DataSarpras::class, 'ruangan_id');
     }
 
-    // TAMBAHKAN INI - Relasi barang sebagai alias untuk sarpras
     public function barang()
     {
         return $this->hasMany(DataSarpras::class, 'ruangan_id');
     }
 
-    // Scope untuk filter tipe ruangan
     public function scopeSarana($query)
     {
         return $query->where('tipe_ruangan', 'sarana');

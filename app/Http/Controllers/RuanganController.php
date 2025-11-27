@@ -17,55 +17,51 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class RuanganController extends Controller
 {
-   public function index(Request $request)
-{
-    if (!Auth::user()->hasPermission('ruangan')) {
-        abort(403, 'Unauthorized action.');
+    public function index(Request $request)
+    {
+        if (!Auth::user()->hasPermission('ruangan')) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $query = Ruangan::with(['prodi.fakultas', 'sarpras'])->oldest();
+
+        // UNIFIED SEARCH - mencari di semua field
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                // Pencarian di tabel ruangan
+                $q->where('nama_ruangan', 'like', "%{$search}%")
+                    ->orWhere('kondisi_ruangan', 'like', "%{$search}%")
+                    ->orWhere('unit_prasarana', 'like', "%{$search}%")
+                    ->orWhereHas('prodi', function ($q) use ($search) {
+                        $q->where('nama_prodi', 'like', "%{$search}%")
+                            ->orWhereHas('fakultas', function ($q) use ($search) {
+                                $q->where('nama_fakultas', 'like', "%{$search}%");
+                            });
+                    })
+                    // Pencarian di tabel barang (sarpras)
+                    ->orWhereHas('sarpras', function ($q) use ($search) {
+                        $q->where('nama_barang', 'like', "%{$search}%")
+                            ->orWhere('kondisi', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        // Filter lainnya
+        if ($request->filled('tipe_ruangan')) {
+            $query->where('tipe_ruangan', $request->tipe_ruangan);
+        }
+
+        if ($request->filled('kondisi')) {
+            $query->where('kondisi_ruangan', $request->kondisi);
+        }
+
+        $ruangan = $query->paginate(15);
+        $fakultas = Fakultas::all();
+        $prodi = Prodi::with('fakultas')->get();
+
+        return view('page.ruangan.index', compact('ruangan', 'fakultas', 'prodi'));
     }
-
-    $query = Ruangan::with(['prodi.fakultas', 'barang'])->latest(); // GANTI sarpras MENJADI barang
-
-    // Search functionality untuk ruangan
-    if ($request->filled('search')) {
-        $search = $request->search;
-        $query->where(function ($q) use ($search) {
-            $q->where('nama_ruangan', 'like', "%{$search}%")
-                ->orWhereHas('prodi', function ($q) use ($search) {
-                    $q->where('nama_prodi', 'like', "%{$search}%")
-                        ->orWhereHas('fakultas', function ($q) use ($search) {
-                            $q->where('nama_fakultas', 'like', "%{$search}%");
-                        });
-                });
-        });
-    }
-
-    // Pencarian barang - PASTIKAN PAKAI 'barang'
-    if ($request->filled('search_barang')) {
-        $searchBarang = $request->search_barang;
-        $query->whereHas('barang', function ($q) use ($searchBarang) {
-            $q->where('nama_barang', 'like', "%{$searchBarang}%");
-        });
-    }
-
-    // Filter lainnya...
-    if ($request->filled('tipe_ruangan')) {
-        $query->where('tipe_ruangan', $request->tipe_ruangan);
-    }
-
-    if ($request->filled('kondisi')) {
-        $query->where('kondisi_ruangan', $request->kondisi);
-    }
-
-    if ($request->filled('prodi')) {
-        $query->where('id_prodi', $request->prodi);
-    }
-
-    $ruangan = $query->paginate(15);
-    $fakultas = Fakultas::all();
-    $prodi = Prodi::with('fakultas')->get();
-
-    return view('page.ruangan.index', compact('ruangan', 'fakultas', 'prodi'));
-}
 
     public function create()
     {
@@ -114,15 +110,18 @@ class RuanganController extends Controller
                 'id_fakultas' => 'required|exists:fakultas,id',
                 'id_prodi' => 'required|exists:prodi,id',
                 'nama_ruangan' => 'required|string|max:255|unique:ruangan,nama_ruangan',
-                'file_dokumen' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048', // TAMBAHKAN INI
+                'kondisi_ruangan' => 'required|in:Baik,Rusak Ringan,Rusak Berat', // TAMBAH VALIDASI
+                'file_dokumen' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048',
             ], [
+                'kondisi_ruangan.required' => 'Kondisi ruangan harus dipilih.',
+                'kondisi_ruangan.in' => 'Kondisi ruangan tidak valid.',
                 'file_dokumen.max' => 'Ukuran file tidak boleh lebih dari 2MB.',
                 'file_dokumen.mimes' => 'Format file harus PDF, DOC, DOCX, JPG, atau PNG.',
             ]);
 
             $data = [
                 'nama_ruangan' => $request->nama_ruangan,
-                'kondisi_ruangan' => 'Baik',
+                'kondisi_ruangan' => $request->kondisi_ruangan, // AMBIL DARI INPUT
                 'tipe_ruangan' => 'sarana',
                 'id_prodi' => $request->id_prodi,
                 'unit_prasarana' => null,
@@ -132,8 +131,11 @@ class RuanganController extends Controller
                 'tipe_ruangan' => 'required|in:prasarana',
                 'unit_prasarana' => 'required|string|max:255',
                 'nama_ruangan' => 'required|string|max:255|unique:ruangan,nama_ruangan',
-                'file_dokumen' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048', // TAMBAHKAN INI
+                'kondisi_ruangan' => 'required|in:Baik,Rusak Ringan,Rusak Berat', // TAMBAH VALIDASI
+                'file_dokumen' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048',
             ], [
+                'kondisi_ruangan.required' => 'Kondisi ruangan harus dipilih.',
+                'kondisi_ruangan.in' => 'Kondisi ruangan tidak valid.',
                 'file_dokumen.max' => 'Ukuran file tidak boleh lebih dari 2MB.',
                 'file_dokumen.mimes' => 'Format file harus PDF, DOC, DOCX, JPG, atau PNG.',
             ]);
@@ -146,7 +148,7 @@ class RuanganController extends Controller
 
             $data = [
                 'nama_ruangan' => $request->nama_ruangan,
-                'kondisi_ruangan' => 'Baik',
+                'kondisi_ruangan' => $request->kondisi_ruangan, // AMBIL DARI INPUT
                 'tipe_ruangan' => 'prasarana',
                 'id_prodi' => null,
                 'unit_prasarana' => $unitPrasarana,
@@ -187,9 +189,11 @@ class RuanganController extends Controller
             $request->validate([
                 'nama_ruangan' => 'required|string|max:255|unique:ruangan,nama_ruangan,' . $ruangan->id,
                 'id_prodi' => 'required|exists:prodi,id',
-                'kondisi_ruangan' => 'required|string|max:255',
-                'file_dokumen' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048', // TAMBAHKAN INI
+                'kondisi_ruangan' => 'required|in:Baik,Rusak Ringan,Rusak Berat', // VALIDASI KONDISI
+                'file_dokumen' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048',
             ], [
+                'kondisi_ruangan.required' => 'Kondisi ruangan harus dipilih.',
+                'kondisi_ruangan.in' => 'Kondisi ruangan tidak valid.',
                 'file_dokumen.max' => 'Ukuran file tidak boleh lebih dari 2MB.',
                 'file_dokumen.mimes' => 'Format file harus PDF, DOC, DOCX, JPG, atau PNG.',
             ]);
@@ -197,9 +201,11 @@ class RuanganController extends Controller
             $request->validate([
                 'nama_ruangan' => 'required|string|max:255|unique:ruangan,nama_ruangan,' . $ruangan->id,
                 'unit_prasarana' => 'required|string|max:255',
-                'kondisi_ruangan' => 'required|string|max:255',
-                'file_dokumen' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048', // TAMBAHKAN INI
+                'kondisi_ruangan' => 'required|in:Baik,Rusak Ringan,Rusak Berat', // VALIDASI KONDISI
+                'file_dokumen' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048',
             ], [
+                'kondisi_ruangan.required' => 'Kondisi ruangan harus dipilih.',
+                'kondisi_ruangan.in' => 'Kondisi ruangan tidak valid.',
                 'file_dokumen.max' => 'Ukuran file tidak boleh lebih dari 2MB.',
                 'file_dokumen.mimes' => 'Format file harus PDF, DOC, DOCX, JPG, atau PNG.',
             ]);
@@ -209,7 +215,7 @@ class RuanganController extends Controller
             // Update data dasar
             $updateData = [
                 'nama_ruangan' => $request->nama_ruangan,
-                'kondisi_ruangan' => $request->kondisi_ruangan,
+                'kondisi_ruangan' => $request->kondisi_ruangan, // AMBIL DARI INPUT
             ];
 
             // Update field berdasarkan tipe ruangan
@@ -500,6 +506,37 @@ class RuanganController extends Controller
         return $pdf->download('laporan-ruangan-' . $ruangan->nama_ruangan . '.pdf');
     }
 
+    // Tambahkan method ini di RuanganController
+    public function downloadAllPdf()
+    {
+        if (!Auth::user()->hasPermission('ruangan')) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Ambil semua ruangan dengan barangnya
+        $ruangan = Ruangan::with(['prodi.fakultas', 'sarpras'])
+            ->orderBy('tipe_ruangan')
+            ->orderBy('nama_ruangan')
+            ->get();
+
+        $data = [
+            'ruangan' => $ruangan,
+            'totalRuangan' => $ruangan->count(),
+            'totalBarang' => $ruangan->sum(function ($room) {
+                return $room->sarpras->count();
+            }),
+            'totalUnit' => $ruangan->sum(function ($room) {
+                return $room->sarpras->sum('jumlah');
+            }),
+            'totalNilai' => $ruangan->sum(function ($room) {
+                return $room->sarpras->sum('harga');
+            }),
+        ];
+
+        $pdf = PDF::loadView('page.ruangan.pdf-all', $data);
+        return $pdf->download('laporan-semua-ruangan-' . now()->format('Y-m-d') . '.pdf');
+    }
+
     public function editBarang($ruanganId, $barangId)
     {
         $ruangan = Ruangan::with(['prodi.fakultas'])->findOrFail($ruanganId);
@@ -531,7 +568,7 @@ class RuanganController extends Controller
             'lokasi_lain' => 'nullable|string|max:255',
             'spesifikasi' => 'required|string',
             'keterangan' => 'nullable|string',
-            'file_dokumen' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120',
+            'file_dokumen' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048', // UBAH: 5120 -> 2048 (2MB)
         ]);
 
         try {
@@ -554,6 +591,16 @@ class RuanganController extends Controller
 
             // HANDLE FILE UPLOAD KE PUBLIC
             if ($request->hasFile('file_dokumen')) {
+                $file = $request->file('file_dokumen');
+
+                // Validasi ukuran file tambahan
+                if ($file->getSize() > 2 * 1024 * 1024) {
+                    return redirect()->back()
+                        ->withInput()
+                        ->with('error', 'Ukuran file tidak boleh lebih dari 2MB. File Anda: ' .
+                            round($file->getSize() / (1024 * 1024), 2) . 'MB');
+                }
+
                 // Hapus file lama jika ada
                 if ($barang->file_dokumen) {
                     $oldFilePath = public_path('dokumen_sarpras/' . $barang->file_dokumen);
@@ -561,8 +608,6 @@ class RuanganController extends Controller
                         unlink($oldFilePath);
                     }
                 }
-
-                $file = $request->file('file_dokumen');
 
                 // Generate unique filename
                 $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
@@ -577,8 +622,6 @@ class RuanganController extends Controller
                 $file->move($folderPath, $fileName);
 
                 $data['file_dokumen'] = $fileName;
-
-                \Log::info("File updated: {$fileName} to public/dokumen_sarpras/");
             }
 
             $barang->update($data);
@@ -644,7 +687,7 @@ class RuanganController extends Controller
             'lokasi_lain' => 'nullable|string|max:255',
             'spesifikasi' => 'required|string',
             'keterangan' => 'nullable|string',
-            'file_dokumen' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120',
+            'file_dokumen' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048', // UBAH: 5120 -> 2048 (2MB)
         ]);
 
         try {
@@ -670,6 +713,14 @@ class RuanganController extends Controller
             if ($request->hasFile('file_dokumen')) {
                 $file = $request->file('file_dokumen');
 
+                // Validasi ukuran file tambahan
+                if ($file->getSize() > 2 * 1024 * 1024) {
+                    return redirect()->back()
+                        ->withInput()
+                        ->with('error', 'Ukuran file tidak boleh lebih dari 2MB. File Anda: ' .
+                            round($file->getSize() / (1024 * 1024), 2) . 'MB');
+                }
+
                 // Generate unique filename
                 $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
 
@@ -683,8 +734,6 @@ class RuanganController extends Controller
                 $file->move($folderPath, $fileName);
 
                 $data['file_dokumen'] = $fileName;
-
-                \Log::info("File uploaded: {$fileName} to public/dokumen_sarpras/");
             }
 
             DataSarpras::create($data);

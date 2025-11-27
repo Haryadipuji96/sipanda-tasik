@@ -42,7 +42,7 @@
         }
 
         .btn-secondary {
-            background-color: #6b7280;
+            background-color: #ff0000;
             color: white;
             padding: 0.5rem 1rem;
             border-radius: 0.375rem;
@@ -51,7 +51,7 @@
         }
 
         .btn-secondary:hover {
-            background-color: #4b5563;
+            background-color: #cc0000;
         }
     </style>
 
@@ -72,8 +72,8 @@
                                 </p>
                             </div>
                         </div>
-                        <a href="{{ route('ruangan.create') }}" 
-                           class="text-white hover:text-green-100 transition flex items-center space-x-2">
+                        <a href="{{ route('ruangan.create') }}"
+                            class="text-white hover:text-green-100 transition flex items-center space-x-2">
                             <i class="fas fa-arrow-left"></i>
                             <span>Kembali</span>
                         </a>
@@ -87,7 +87,8 @@
                         <div>
                             <h4 class="font-medium text-green-800 mb-1">Ruangan Prasarana</h4>
                             <p class="text-green-700 text-sm">
-                                Ruangan prasarana digunakan untuk keperluan umum institusi seperti rektorat, perpustakaan, gedung yayasan, dll.
+                                Ruangan prasarana digunakan untuk keperluan umum institusi seperti rektorat,
+                                perpustakaan, gedung yayasan, dll.
                                 Ruangan ini tidak terkait dengan Program Studi tertentu.
                             </p>
                         </div>
@@ -95,7 +96,7 @@
                 </div>
 
                 <!-- Form -->
-                <form action="{{ route('ruangan.store') }}" method="POST">
+                <form action="{{ route('ruangan.store') }}" method="POST" id="prasaranaForm">
                     @csrf
                     <input type="hidden" name="tipe_ruangan" value="prasarana">
 
@@ -106,34 +107,67 @@
                                 Unit Prasarana <span class="text-red-500">*</span>
                             </label>
                             <select name="unit_prasarana" id="unit_prasarana"
-                                    class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
-                                    required>
+                                class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                                required>
                                 <option value="">-- Pilih Unit Prasarana --</option>
-                                <option value="Rektorat" {{ old('unit_prasarana') == 'Rektorat' ? 'selected' : '' }}>Rektorat</option>
-                                <option value="Perpustakaan" {{ old('unit_prasarana') == 'Perpustakaan' ? 'selected' : '' }}>Perpustakaan</option>
-                                <option value="Gedung Yayasan" {{ old('unit_prasarana') == 'Gedung Yayasan' ? 'selected' : '' }}>Gedung Yayasan</option>
-                                <option value="Masjid" {{ old('unit_prasarana') == 'Masjid' ? 'selected' : '' }}>Masjid</option>
-                                <option value="Auditorium" {{ old('unit_prasarana') == 'Auditorium' ? 'selected' : '' }}>Auditorium</option>
-                                <option value="Gedung Serba Guna" {{ old('unit_prasarana') == 'Gedung Serba Guna' ? 'selected' : '' }}>Gedung Serba Guna</option>
-                                <option value="Lainnya" {{ old('unit_prasarana') == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
+                                <option value="Rektorat" {{ old('unit_prasarana') == 'Rektorat' ? 'selected' : '' }}>
+                                    Rektorat</option>
+                                <option value="Perpustakaan"
+                                    {{ old('unit_prasarana') == 'Perpustakaan' ? 'selected' : '' }}>Perpustakaan
+                                </option>
+                                <option value="Gedung Yayasan"
+                                    {{ old('unit_prasarana') == 'Gedung Yayasan' ? 'selected' : '' }}>Gedung Yayasan
+                                </option>
+                                <option value="Masjid" {{ old('unit_prasarana') == 'Masjid' ? 'selected' : '' }}>Masjid
+                                </option>
+                                <option value="Auditorium"
+                                    {{ old('unit_prasarana') == 'Auditorium' ? 'selected' : '' }}>Auditorium</option>
+                                <option value="Gedung Serba Guna"
+                                    {{ old('unit_prasarana') == 'Gedung Serba Guna' ? 'selected' : '' }}>Gedung Serba
+                                    Guna</option>
+                                <option value="Lainnya" {{ old('unit_prasarana') == 'Lainnya' ? 'selected' : '' }}>
+                                    Lainnya</option>
                             </select>
                             @error('unit_prasarana')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
+
+
+
                         <!-- Input Lainnya (muncul jika memilih Lainnya) -->
                         <div class="mb-6" id="unit_lainnya_container" style="display: none;">
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 Nama Unit Lainnya <span class="text-red-500">*</span>
                             </label>
-                            <input type="text" 
-                                   name="unit_lainnya" 
-                                   id="unit_lainnya"
-                                   value="{{ old('unit_lainnya') }}"
-                                   class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
-                                   placeholder="Masukkan nama unit prasarana">
+                            <input type="text" name="unit_lainnya" id="unit_lainnya"
+                                value="{{ old('unit_lainnya') }}"
+                                class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                                placeholder="Masukkan nama unit prasarana">
                             @error('unit_lainnya')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Kondisi Ruangan -->
+                        <div class="mb-4">
+                            <label class="block font-medium mb-2 text-gray-700">
+                                Kondisi Ruangan <span class="text-red-500">*</span>
+                            </label>
+                            <select name="kondisi_ruangan"
+                                class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                required>
+                                <option value="Baik" {{ old('kondisi_ruangan') == 'Baik' ? 'selected' : '' }}>Baik
+                                </option>
+                                <option value="Rusak Ringan"
+                                    {{ old('kondisi_ruangan') == 'Rusak Ringan' ? 'selected' : '' }}>Rusak Ringan
+                                </option>
+                                <option value="Rusak Berat"
+                                    {{ old('kondisi_ruangan') == 'Rusak Berat' ? 'selected' : '' }}>Rusak Berat
+                                </option>
+                            </select>
+                            @error('kondisi_ruangan')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
@@ -143,25 +177,23 @@
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 Nama Ruangan <span class="text-red-500">*</span>
                             </label>
-                            <input type="text" 
-                                   name="nama_ruangan" 
-                                   value="{{ old('nama_ruangan') }}"
-                                   class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
-                                   placeholder="Contoh: Ruang Rektor, Perpustakaan Lantai 1, Aula Utama"
-                                   required>
+                            <input type="text" name="nama_ruangan" value="{{ old('nama_ruangan') }}"
+                                class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                                placeholder="Contoh: Ruang Rektor, Perpustakaan Lantai 1, Aula Utama" required>
                             @error('nama_ruangan')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
+
                         <!-- Tombol -->
                         <div class="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t">
-                            <a href="{{ route('ruangan.create') }}" 
-                               class="btn-secondary text-center order-2 sm:order-1">
+                            <a href="{{ route('ruangan.create') }}"
+                                class="btn-secondary text-center order-2 sm:order-1">
                                 Batal
                             </a>
-                            <button type="submit" 
-                                    class="btn-primary flex items-center justify-center order-1 sm:order-2">
+                            <button type="submit"
+                                class="btn-primary flex items-center justify-center order-1 sm:order-2">
                                 <i class="fas fa-save mr-2"></i>
                                 Simpan Ruangan
                             </button>
@@ -176,47 +208,93 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // NOTIFIKASI SUKSES
-            @if (session('success'))
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil!',
-                    text: "{{ session('success') }}",
-                    timer: 3000,
-                    showConfirmButton: false
-                });
-            @endif
-
-            // NOTIFIKASI ERROR
-            @if (session('error'))
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal!',
-                    text: "{{ session('error') }}",
-                    timer: 4000,
-                    showConfirmButton: true
-                });
-            @endif
-
-            // Handle pilihan unit prasarana
-            $('#unit_prasarana').change(function() {
-                var selectedValue = $(this).val();
-                if (selectedValue === 'Lainnya') {
-                    $('#unit_lainnya_container').show();
-                    $('#unit_lainnya').prop('required', true);
-                } else {
-                    $('#unit_lainnya_container').hide();
-                    $('#unit_lainnya').prop('required', false);
-                    $('#unit_lainnya').val('');
-                }
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // NOTIFIKASI SUKSES
+        @if (session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: "{{ session('success') }}",
+                timer: 3000,
+                showConfirmButton: false
             });
+        @endif
 
-            // Trigger change on page load jika ada old value
-            @if (old('unit_prasarana') == 'Lainnya')
-                $('#unit_prasarana').trigger('change');
-            @endif
+        // NOTIFIKASI ERROR
+        @if (session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal!',
+                text: "{{ session('error') }}",
+                timer: 4000,
+                showConfirmButton: true
+            });
+        @endif
+
+        // Form submission confirmation untuk Prasarana
+        const form = document.getElementById('prasaranaForm');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault(); // PASTIKAN INI ADA DI AWAL
+                
+                const namaRuangan = document.querySelector('input[name="nama_ruangan"]').value;
+                const unitPrasarana = document.querySelector('select[name="unit_prasarana"]');
+                const kondisi = document.querySelector('select[name="kondisi_ruangan"]');
+                const unitLainnya = document.querySelector('input[name="unit_lainnya"]');
+
+                const unitPrasaranaText = unitPrasarana.options[unitPrasarana.selectedIndex]?.text || '-';
+                const kondisiText = kondisi.options[kondisi.selectedIndex]?.text || '-';
+
+                // Jika pilih "Lainnya", tampilkan nilai dari input unit_lainnya
+                const unitDisplayText = (unitPrasarana.value === 'Lainnya' && unitLainnya.value) ?
+                    unitLainnya.value :
+                    unitPrasaranaText;
+
+                Swal.fire({
+                    title: 'Simpan Ruangan Prasarana?',
+                    html: `
+                    <div class="text-left text-sm">
+                        <p><strong>Nama Ruangan:</strong> ${namaRuangan}</p>
+                        <p><strong>Unit Prasarana:</strong> ${unitDisplayText}</p>
+                        <p><strong>Kondisi:</strong> ${kondisiText}</p>
+                        <p><strong>Tipe:</strong> Prasarana</p>
+                    </div>
+                `,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#10b981',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Ya, Simpan!',
+                    cancelButtonText: 'Batal',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Hapus event listener sementara untuk mencegah loop
+                        form.removeEventListener('submit', arguments.callee);
+                        form.submit();
+                    }
+                });
+            });
+        }
+
+        // Handle pilihan unit prasarana
+        $('#unit_prasarana').change(function() {
+            var selectedValue = $(this).val();
+            if (selectedValue === 'Lainnya') {
+                $('#unit_lainnya_container').show();
+                $('#unit_lainnya').prop('required', true);
+            } else {
+                $('#unit_lainnya_container').hide();
+                $('#unit_lainnya').prop('required', false);
+                $('#unit_lainnya').val('');
+            }
         });
-    </script>
+
+        // Trigger change on page load jika ada old value
+        @if (old('unit_prasarana') == 'Lainnya')
+            $('#unit_prasarana').trigger('change');
+        @endif
+    });
+</script>
 </x-app-layout>

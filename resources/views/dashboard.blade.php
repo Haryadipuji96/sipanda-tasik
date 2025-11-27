@@ -152,16 +152,16 @@
                                 <td class="px-3 py-2 sm:px-4 sm:py-3 font-medium text-xs sm:text-sm">
                                     {{ $ruangan->nama_ruangan }}</td>
                                 <td class="px-3 py-2 sm:px-4 sm:py-3">
-                                    @if ($ruangan->tipe_ruangan == 'akademik')
+                                    @if ($ruangan->tipe_ruangan == 'sarana')
                                         <span
-                                            class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">Akademik</span>
+                                            class="px-2 py-1 text-xs bg-orange-100 text-orange-800 rounded-full">Sarana</span>
                                     @else
                                         <span
-                                            class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">Umum</span>
+                                            class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">Prasarana</span>
                                     @endif
                                 </td>
                                 <td class="px-3 py-2 sm:px-4 sm:py-3">
-                                    @if ($ruangan->tipe_ruangan == 'akademik')
+                                    @if ($ruangan->tipe_ruangan == 'sarana')
                                         <div class="text-xs sm:text-sm">
                                             <div class="font-medium">{{ $ruangan->prodi->nama_prodi ?? 'N/A' }}</div>
                                             <div class="text-gray-500 text-xs">
@@ -219,57 +219,23 @@
     @push('scripts')
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
-            // ------------------ Greeting Dinamis ------------------
-            const greetingEl = document.getElementById('greeting');
-            const now = new Date();
-            const hour = now.getHours();
-            let greeting = "Selamat Datang";
-
-            if (hour >= 4 && hour < 12) greeting = "Selamat Pagi";
-            else if (hour >= 12 && hour < 15) greeting = "Selamat Siang";
-            else if (hour >= 15 && hour < 18) greeting = "Selamat Sore";
-            else greeting = "Selamat Malam";
-
-            greetingEl.childNodes[0].textContent = `${greeting}, {{ Auth::user()->name }} 👋`;
-
-            // ------------------ Quote Harian ------------------
-            const quotes = [
-                "“Pendidikan adalah senjata paling ampuh untuk mengubah dunia.” – Nelson Mandela",
-                "“Belajar tanpa berpikir itu sia-sia, berpikir tanpa belajar itu berbahaya.” – Confucius",
-                "“Kesuksesan adalah hasil dari persiapan, kerja keras, dan belajar dari kegagalan.” – Colin Powell",
-                "“Ilmu pengetahuan adalah harta yang paling berharga.” – Mahatma Gandhi",
-                "“Orang yang berhenti belajar akan menjadi tua, baik umur 20 atau 80.” – Henry Ford",
-                "“Kampus bukan hanya tempat belajar, tapi tempat menginspirasi perubahan.”",
-                "“Setiap hari adalah kesempatan baru untuk belajar sesuatu yang baru.”",
-                "“Pendidikan membuka pikiran, memperluas pandangan, dan membentuk masa depan.”",
-                "“Tidak ada kata terlambat untuk belajar dan memperbaiki diri.”",
-                "“Guru membuka pintu, tapi kamu harus masuk sendiri.” – Pepatah Tiongkok"
-            ];
-            const today = new Date();
-            const dayIndex = today.getDate() % quotes.length;
-            document.getElementById('dailyQuote').innerText = quotes[dayIndex];
-
-            // ------------------ Tanggal & Jam Realtime ------------------
-            function updateDateTime() {
-                const now = new Date();
-                const options = {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                };
-                const dateString = now.toLocaleDateString('id-ID', options);
-                const timeString = now.toLocaleTimeString('id-ID');
-                document.getElementById('currentDateTime').innerText = `${dateString} | ${timeString}`;
-            }
-            updateDateTime();
-            setInterval(updateDateTime, 1000);
-
             // ------------------ Data dari Controller ------------------
             const dosenPerProdi = @json($dosenPerProdi ?? []);
             const arsipPerBulan = @json($arsipPerBulan ?? []);
-            const barangPerKategori = @json($barangPerKategori ?? []);
+            const ruanganPerTipe = @json($ruanganPerTipe ?? []); // TAMBAHKAN INI
             const kondisiBarang = @json($kondisiBarang ?? []);
+
+            // Function untuk menampilkan pesan no data
+            function showNoDataMessage(canvasId, message) {
+                document.getElementById(canvasId).parentElement.innerHTML = `
+            <div class="flex items-center justify-center h-48 text-gray-500">
+                <div class="text-center">
+                    <i class="fas fa-chart-bar text-3xl mb-2"></i>
+                    <p class="text-sm">${message}</p>
+                </div>
+            </div>
+        `;
+            }
 
             // Function untuk membuat chart dengan responsive options
             function createResponsiveChart(canvasId, config) {
@@ -345,14 +311,7 @@
                     }
                 });
             } else {
-                document.getElementById('chartDosenPerProdi').parentElement.innerHTML = `
-                    <div class="flex items-center justify-center h-48 text-gray-500">
-                        <div class="text-center">
-                            <i class="fas fa-chart-bar text-3xl mb-2"></i>
-                            <p class="text-sm">Data dosen per prodi tidak tersedia</p>
-                        </div>
-                    </div>
-                `;
+                showNoDataMessage('chartDosenPerProdi', 'Data dosen per prodi tidak tersedia');
             }
 
             // ------------------ Chart Arsip Per Bulan ------------------
@@ -384,14 +343,7 @@
                     }
                 });
             } else {
-                document.getElementById('chartArsipPerBulan').parentElement.innerHTML = `
-                    <div class="flex items-center justify-center h-48 text-gray-500">
-                        <div class="text-center">
-                            <i class="fas fa-chart-line text-3xl mb-2"></i>
-                            <p class="text-sm">Data arsip per bulan tidak tersedia</p>
-                        </div>
-                    </div>
-                `;
+                showNoDataMessage('chartArsipPerBulan', 'Data arsip per bulan tidak tersedia');
             }
 
             // ------------------ Chart Ruangan Per Tipe ------------------
@@ -410,12 +362,12 @@
                                 label: 'Jumlah Ruangan',
                                 data: tipeData,
                                 backgroundColor: [
-                                    'rgba(59, 130, 246, 0.8)', // Biru untuk Akademik
-                                    'rgba(16, 185, 129, 0.8)', // Hijau untuk Umum
+                                    'rgba(251, 146, 60, 0.8)', // Orange untuk Sarana
+                                    'rgba(16, 185, 129, 0.8)', // Hijau untuk Prasarana
                                 ],
                                 borderColor: [
-                                    'rgba(59, 130, 246, 1)',
-                                    'rgba(16, 185, 129, 1)',
+                                    'rgba(251, 146, 60, 1)', // Orange untuk Sarana
+                                    'rgba(16, 185, 129, 1)', // Hijau untuk Prasarana
                                 ],
                                 borderWidth: 2
                             }]
@@ -468,14 +420,7 @@
                     }
                 });
             } else {
-                document.getElementById('chartKondisiBarang').parentElement.innerHTML = `
-                    <div class="flex items-center justify-center h-48 text-gray-500">
-                        <div class="text-center">
-                            <i class="fas fa-chart-pie text-3xl mb-2"></i>
-                            <p class="text-sm">Data kondisi barang tidak tersedia</p>
-                        </div>
-                    </div>
-                `;
+                showNoDataMessage('chartKondisiBarang', 'Data kondisi barang tidak tersedia');
             }
 
             // Handle window resize untuk update chart

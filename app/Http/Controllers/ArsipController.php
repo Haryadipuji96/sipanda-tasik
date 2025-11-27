@@ -47,6 +47,12 @@ class ArsipController extends Controller
         return view('page.arsip.index', compact('arsip', 'kategori'));
     }
 
+    public function edit(Arsip $arsip)
+    {
+        $kategori = KategoriArsip::all();
+        return view('page.arsip.edit', compact('arsip', 'kategori'));
+    }
+
     public function create()
     {
         if (!Auth::user()->canCrud('arsip')) {

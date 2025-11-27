@@ -11,30 +11,30 @@ class DataSarpras extends Model
 
     protected $fillable = [
         'id_prodi',
-        'ruangan_id', // Ubah dari 'ruangan_id' menjadi 'id_ruangan' untuk konsistensi
+        'ruangan_id',
         'nama_ruangan',
         'nama_barang',
         'merk_barang',
         'jumlah',
         'satuan',
+        'harga', 
         'kategori_barang',
         'kondisi',
         'tanggal_pengadaan',
+        'tahun', // ✅ DITAMBAHKAN
         'spesifikasi',
         'kode_seri',
         'sumber',
         'keterangan',
         'file_dokumen',
         'lokasi_lain',
-        'harga', 
-        
     ];
 
     protected $casts = [
         'tanggal_pengadaan' => 'date',
         'tahun' => 'integer',
-        'jumlah' => 'integer'
-
+        'jumlah' => 'integer',
+        'harga' => 'decimal:2', // ✅ DITAMBAHKAN
     ];
 
     public function prodi()
@@ -44,6 +44,6 @@ class DataSarpras extends Model
 
     public function ruangan()
     {
-        return $this->belongsTo(Ruangan::class, 'ruangan_id'); // Sesuaikan dengan kolom di database
+        return $this->belongsTo(Ruangan::class, 'ruangan_id');
     }
 }

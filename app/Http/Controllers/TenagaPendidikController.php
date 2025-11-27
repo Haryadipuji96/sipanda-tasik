@@ -375,10 +375,10 @@ class TenagaPendidikController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        $tenagaPendidik = TenagaPendidik::findOrFail($id);
+        $tendik = TenagaPendidik::findOrFail($id);
         $prodi = Prodi::with('fakultas')->get();
         $jabatanOptions = TenagaPendidik::getJabatanStrukturalOptions(); // OPTION BARU
-        return view('page.tenaga_pendidik.edit', compact('tenagaPendidik', 'prodi', 'jabatanOptions'));
+        return view('page.tenaga_pendidik.edit', compact('tendik', 'prodi', 'jabatanOptions'));
     }
 
 
@@ -613,7 +613,7 @@ class TenagaPendidikController extends Controller
     {
         $tenagaPendidik = TenagaPendidik::with('prodi.fakultas')->findOrFail($id);
 
-        // PERBAIKAN: Gunakan view yang benar - pdf.blade.php
+        // PERBAIKAN: Pastikan menggunakan variabel yang sama dengan view
         $pdf = Pdf::loadView('page.tenaga_pendidik.pdf', compact('tenagaPendidik'))
             ->setPaper('a4', 'portrait');
 
@@ -627,7 +627,7 @@ class TenagaPendidikController extends Controller
     {
         $tenagaPendidik = TenagaPendidik::with('prodi.fakultas')->findOrFail($id);
 
-        // PERBAIKAN: Gunakan view yang benar - pdf.blade.php
+        // PERBAIKAN: Pastikan menggunakan variabel yang sama dengan view
         $pdf = Pdf::loadView('page.tenaga_pendidik.pdf', compact('tenagaPendidik'))
             ->setPaper('a4', 'portrait');
 

@@ -42,7 +42,7 @@
         }
 
         .btn-secondary {
-            background-color: #6b7280;
+            background-color: #ff0000;
             color: white;
             padding: 0.5rem 1rem;
             border-radius: 0.375rem;
@@ -51,7 +51,7 @@
         }
 
         .btn-secondary:hover {
-            background-color: #4b5563;
+            background-color: #cc0000;
         }
 
         .section-divider {
@@ -686,8 +686,7 @@
                             <!-- Tombol -->
                             <div class="flex flex-col sm:flex-row justify-end gap-3 pt-4 sm:pt-6 border-t">
                                 <a href="{{ route('dosen.index') }}"
-                                    class="btn-secondary text-center order-2 sm:order-1 px-4 py-2 text-sm sm:text-base">
-                                    <i class="fas fa-times mr-2"></i>
+                                    class="btn-secondary text-center order-2 sm:order-1">
                                     Batal
                                 </a>
                                 <button type="submit"
@@ -761,110 +760,44 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Variabel untuk menyimpan status validasi file
-            let fileValidationState = {
-                validFiles: [],
-                invalidFiles: []
-            };
+            // Function untuk validasi file
+            function validateFile(file) {
+                if (!file) return false;
 
-            // Fungsi untuk validasi file (tanpa show success notification)
-            function validateFile(file, inputElement) {
-                if (file) {
-                    // Validasi ukuran file (2MB)
-                    if (file.size > 2 * 1024 * 1024) {
-                        fileValidationState.invalidFiles.push({
-                            name: file.name,
-                            size: (file.size / (1024 * 1024)).toFixed(2),
-                            error: 'size'
-                        });
-
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'File Terlalu Besar',
-                            text: 'Ukuran file maksimal 2MB. File Anda: ' + (file.size / (1024 * 1024))
-                                .toFixed(2) + 'MB',
-                            confirmButtonColor: '#3b82f6'
-                        });
-                        inputElement.value = '';
-                        return false;
-                    }
-
-                    // Validasi tipe file
-                    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
-                    if (!allowedTypes.includes(file.type)) {
-                        fileValidationState.invalidFiles.push({
-                            name: file.name,
-                            type: file.type,
-                            error: 'type'
-                        });
-
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Format File Tidak Didukung',
-                            text: 'Hanya file PDF, JPG, dan PNG yang diizinkan.',
-                            confirmButtonColor: '#3b82f6'
-                        });
-                        inputElement.value = '';
-                        return false;
-                    }
-
-                    // File valid - tambahkan ke list valid files
-                    fileValidationState.validFiles.push({
-                        name: file.name,
-                        size: (file.size / (1024 * 1024)).toFixed(2),
-                        input: inputElement.name
-                    });
-
-                    return true;
-                }
-                return false;
-            }
-
-            // Fungsi untuk reset status validasi file
-            function resetFileValidation() {
-                fileValidationState = {
-                    validFiles: [],
-                    invalidFiles: []
-                };
-            }
-
-            // Fungsi untuk menampilkan summary file yang valid saat submit
-            function showFileValidationSummary() {
-                if (fileValidationState.validFiles.length > 0) {
-                    let successMessage = 'File berikut siap diupload:\n';
-                    fileValidationState.validFiles.forEach(file => {
-                        successMessage += `• ${file.name} (${file.size}MB)\n`;
-                    });
-
+                // Validate file type
+                const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+                if (!allowedTypes.includes(file.type)) {
                     Swal.fire({
-                        icon: 'success',
-                        title: 'File Valid',
-                        text: successMessage,
-                        timer: 3000,
-                        showConfirmButton: false
+                        icon: 'error',
+                        title: 'Format File Tidak Didukung',
+                        text: 'Hanya file PDF, JPG, dan PNG yang diizinkan.'
                     });
+                    return false;
                 }
+
+                // Validate file size (2MB)
+                if (file.size > 2 * 1024 * 1024) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'File Terlalu Besar',
+                        text: 'Ukuran file maksimal 2MB. File Anda: ' + (file.size / (1024 * 1024)).toFixed(
+                            2) + 'MB'
+                    });
+                    return false;
+                }
+
+                return true;
             }
 
-            // Validasi semua file input untuk form create
+            // Validasi untuk semua input file dosen
             const fileInputs = document.querySelectorAll('input[type="file"]');
             fileInputs.forEach(input => {
                 input.addEventListener('change', function(e) {
                     const file = e.target.files[0];
                     if (file) {
-                        // Reset validation state untuk file ini
-                        fileValidationState.validFiles = fileValidationState.validFiles.filter(f =>
-                            f.input !== this.name);
-                        fileValidationState.invalidFiles = fileValidationState.invalidFiles.filter(
-                            f => f.input !== this.name);
-
-                        validateFile(file, this);
-                    } else {
-                        // Jika file dihapus, hapus dari state
-                        fileValidationState.validFiles = fileValidationState.validFiles.filter(f =>
-                            f.input !== this.name);
-                        fileValidationState.invalidFiles = fileValidationState.invalidFiles.filter(
-                            f => f.input !== this.name);
+                        if (!validateFile(file)) {
+                            this.value = ''; // Clear input jika validasi gagal
+                        }
                     }
                 });
             });
@@ -876,116 +809,16 @@
                     let isValid = true;
                     let errorMessages = [];
 
-                    // Reset validation state
-                    resetFileValidation();
-
                     // Validasi field required
                     const requiredFields = form.querySelectorAll('[required]');
                     requiredFields.forEach(field => {
                         if (!field.value.trim()) {
                             isValid = false;
                             field.classList.add('border-red-500');
-                            errorMessages.push(`Field ${field.name} wajib diisi`);
-                        } else {
-                            field.classList.remove('border-red-500');
-                        }
-                    });
-
-                    // Validasi semua file sebelum submit
-                    const fileInputs = form.querySelectorAll('input[type="file"]');
-                    fileInputs.forEach(input => {
-                        if (input.files.length > 0) {
-                            const file = input.files[0];
-                            const fileIsValid = validateFile(file, input);
-                            if (!fileIsValid) {
-                                isValid = false;
-                            }
-                        }
-                    });
-
-                    if (!isValid) {
-                        e.preventDefault();
-
-                        // Tampilkan error messages
-                        if (fileValidationState.invalidFiles.length > 0) {
-                            let fileErrorMessage = 'Masalah dengan file upload:\n';
-                            fileValidationState.invalidFiles.forEach(file => {
-                                if (file.error === 'size') {
-                                    fileErrorMessage +=
-                                        `• ${file.name} - Ukuran file terlalu besar (${file.size}MB)\n`;
-                                } else if (file.error === 'type') {
-                                    fileErrorMessage +=
-                                        `• ${file.name} - Format file tidak didukung\n`;
-                                }
-                            });
-
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Validasi Gagal',
-                                html: `
-                                <div class="text-left">
-                                    <p class="mb-2">${errorMessages.join('<br>')}</p>
-                                    <p class="mt-3">${fileErrorMessage}</p>
-                                </div>
-                            `,
-                                confirmButtonColor: '#3b82f6'
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Data Belum Lengkap',
-                                text: errorMessages.join('\n'),
-                                confirmButtonColor: '#3b82f6'
-                            });
-                        }
-                    } else {
-                        // Jika semua valid, tampilkan summary file yang akan diupload
-                        if (fileValidationState.validFiles.length > 0) {
-                            e.preventDefault(); // Prevent immediate submit
-
-                            let successMessage = 'Data siap disimpan!\n\nFile berikut akan diupload:\n';
-                            fileValidationState.validFiles.forEach(file => {
-                                successMessage += `• ${file.name} (${file.size}MB)\n`;
-                            });
-
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Konfirmasi Simpan',
-                                text: successMessage,
-                                showCancelButton: true,
-                                confirmButtonText: 'Ya, Simpan Data',
-                                cancelButtonText: 'Periksa Kembali',
-                                confirmButtonColor: '#3b82f6',
-                                cancelButtonColor: '#6b7280'
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    // Jika dikonfirmasi, submit form
-                                    form.submit();
-                                }
-                            });
-                        }
-                        // Jika tidak ada file yang diupload, lanjutkan submit normal
-                    }
-                });
-            }
-
-            // Validasi form edit saat submit (delegasi event)
-            document.addEventListener('submit', function(e) {
-                const form = e.target;
-                if (form && form.getAttribute('action')?.includes('/dosen/') && form.id !== 'dosenForm') {
-                    let isValid = true;
-                    let errorMessages = [];
-
-                    // Reset validation state
-                    resetFileValidation();
-
-                    // Validasi field required
-                    const requiredFields = form.querySelectorAll('[required]');
-                    requiredFields.forEach(field => {
-                        if (!field.value.trim()) {
-                            isValid = false;
-                            field.classList.add('border-red-500');
-                            errorMessages.push(`Field ${field.name} wajib diisi`);
+                            const fieldName = field.name.replace(/_/g, ' ');
+                            errorMessages.push(
+                                `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} wajib diisi`
+                            );
                         } else {
                             field.classList.remove('border-red-500');
                         }
@@ -996,78 +829,108 @@
                     fileInputs.forEach(input => {
                         if (input.files.length > 0) {
                             const file = input.files[0];
-                            const fileIsValid = validateFile(file, input);
-                            if (!fileIsValid) {
+                            if (!validateFile(file)) {
                                 isValid = false;
+                                // Pesan error sudah ditampilkan di validateFile
                             }
                         }
                     });
 
                     if (!isValid) {
                         e.preventDefault();
-
-                        if (fileValidationState.invalidFiles.length > 0) {
-                            let fileErrorMessage = 'Masalah dengan file upload:\n';
-                            fileValidationState.invalidFiles.forEach(file => {
-                                if (file.error === 'size') {
-                                    fileErrorMessage +=
-                                        `• ${file.name} - Ukuran file terlalu besar (${file.size}MB)\n`;
-                                } else if (file.error === 'type') {
-                                    fileErrorMessage +=
-                                        `• ${file.name} - Format file tidak didukung\n`;
-                                }
-                            });
-
+                        if (errorMessages.length > 0) {
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Validasi Gagal',
-                                html: `
-                                <div class="text-left">
-                                    <p class="mb-2">${errorMessages.join('<br>')}</p>
-                                    <p class="mt-3">${fileErrorMessage}</p>
-                                </div>
-                            `,
-                                confirmButtonColor: '#3b82f6'
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Data Belum Lengkap',
-                                text: errorMessages.join('\n'),
+                                title: 'Data belum lengkap',
+                                html: errorMessages.map(msg => `<p>• ${msg}</p>`).join(''),
                                 confirmButtonColor: '#3b82f6'
                             });
                         }
-                    } else {
-                        // Jika semua valid, tampilkan konfirmasi untuk edit
-                        if (fileValidationState.validFiles.length > 0) {
-                            e.preventDefault();
-
-                            let successMessage = 'Data siap diupdate!\n\nFile berikut akan diupload:\n';
-                            fileValidationState.validFiles.forEach(file => {
-                                successMessage += `• ${file.name} (${file.size}MB)\n`;
-                            });
-
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Konfirmasi Update',
-                                text: successMessage,
-                                showCancelButton: true,
-                                confirmButtonText: 'Ya, Update Data',
-                                cancelButtonText: 'Periksa Kembali',
-                                confirmButtonColor: '#3b82f6',
-                                cancelButtonColor: '#6b7280'
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    form.submit();
-                                }
-                            });
-                        }
-                        // Jika tidak ada file baru yang diupload, lanjutkan submit normal
                     }
+                    // Jika valid, form akan langsung di-submit tanpa loading/spinner
+                });
+            }
+
+            // Validasi form edit saat submit
+            document.addEventListener('submit', function(e) {
+                const form = e.target;
+                if (form && form.getAttribute('action')?.includes('/dosen/') && form.id !== 'dosenForm') {
+                    let isValid = true;
+                    let errorMessages = [];
+
+                    // Validasi field required
+                    const requiredFields = form.querySelectorAll('[required]');
+                    requiredFields.forEach(field => {
+                        if (!field.value.trim()) {
+                            isValid = false;
+                            field.classList.add('border-red-500');
+                            const fieldName = field.name.replace(/_/g, ' ');
+                            errorMessages.push(
+                                `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} wajib diisi`
+                            );
+                        } else {
+                            field.classList.remove('border-red-500');
+                        }
+                    });
+
+                    // Validasi file upload
+                    const fileInputs = form.querySelectorAll('input[type="file"]');
+                    fileInputs.forEach(input => {
+                        if (input.files.length > 0) {
+                            const file = input.files[0];
+                            if (!validateFile(file)) {
+                                isValid = false;
+                                // Pesan error sudah ditampilkan di validateFile
+                            }
+                        }
+                    });
+
+                    if (!isValid) {
+                        e.preventDefault();
+                        if (errorMessages.length > 0) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Data belum lengkap',
+                                html: errorMessages.map(msg => `<p>• ${msg}</p>`).join(''),
+                                confirmButtonColor: '#3b82f6'
+                            });
+                        }
+                    }
+                    // Jika valid, form akan langsung di-submit tanpa loading/spinner
                 }
             });
 
-            // NOTIFIKASI SUKSES
+            // Auto-capitalize untuk nama dosen
+            const namaInput = document.querySelector('input[name="nama"]');
+            if (namaInput) {
+                namaInput.addEventListener('blur', function() {
+                    this.value = this.value.replace(/\w\S*/g, function(txt) {
+                        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+                    });
+                });
+            }
+
+            // Auto-capitalize untuk tempat lahir
+            const tempatLahirInput = document.querySelector('input[name="tempat_lahir"]');
+            if (tempatLahirInput) {
+                tempatLahirInput.addEventListener('blur', function() {
+                    this.value = this.value.replace(/\w\S*/g, function(txt) {
+                        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+                    });
+                });
+            }
+
+            // Auto-capitalize untuk jabatan
+            const jabatanInput = document.querySelector('input[name="jabatan"]');
+            if (jabatanInput) {
+                jabatanInput.addEventListener('blur', function() {
+                    this.value = this.value.replace(/\w\S*/g, function(txt) {
+                        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+                    });
+                });
+            }
+
+            // NOTIFIKASI SUKSES CREATE
             @if (session('success'))
                 Swal.fire({
                     icon: 'success',
@@ -1083,15 +946,12 @@
             // NOTIFIKASI ERROR VALIDATION
             @if ($errors->any())
                 @if (!session('success'))
-                    let errorMessage = '';
-                    @foreach ($errors->all() as $error)
-                        errorMessage += '• {{ $error }}\n';
-                    @endforeach
-
                     Swal.fire({
                         icon: 'error',
                         title: 'Terjadi Kesalahan!',
-                        text: errorMessage,
+                        html: `@foreach ($errors->all() as $error)
+                            <p>• {{ $error }}</p>
+                           @endforeach`,
                         timer: 5000,
                         showConfirmButton: true
                     });
