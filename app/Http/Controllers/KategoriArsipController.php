@@ -8,19 +8,29 @@ use Illuminate\Support\Facades\Auth;
 
 class KategoriArsipController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-         if (!Auth::user()->canCrud('kategori-arsip')) {
+        if (!Auth::user()->canCrud('kategori-arsip')) {
             abort(403, 'Unauthorized action.');
         }
 
-        $kategori = KategoriArsip::latest()->paginate(20);
-        return view('page.kategori_arsip.index', compact('kategori'));
+        $search = $request->get('search');
+
+        $kategori = KategoriArsip::when($search, function ($query) use ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_kategori', 'like', '%' . $search . '%')
+                    ->orWhere('deskripsi', 'like', '%' . $search . '%');
+            });
+        })
+            ->latest()
+            ->paginate(20);
+
+        return view('page.kategori_arsip.index', compact('kategori', 'search'));
     }
 
     public function create()
     {
-         if (!Auth::user()->canCrud('kategori-arsip')) {
+        if (!Auth::user()->canCrud('kategori-arsip')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -29,7 +39,7 @@ class KategoriArsipController extends Controller
 
     public function store(Request $request)
     {
-         if (!Auth::user()->canCrud('kategori-arsip')) {
+        if (!Auth::user()->canCrud('kategori-arsip')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -44,7 +54,7 @@ class KategoriArsipController extends Controller
 
     public function edit($id)
     {
-         if (!Auth::user()->canCrud('kategori-arsip')) {
+        if (!Auth::user()->canCrud('kategori-arsip')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -54,7 +64,7 @@ class KategoriArsipController extends Controller
 
     public function update(Request $request, $id)
     {
-         if (!Auth::user()->canCrud('kategori-arsip')) {
+        if (!Auth::user()->canCrud('kategori-arsip')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -71,10 +81,10 @@ class KategoriArsipController extends Controller
 
     public function destroy($id)
     {
-         if (!Auth::user()->canCrud('kategori-arsip')) {
+        if (!Auth::user()->canCrud('kategori-arsip')) {
             abort(403, 'Unauthorized action.');
         }
-        
+
         $kategori = KategoriArsip::findOrFail($id);
         $kategori->delete();
         return redirect()->route('kategori-arsip.index')->with('success', 'Kategori arsip berhasil dihapus.');

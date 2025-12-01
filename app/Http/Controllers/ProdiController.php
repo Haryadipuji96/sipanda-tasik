@@ -4,41 +4,59 @@ namespace App\Http\Controllers;
 
 use App\Models\Prodi;
 use App\Models\Fakultas;
-use App\Models\Dosen; 
+use App\Models\Dosen;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ProdiController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-         if (!Auth::user()->canCrud('prodi')) {
+        if (!Auth::user()->canCrud('prodi')) {
             abort(403, 'Unauthorized action.');
         }
 
-        
-        $prodi = Prodi::with('fakultas')->latest()->paginate(15);
-        $fakultas = Fakultas::all(); // <-- tambahkan ini
+        $search = $request->get('search');
+
+        $prodi = Prodi::with(['fakultas', 'ketuaProdi'])
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('nama_prodi', 'like', '%' . $search . '%')
+                        ->orWhere('jenjang', 'like', '%' . $search . '%')
+                        ->orWhere('deskripsi', 'like', '%' . $search . '%')
+                        ->orWhereHas('fakultas', function ($q) use ($search) {
+                            $q->where('nama_fakultas', 'like', '%' . $search . '%');
+                        })
+                        ->orWhereHas('ketuaProdi', function ($q) use ($search) {
+                            // GANTI 'namaLengkap' dengan nama kolom yang benar
+                            $q->where('nama', 'like', '%' . $search . '%'); // atau 'nama_lengkap', 'name', dll
+                        });
+                });
+            })
+            ->latest()
+            ->paginate(15);
+
+        $fakultas = Fakultas::all();
         $dosen = Dosen::all();
-        
-        return view('page.prodi.index', compact('prodi', 'fakultas', 'dosen'));
+
+        return view('page.prodi.index', compact('prodi', 'fakultas', 'dosen', 'search'));
     }
 
 
     public function create()
     {
-         if (!Auth::user()->canCrud('prodi')) {
+        if (!Auth::user()->canCrud('prodi')) {
             abort(403, 'Unauthorized action.');
         }
 
         $fakultas = Fakultas::all();
-         $dosen = Dosen::all();
+        $dosen = Dosen::all();
         return view('page.prodi.create', compact('fakultas', 'dosen'));
     }
 
     public function store(Request $request)
     {
-         if (!Auth::user()->canCrud('prodi')) {
+        if (!Auth::user()->canCrud('prodi')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -47,7 +65,7 @@ class ProdiController extends Controller
             'id_fakultas' => 'required|exists:fakultas,id',
             'nama_prodi' => 'required|string|max:255',
             'jenjang' => 'nullable|string|max:50',
-            'ketua_prodi' => 'nullable|exists:dosen,id', 
+            'ketua_prodi' => 'nullable|exists:dosen,id',
             'deskripsi' => 'nullable|string',
         ]);
 
@@ -57,19 +75,19 @@ class ProdiController extends Controller
 
     public function edit($id)
     {
-         if (!Auth::user()->canCrud('prodi')) {
+        if (!Auth::user()->canCrud('prodi')) {
             abort(403, 'Unauthorized action.');
         }
 
         $prodi = Prodi::findOrFail($id);
         $fakultas = Fakultas::all();
-         $dosen = Dosen::all();
+        $dosen = Dosen::all();
         return view('page.prodi.edit', compact('prodi', 'fakultas', 'dosen'));
     }
 
     public function update(Request $request, $id)
     {
-         if (!Auth::user()->canCrud('prodi')) {
+        if (!Auth::user()->canCrud('prodi')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -93,10 +111,10 @@ class ProdiController extends Controller
 
     public function destroy($id)
     {
-         if (!Auth::user()->canCrud('prodi')) {
+        if (!Auth::user()->canCrud('prodi')) {
             abort(403, 'Unauthorized action.');
         }
-        
+
         $prodi = Prodi::findOrFail($id);
         $prodi->delete();
         return redirect()->route('prodi.index')->with('success', 'Data program studi berhasil dihapus.');

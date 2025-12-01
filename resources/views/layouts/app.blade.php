@@ -406,13 +406,13 @@
 
         <!-- Footer -->
         <footer class="site-footer">
-            {{-- <div class="footer-main">
+            <div class="footer-main">
                 <!-- Bagian Informasi Kampus -->
                 <div class="footer-section">
                     <div class="footer-logo">
                         <img src="{{ asset('images/Logo-IAIT.png') }}" alt="IAIT Logo" class="logo-img">
                         <div class="logo-text">
-                            <h3>IAIT Tasikmalaya</h3>
+                            <h3>IAI Tasikmalaya</h3>
                             <p>Institut Agama Islam Tasikmalaya</p>
                         </div>
                     </div>
@@ -463,7 +463,7 @@
                         <p><i class="fas fa-envelope"></i> sipanda@iait.ac.id</p>
                     </div>
                 </div>
-            </div> --}}
+            </div>
 
             <!-- Copyright -->
             <div class="footer-bottom">
@@ -471,7 +471,7 @@
                     <p>&copy; {{ date('Y') }} SIPANDA - Sistem Informasi Pangkalan Arsip dan Data. IAIT Tasikmalaya.
                         All rights reserved.</p>
                     <div class="footer-credits">
-                        <span>Developed by IT Team IAIT Tasikmalaya</span>
+                        <span>Developed by IT Team IAI Tasikmalaya</span>
                     </div>
                 </div>
             </div>

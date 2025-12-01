@@ -116,19 +116,28 @@
         /* Zebra striping untuk baris - DIPERBARUI */
         .table-custom tbody tr:nth-child(odd) {
             background-color: #ffffff;
-            /* Putih untuk baris ganjil */
         }
 
         .table-custom tbody tr:nth-child(even) {
             background-color: #e3f4ff;
-            /* Biru sangat muda untuk baris genap */
         }
-
-
 
         /* Styling untuk sel aksi */
         .table-custom .action-cell {
             background-color: transparent !important;
+        }
+
+        /* CSS untuk tombol reset */
+        #reset-btn {
+            transition: all 0.3s ease;
+        }
+
+        #reset-btn.hidden {
+            display: none !important;
+        }
+
+        #reset-btn:not(.hidden) {
+            display: inline-flex !important;
         }
     </style>
 
@@ -147,21 +156,17 @@
             @endif
         </div>
 
+        <!-- Search Bar Component -->
+        <x-search-bar route="dokumen-mahasiswa.index" placeholder="Cari NIM, nama mahasiswa, prodi, atau status..." />
+
         <!-- Filter Section -->
         <div class="bg-gray-50 p-4 rounded-lg mb-6 border border-gray-200">
-            <form method="GET" action="{{ route('dokumen-mahasiswa.index') }}">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <!-- Search -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Pencarian</label>
-                        <input type="text" name="search" value="{{ request('search') }}"
-                            class="w-full border rounded px-3 py-2 text-sm" placeholder="Cari NIM atau nama...">
-                    </div>
-
+            <form method="GET" action="{{ route('dokumen-mahasiswa.index') }}" id="filterForm">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Filter Prodi -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Program Studi</label>
-                        <select name="prodi_id" class="w-full border rounded px-3 py-2 text-sm">
+                        <select name="prodi_id" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             <option value="">Semua Prodi</option>
                             @foreach ($prodi as $p)
                                 <option value="{{ $p->id }}"
@@ -175,7 +180,7 @@
                     <!-- Filter Status Mahasiswa -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Status Mahasiswa</label>
-                        <select name="status_mahasiswa" class="w-full border rounded px-3 py-2 text-sm">
+                        <select name="status_mahasiswa" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             <option value="">Semua Status</option>
                             <option value="Aktif" {{ request('status_mahasiswa') == 'Aktif' ? 'selected' : '' }}>
                                 Aktif</option>
@@ -189,26 +194,24 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col sm:flex-row gap-3 mt-4">
-                    <div class="flex gap-2 order-2 sm:order-1">
-                        <a href="{{ route('dokumen-mahasiswa.index') }}"
-                            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm flex items-center">
-                            <i class="fas fa-refresh mr-2"></i>
-                            Reset
+                <div class="flex flex-col sm:flex-row gap-3 mt-4 justify-between items-start sm:items-center">
+                    <!-- Left Side - Reset Button -->
+                    <div class="flex-1">
+                        <!-- Tombol Reset - Hanya tampil jika ada filter aktif -->
+                        <a href="{{ route('dokumen-mahasiswa.index') }}" id="reset-btn"
+                            class="inline-flex items-center justify-center px-3 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded text-sm font-medium transition duration-200 shadow-sm hover:shadow-md hidden min-w-[100px]"
+                            title="Reset Filter">
+                            <i class="fas fa-refresh mr-1"></i>
+                            <span>Reset</span>
                         </a>
-                        <button type="submit"
-                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm flex items-center">
-                            <i class="fas fa-search mr-2"></i>
-                            Cari
-                        </button>
                     </div>
 
-                    <!-- Tombol Import -->
+                    <!-- Right Side - Import Button -->
                     @if (auth()->check() && auth()->user()->canCrud('dokumen-mahasiswa'))
-                        <div class="order-1 sm:order-2">
+                        <div class="flex-1 flex justify-end">
                             <button type="button"
                                 onclick="window.location='{{ route('dokumen-mahasiswa.import-form') }}'"
-                                class="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded text-sm flex items-center justify-center">
+                                class="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded text-sm flex items-center justify-center transition duration-200 shadow-sm hover:shadow-md">
                                 <i class="fas fa-file-import mr-2"></i>
                                 Import Excel
                             </button>
@@ -217,6 +220,50 @@
                 </div>
             </form>
         </div>
+
+        <!-- Info Pencarian Aktif -->
+        @if (request('search'))
+            <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <i class="fas fa-search text-blue-500 mr-2"></i>
+                        <span class="text-blue-700 text-sm">
+                            Hasil pencarian untuk: <strong>"{{ request('search') }}"</strong>
+                        </span>
+                    </div>
+                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
+                        {{ $dokumenMahasiswa->total() }} hasil ditemukan
+                    </span>
+                </div>
+            </div>
+        @endif
+
+        <!-- Active Filter Info -->
+        @if (request('prodi_id') || request('status_mahasiswa'))
+            <div class="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <div class="flex items-center flex-wrap gap-2">
+                    <i class="fas fa-filter text-green-500 mr-1"></i>
+                    <span class="text-green-700 text-sm">Filter aktif:</span>
+
+                    @if (request('prodi_id'))
+                        @php
+                            $selectedProdi = $prodi->firstWhere('id', request('prodi_id'));
+                        @endphp
+                        @if ($selectedProdi)
+                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
+                                Prodi: {{ $selectedProdi->nama_prodi }}
+                            </span>
+                        @endif
+                    @endif
+
+                    @if (request('status_mahasiswa'))
+                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
+                            Status: {{ request('status_mahasiswa') }}
+                        </span>
+                    @endif
+                </div>
+            </div>
+        @endif
 
         <!-- Table -->
         <div class="table-wrapper border border-gray-200 rounded-lg">
@@ -250,13 +297,19 @@
                     @forelse($dokumenMahasiswa as $index => $item)
                         <tr class="hover:bg-gray-50">
                             <td class="border px-3 py-2 text-center">{{ $dokumenMahasiswa->firstItem() + $index }}</td>
-                            <td class="border px-3 py-2 font-mono font-medium">{{ $item->nim }}</td>
-                            <td class="border px-3 py-2">{!! highlight($item->nama_lengkap, request('search')) !!}</td>
+                            <td class="border px-3 py-2 font-mono font-medium">
+                                {!! highlight($item->nim, request('search')) !!}
+                            </td>
+                            <td class="border px-3 py-2">
+                                {!! highlight($item->nama_lengkap, request('search')) !!}
+                            </td>
                             <td class="border px-3 py-2">
                                 <div class="text-sm">
-                                    <div class="font-medium">{!! highlight($item->prodi->nama_prodi, request('search')) !!}</div>
+                                    <div class="font-medium">
+                                        {!! highlight($item->prodi->nama_prodi, request('search')) !!}
+                                    </div>
                                     <div class="text-gray-500 text-xs">
-                                        {{ $item->prodi->fakultas->nama_fakultas }}
+                                        {!! highlight($item->prodi->fakultas->nama_fakultas, request('search')) !!}
                                     </div>
                                 </div>
                             </td>
@@ -278,7 +331,7 @@
                                     };
                                 @endphp
                                 <span class="badge {{ $statusColor }}">
-                                    {{ $item->status_mahasiswa }}
+                                    {!! highlight($item->status_mahasiswa, request('search')) !!}
                                 </span>
                             </td>
                             <td class="border px-3 py-2">
@@ -350,8 +403,22 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="text-center py-3 text-gray-600">Belum ada data dokumen
-                                mahasiswa.</td>
+                            <td colspan="8" class="text-center py-8">
+                                @if (request('search') || request('prodi_id') || request('status_mahasiswa'))
+                                    <div class="text-gray-500">
+                                        <i class="fas fa-search fa-2x mb-2"></i>
+                                        <p>Tidak ditemukan data dengan filter yang dipilih</p>
+                                        <a href="{{ route('dokumen-mahasiswa.index') }}" class="text-blue-500 hover:text-blue-700 text-sm mt-2 inline-block">
+                                            Tampilkan semua data
+                                        </a>
+                                    </div>
+                                @else
+                                    <div class="text-gray-500">
+                                        <i class="fas fa-inbox fa-2x mb-2"></i>
+                                        <p>Belum ada data dokumen mahasiswa.</p>
+                                    </div>
+                                @endif
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -401,6 +468,44 @@
                     showConfirmButton: false
                 });
             @endif
+
+            // ✅ FILTER FORM HANDLER - AUTO SUBMIT
+            const filterForm = document.getElementById('filterForm');
+            if (filterForm) {
+                // Auto-submit ketika filter select berubah
+                const filterSelects = document.querySelectorAll('select[name="prodi_id"], select[name="status_mahasiswa"]');
+                filterSelects.forEach(select => {
+                    select.addEventListener('change', function() {
+                        filterForm.submit();
+                    });
+                });
+            }
+
+            // ✅ FUNGSI UNTUK MENGONTROL TOMBOL RESET
+            function checkFilterStatus() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const hasFilters = urlParams.has('search') || urlParams.has('prodi_id') || urlParams.has('status_mahasiswa');
+
+                const resetBtn = document.getElementById('reset-btn');
+
+                if (resetBtn) {
+                    if (hasFilters) {
+                        resetBtn.classList.remove('hidden');
+                    } else {
+                        resetBtn.classList.add('hidden');
+                    }
+                }
+            }
+
+            // Panggil fungsi saat halaman dimuat
+            checkFilterStatus();
+
+            // Juga panggil saat form filter disubmit (untuk antisipasi)
+            if (filterForm) {
+                filterForm.addEventListener('submit', function() {
+                    setTimeout(checkFilterStatus, 100);
+                });
+            }
         });
     </script>
 </x-app-layout>

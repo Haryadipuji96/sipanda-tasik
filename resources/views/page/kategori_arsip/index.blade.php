@@ -41,6 +41,34 @@
         }
 
         /* =======================
+           Highlight Animasi
+        ======================= */
+        .highlight {
+            background-color: #fde68a;
+            font-weight: 600;
+            border-radius: 4px;
+            padding: 0 2px;
+            animation: fadeGlow 1.2s ease-out;
+        }
+
+        @keyframes fadeGlow {
+            0% {
+                background-color: #facc15;
+                box-shadow: 0 0 8px #facc15;
+            }
+
+            50% {
+                background-color: #fde68a;
+                box-shadow: 0 0 5px #fde68a;
+            }
+
+            100% {
+                background-color: #fde68a;
+                box-shadow: none;
+            }
+        }
+
+        /* =======================
            Zebra Stripe Table - DIPERBARUI
         ======================= */
         .table-custom {
@@ -79,15 +107,11 @@
         /* Zebra striping untuk baris - DIPERBARUI */
         .table-custom tbody tr:nth-child(odd) {
             background-color: #ffffff;
-            /* Putih untuk baris ganjil */
         }
 
         .table-custom tbody tr:nth-child(even) {
             background-color: #e3f4ff;
-            /* Biru sangat muda untuk baris genap */
         }
-
-
 
         /* Styling untuk sel aksi */
         .table-custom .action-cell {
@@ -108,6 +132,25 @@
             </button>
         </div>
 
+        <!-- Search Bar Component -->
+        <x-search-bar route="kategori-arsip.index" placeholder="Cari nama kategori atau deskripsi..." />
+
+        <!-- Info Pencarian Aktif -->
+        @if (request('search'))
+            <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <i class="fas fa-search text-blue-500 mr-2"></i>
+                        <span class="text-blue-700 text-sm">
+                            Hasil pencarian untuk: <strong>"{{ request('search') }}"</strong>
+                        </span>
+                    </div>
+                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
+                        {{ $kategori->total() }} hasil ditemukan
+                    </span>
+                </div>
+            </div>
+        @endif
 
         <!-- Table -->
         <div class="table-wrapper border border-gray-200 rounded-lg">
@@ -121,11 +164,33 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @php
+                        function highlight($text, $search)
+                        {
+                            if (!$search) {
+                                return e($text);
+                            }
+                            return preg_replace(
+                                '/(' . preg_quote($search, '/') . ')/i',
+                                '<span class="highlight">$1</span>',
+                                e($text),
+                            );
+                        }
+                    @endphp
+
                     @forelse($kategori as $index => $k)
                         <tr x-data="{ openModal: false }">
                             <td class="border px-3 py-2">{{ $index + $kategori->firstItem() }}</td>
-                            <td class="border px-3 py-2">{{ $k->nama_kategori }}</td>
-                            <td class="border px-3 py-2">{{ $k->deskripsi }}</td>
+                            <td class="border px-3 py-2 font-medium">
+                                {!! highlight($k->nama_kategori, request('search')) !!}
+                            </td>
+                            <td class="border px-3 py-2">
+                                @if ($k->deskripsi)
+                                    {!! highlight($k->deskripsi, request('search')) !!}
+                                @else
+                                    <span class="text-gray-400">-</span>
+                                @endif
+                            </td>
                             <td class="border px-3 py-2 text-center flex justify-center gap-2">
                                 <!-- Tombol Edit -->
                                 <a href="{{ route('kategori-arsip.edit', $k->id) }}"
@@ -157,7 +222,22 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="text-center py-3">Belum ada data kategori arsip.</td>
+                            <td colspan="4" class="text-center py-8">
+                                @if (request('search'))
+                                    <div class="text-gray-500">
+                                        <i class="fas fa-search fa-2x mb-2"></i>
+                                        <p>Tidak ditemukan kategori arsip dengan kata kunci "{{ request('search') }}"</p>
+                                        <a href="{{ route('kategori-arsip.index') }}" class="text-blue-500 hover:text-blue-700 text-sm mt-2 inline-block">
+                                            Tampilkan semua data
+                                        </a>
+                                    </div>
+                                @else
+                                    <div class="text-gray-500">
+                                        <i class="fas fa-inbox fa-2x mb-2"></i>
+                                        <p>Belum ada data kategori arsip.</p>
+                                    </div>
+                                @endif
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>

@@ -338,6 +338,19 @@
         .table-custom .action-cell {
             background-color: transparent !important;
         }
+
+        /* CSS untuk tombol reset */
+        #reset-btn {
+            transition: all 0.3s ease;
+        }
+
+        #reset-btn.hidden {
+            display: none !important;
+        }
+
+        #reset-btn:not(.hidden) {
+            display: inline-flex !important;
+        }
     </style>
 
     <div class="p-6">
@@ -365,7 +378,7 @@
 
             <!-- Filter Section -->
             <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <form method="GET" action="{{ route('ruangan.index') }}">
+                <form method="GET" action="{{ route('ruangan.index') }}" id="filterForm">
                     <!-- Search Bar -->
                     <div class="mb-4">
                         <x-search-bar-ruangan route="ruangan.index"
@@ -379,7 +392,7 @@
                             <!-- Filter Tipe Ruangan -->
                             <div class="lg:col-span-1">
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Tipe Ruangan</label>
-                                <select name="tipe_ruangan"
+                                <select name="tipe_ruangan" id="tipe_ruangan"
                                     class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                     <option value="">Semua Tipe</option>
                                     <option value="sarana" {{ request('tipe_ruangan') == 'sarana' ? 'selected' : '' }}>
@@ -395,7 +408,7 @@
                             <!-- Filter Kondisi Ruangan -->
                             <div class="lg:col-span-1">
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Kondisi Ruangan</label>
-                                <select name="kondisi"
+                                <select name="kondisi" id="kondisi"
                                     class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                     <option value="">Semua Kondisi</option>
                                     <option value="Baik" {{ request('kondisi') == 'Baik' ? 'selected' : '' }}>Baik
@@ -411,27 +424,11 @@
                                 </select>
                             </div>
 
-                            <!-- Action Buttons -->
-                            <div class="flex flex-col xs:flex-row gap-2 lg:col-span-2">
-                                <button type="submit"
-                                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm flex items-center justify-center transition duration-200 shadow-sm hover:shadow-md flex-1">
-                                    <i class="fas fa-search mr-2"></i>
-                                    Terapkan Filter
-                                </button>
-                                <a href="{{ route('ruangan.index') }}"
-                                    class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm flex items-center justify-center transition duration-200 shadow-sm hover:shadow-md flex-1">
-                                    <i class="fas fa-refresh mr-2"></i>
-                                    Reset
-                                </a>
-                            </div>
-                        </div>
+                            <div class="flex flex-col xs:flex-row gap-2 lg:col-span-2 justify-end">
 
-                        <!-- Delete Selected Button & Download PDF -->
-                        @if (auth()->check() && auth()->user()->canCrud('ruangan'))
-                            <div class="flex flex-col sm:flex-row gap-3 justify-end">
                                 <!-- Tombol Download All PDF -->
                                 <a href="{{ route('ruangan.download-all-pdf') }}"
-                                    class="inline-flex items-center justify-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition duration-200 shadow-sm hover:shadow-md order-1 sm:order-1"
+                                    class="inline-flex items-center justify-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition duration-200 shadow-sm hover:shadow-md flex-1 xs:flex-none xs:w-auto min-w-[140px]"
                                     title="Download PDF Semua Ruangan">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2 flex-shrink-0"
                                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -440,16 +437,34 @@
                                     </svg>
                                     <span class="whitespace-nowrap">Download PDF</span>
                                 </a>
-
-                                <!-- Tombol Hapus Terpilih -->
-                                <button id="delete-selected"
-                                    class="inline-flex items-center justify-center px-4 py-2 text-sm rounded-lg font-medium text-white bg-red-600 hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition duration-200 shadow-sm hover:shadow-md order-2 sm:order-2"
-                                    disabled>
-                                    <i class="fas fa-trash mr-2"></i>
-                                    <span>Hapus Terpilih</span>
-                                </button>
                             </div>
-                        @endif
+                        </div>
+
+                        <!-- Action Buttons Section -->
+                        <div class="flex flex-col xs:flex-row gap-2 justify-between items-start sm:items-start">
+                            <!-- Left Side - Delete Button -->
+                            <div class="flex-1">
+                                @if (auth()->check() && auth()->user()->canCrud('ruangan'))
+                                    <button id="delete-selected"
+                                        class="inline-flex items-center justify-center px-4 py-2 text-sm rounded-lg font-medium text-white bg-red-600 hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition duration-200 shadow-sm hover:shadow-md w-full xs:w-auto"
+                                        disabled>
+                                        <i class="fas fa-trash mr-2"></i>
+                                        <span>Hapus Terpilih</span>
+                                    </button>
+                                @endif
+                            </div>
+
+                            <!-- Right Side - Reset Button -->
+                            <div class="flex-1 flex justify-end">
+                                <!-- Tombol Reset - Hanya tampil jika ada filter aktif -->
+                                <a href="{{ route('ruangan.index') }}" id="reset-btn"
+                                    class="inline-flex items-center justify-center px-3 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg text-sm font-medium transition duration-200 shadow-sm hover:shadow-md hidden min-w-[100px]"
+                                    title="Reset Filter">
+                                    <i class="fas fa-refresh mr-1"></i>
+                                    <span>Reset</span>
+                                </a>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Active Search Info -->
@@ -987,5 +1002,61 @@
             // Reset session storage ketika halaman dimuat
             sessionStorage.removeItem('showRuanganSuccess');
         });
+
+        // Fungsi untuk mengecek dan mengontrol tombol reset
+        function checkFilterStatus() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const hasFilters = urlParams.has('search') || urlParams.has('tipe_ruangan') ||
+                urlParams.has('kondisi') || urlParams.has('prodi');
+
+            const resetBtn = document.getElementById('reset-btn');
+
+            if (resetBtn) {
+                if (hasFilters) {
+                    resetBtn.classList.remove('hidden');
+                } else {
+                    resetBtn.classList.add('hidden');
+                }
+            }
+        }
+
+        // Panggil fungsi saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', function() {
+            checkFilterStatus();
+
+            // Juga panggil saat form filter disubmit (untuk antisipasi)
+            const filterForm = document.getElementById('filterForm');
+            if (filterForm) {
+                filterForm.addEventListener('submit', function() {
+                    setTimeout(checkFilterStatus, 100);
+                });
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // SELECT ALL CHECKBOX
+            const selectAll = document.getElementById('select-all');
+            const selectItems = document.querySelectorAll('.select-item');
+            const deleteSelectedBtn = document.getElementById('delete-selected');
+
+            // ... [ALL YOUR EXISTING CODE] ...
+
+            // Reset session storage ketika halaman dimuat
+            sessionStorage.removeItem('showRuanganSuccess');
+
+            // ✅ TAMBAHKAN INI - FILTER FORM HANDLER
+            const filterForm = document.getElementById('filterForm');
+            if (filterForm) {
+                // Auto-submit ketika filter select berubah
+                const filterSelects = document.querySelectorAll('#tipe_ruangan, #kondisi');
+                filterSelects.forEach(select => {
+                    select.addEventListener('change', function() {
+                        filterForm.submit();
+                    });
+                });
+            }
+        });
     </script>
+
+
 </x-app-layout>
