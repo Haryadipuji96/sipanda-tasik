@@ -71,6 +71,17 @@
             font-weight: bold;
         }
 
+        .prodi-list {
+            margin-top: 3px;
+            padding-left: 15px;
+            font-weight: normal;
+        }
+
+        .prodi-item {
+            margin-bottom: 2px;
+            font-size: 8px;
+        }
+
         table { 
             width: 100%; 
             border-collapse: collapse; 
@@ -161,6 +172,19 @@
             font-style: italic;
             color: #666;
         }
+
+        .ruangan-number {
+            background-color: #1d4ed8;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 5px;
+            font-size: 9px;
+        }
     </style>
 </head>
 <body>
@@ -191,14 +215,28 @@
         <div class="ruangan-section {{ $index > 0 ? 'page-break' : '' }}">
             <!-- Header Ruangan -->
             <div class="ruangan-header">
-                <strong>RUANGAN {{ $loop->iteration }}:</strong> {{ $room->nama_ruangan }}<br>
+                <span class="ruangan-number">{{ $loop->iteration }}</span>
+                <strong>{{ $room->nama_ruangan }}</strong><br>
                 <strong>Tipe:</strong> {{ $room->tipe_ruangan == 'sarana' ? 'Sarana' : 'Prasarana' }} | 
-                <strong>Kondisi:</strong> {{ $room->kondisi_ruangan }}<br>
-                @if($room->tipe_ruangan == 'sarana' && $room->prodi)
-                    <strong>Program Studi:</strong> {{ $room->prodi->nama_prodi }} | 
-                    <strong>Fakultas:</strong> {{ $room->prodi->fakultas->nama_fakultas ?? '-' }}
+                <strong>Kondisi Ruangan:</strong> {{ $room->kondisi_ruangan }}<br>
+                
+                @if($room->tipe_ruangan == 'sarana')
+                    @if($room->prodis->count() > 0)
+                        <strong>Program Studi:</strong>
+                        <div class="prodi-list">
+                            @foreach($room->prodis as $prodi)
+                                <div class="prodi-item">
+                                    • {{ $prodi->nama_prodi }} 
+                                    ({{ $prodi->jenjang ?? '-' }})
+                                    - Fakultas {{ $prodi->fakultas->nama_fakultas ?? '-' }}
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <strong>Program Studi:</strong> -<br>
+                    @endif
                 @else
-                    <strong>Lokasi:</strong> {{ $room->unit_prasarana }}
+                    <strong>Unit Prasarana:</strong> {{ $room->unit_prasarana }}
                 @endif
             </div>
 

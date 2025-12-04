@@ -33,7 +33,7 @@ class ProdiController extends Controller
                         });
                 });
             })
-            ->latest()
+            ->oldest()
             ->paginate(15);
 
         $fakultas = Fakultas::all();
@@ -109,13 +109,23 @@ class ProdiController extends Controller
         }
     }
 
+    // App/Http/Controllers/ProdiController.php
     public function destroy($id)
     {
         if (!Auth::user()->canCrud('prodi')) {
             abort(403, 'Unauthorized action.');
         }
 
-        $prodi = Prodi::findOrFail($id);
+        $prodi = Prodi::withCount('dokumenMahasiswa')->findOrFail($id);
+
+        // Cek apakah prodi memiliki dokumen mahasiswa
+        if ($prodi->dokumen_mahasiswa_count > 0) {
+            return redirect()->route('prodi.index')
+                ->with('error', 'Tidak dapat menghapus program studi karena terdapat ' .
+                    $prodi->dokumen_mahasiswa_count . ' data mahasiswa terkait. ' .
+                    'Harap hapus atau pindahkan data mahasiswa terlebih dahulu.');
+        }
+
         $prodi->delete();
         return redirect()->route('prodi.index')->with('success', 'Data program studi berhasil dihapus.');
     }

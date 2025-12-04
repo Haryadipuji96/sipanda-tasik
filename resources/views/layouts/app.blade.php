@@ -7,6 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ $title ?? config('app.name', 'SIPANDA') }}</title>
+    
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <!-- Fonts -->
     <link rel="icon" href="{{ asset('images/Logo-IAIT.png') }}" type="image/png">
@@ -28,16 +29,31 @@
             padding: 0;
             min-height: 100vh;
             font-family: 'Figtree', sans-serif;
-            background-image: url('{{ asset('images/gambar.jpg') }}');
+            background: linear-gradient(rgba(255, 255, 255, 0.8),
+                    rgba(255, 255, 255, 0.7)), url('{{ asset('images/gambar.jpg') }}');
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center;
+            background-attachment: fixed;
             position: relative;
             display: flex;
             flex-direction: column;
         }
 
-        body::before {
+        /* Untuk mobile - gradient lebih kuat */
+        @media (max-width: 768px) {
+            body {
+                background: linear-gradient(rgba(255, 255, 255, 0.8),
+                        rgba(255, 255, 255, 0.85)), url('{{ asset('images/gambar.jpg') }}');
+                background-size: cover;
+                background-repeat: no-repeat;
+                background-position: center;
+                background-attachment: scroll;
+                /* Ubah dari fixed untuk performa mobile */
+            }
+        }
+
+        /* body::before {
             content: "";
             position: fixed;
             top: 0;
@@ -46,7 +62,7 @@
             height: 100%;
             background-color: rgba(255, 255, 255, 0.6);
             z-index: -1;
-        }
+        } */
 
         .min-h-screen {
             min-height: 100vh;
@@ -406,7 +422,7 @@
 
         <!-- Footer -->
         <footer class="site-footer">
-            <div class="footer-main">
+            {{-- <div class="footer-main">
                 <!-- Bagian Informasi Kampus -->
                 <div class="footer-section">
                     <div class="footer-logo">
@@ -463,7 +479,7 @@
                         <p><i class="fas fa-envelope"></i> sipanda@iait.ac.id</p>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             <!-- Copyright -->
             <div class="footer-bottom">

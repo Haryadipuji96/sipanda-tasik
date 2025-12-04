@@ -144,7 +144,7 @@
                                         <label class="block text-sm font-medium text-gray-700 mb-2">
                                             Posisi/Jabatan Struktural
                                         </label>
-                                        <select name="jabatan_struktural"
+                                        <select name="jabatan_struktural" id="jabatanSelect"
                                             class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
                                             <option value="">-- Pilih Posisi --</option>
                                             @foreach ($jabatanOptions as $jabatan)
@@ -154,6 +154,22 @@
                                                 </option>
                                             @endforeach
                                         </select>
+
+                                        <!-- Input manual yang muncul ketika memilih "Lainnya" -->
+                                        <div id="jabatanManualInput"
+                                            class="mt-3 {{ !in_array($tendik->jabatan_struktural, $jabatanOptions) && $tendik->jabatan_struktural ? '' : 'hidden' }}">
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                                Tulis Jabatan Lainnya
+                                            </label>
+                                            <input type="text" name="jabatan_lainnya" id="jabatanLainnya"
+                                                class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                                placeholder="Contoh: Staf. Kasubag Akademik"
+                                                value="{{ old('jabatan_lainnya', !in_array($tendik->jabatan_struktural, $jabatanOptions) ? $tendik->jabatan_struktural : '') }}">
+                                            @error('jabatan_lainnya')
+                                                <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+
                                         @error('jabatan_struktural')
                                             <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
                                         @enderror
@@ -277,6 +293,69 @@
                                         @error('tmt_kerja')
                                             <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
                                         @enderror
+                                    </div>
+                                </div>
+                                <!-- Masa Kerja & Golongan -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Masa Kerja (Tahun)
+                                        </label>
+                                        <input type="number" name="masa_kerja_tahun"
+                                            value="{{ old('masa_kerja_tahun', $tendik->masa_kerja_tahun) }}"
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                            min="0" placeholder="0">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Masa Kerja (Bulan)
+                                        </label>
+                                        <input type="number" name="masa_kerja_bulan"
+                                            value="{{ old('masa_kerja_bulan', $tendik->masa_kerja_bulan) }}"
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                            min="0" max="11" placeholder="0">
+                                    </div>
+                                </div>
+
+                                <!-- Masa Kerja Golongan -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Masa Kerja Golongan (Tahun)
+                                        </label>
+                                        <input type="number" name="masa_kerja_golongan_tahun"
+                                            value="{{ old('masa_kerja_golongan_tahun', $tendik->masa_kerja_golongan_tahun) }}"
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                            min="0" placeholder="0">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Masa Kerja Golongan (Bulan)
+                                        </label>
+                                        <input type="number" name="masa_kerja_golongan_bulan"
+                                            value="{{ old('masa_kerja_golongan_bulan', $tendik->masa_kerja_golongan_bulan) }}"
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                            min="0" max="11" placeholder="0">
+                                    </div>
+                                </div>
+
+                                <!-- Gol & KNP YAD -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Golongan (Gol)
+                                        </label>
+                                        <input type="text" name="gol" value="{{ old('gol', $tendik->gol) }}"
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                            placeholder="Contoh: IV/A">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            KNP YAD
+                                        </label>
+                                        <input type="date" name="knp_yad"
+                                            value="{{ old('knp_yad', $tendik->knp_yad ? $tendik->knp_yad->format('Y-m-d') : '') }}"
+                                            class="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
                                     </div>
                                 </div>
                             </div>
@@ -767,6 +846,36 @@
                     });
                 @endif
             @endif
+        });
+    </script>
+    <!-- JavaScript untuk menampilkan input manual -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const jabatanSelect = document.getElementById('jabatanSelect');
+            const jabatanManualInput = document.getElementById('jabatanManualInput');
+            const jabatanLainnya = document.getElementById('jabatanLainnya');
+
+            // Cek apakah nilai jabatan ada di dropdown atau tidak
+            const currentJabatan = "{{ $tendik->jabatan_struktural }}";
+            const jabatanOptions = {!! json_encode($jabatanOptions) !!};
+
+            if (currentJabatan && !jabatanOptions.includes(currentJabatan)) {
+                jabatanSelect.value = 'Lainnya';
+                jabatanManualInput.classList.remove('hidden');
+                jabatanLainnya.value = currentJabatan;
+            }
+
+            // Event listener untuk perubahan dropdown
+            jabatanSelect.addEventListener('change', function() {
+                if (this.value === 'Lainnya') {
+                    jabatanManualInput.classList.remove('hidden');
+                    jabatanLainnya.required = true;
+                } else {
+                    jabatanManualInput.classList.add('hidden');
+                    jabatanLainnya.required = false;
+                    jabatanLainnya.value = '';
+                }
+            });
         });
     </script>
 </x-app-layout>

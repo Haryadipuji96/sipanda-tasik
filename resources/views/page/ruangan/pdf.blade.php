@@ -65,6 +65,15 @@
             font-size: 9px;
         }
 
+        .prodi-list {
+            margin-top: 3px;
+            padding-left: 15px;
+        }
+
+        .prodi-item {
+            margin-bottom: 2px;
+        }
+
         table { 
             width: 100%; 
             border-collapse: collapse; 
@@ -152,12 +161,27 @@
 
     <!-- Informasi Ruangan -->
     <div class="ruangan-info">
-        <strong>Ruangan:</strong> {{ $namaRuangan }}<br>
-        @if($prodi)
-            <strong>Program Studi:</strong> {{ $prodi->nama_prodi }}<br>
-            <strong>Fakultas:</strong> {{ $prodi->fakultas->nama_fakultas ?? '-' }}
+        <strong>Ruangan:</strong> {{ $ruangan->nama_ruangan }}<br>
+        <strong>Tipe:</strong> {{ $ruangan->tipe_ruangan == 'sarana' ? 'Sarana' : 'Prasarana' }}<br>
+        <strong>Kondisi Ruangan:</strong> {{ $ruangan->kondisi_ruangan }}<br>
+        
+        @if($ruangan->tipe_ruangan == 'sarana')
+            @if($ruangan->prodis->count() > 0)
+                <strong>Program Studi:</strong>
+                <div class="prodi-list">
+                    @foreach($ruangan->prodis as $prodi)
+                        <div class="prodi-item">
+                            • {{ $prodi->nama_prodi }} 
+                            ({{ $prodi->jenjang ?? '-' }})
+                            - Fakultas {{ $prodi->fakultas->nama_fakultas ?? '-' }}
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <strong>Program Studi:</strong> -<br>
+            @endif
         @else
-            <strong>Lokasi:</strong> Unit Prasarana <!-- DIUBAH -->
+            <strong>Unit Prasarana:</strong> {{ $ruangan->unit_prasarana }}<br>
         @endif
     </div>
 
@@ -195,7 +219,13 @@
                         @endif
                     </td>
                     <td class="col-kondisi">{{ $item->kondisi }}</td>
-                    <td class="col-tanggal">{{ \Carbon\Carbon::parse($item->tanggal_pengadaan)->format('d/m/Y') }}</td>
+                    <td class="col-tanggal">
+                        @if($item->tanggal_pengadaan)
+                            {{ \Carbon\Carbon::parse($item->tanggal_pengadaan)->format('d/m/Y') }}
+                        @else
+                            -
+                        @endif
+                    </td>
                     <td class="col-kode">{{ $item->kode_seri }}</td>
                     <td class="col-sumber">{{ $item->sumber }}</td>
                     <td class="col-spesifikasi">{{ $item->spesifikasi }}</td>
@@ -207,7 +237,7 @@
 
     <!-- Summary -->
     <div class="summary-total">
-        <strong>RINGKASAN RUANGAN {{ strtoupper($namaRuangan) }}:</strong><br>
+        <strong>RINGKASAN RUANGAN {{ strtoupper($ruangan->nama_ruangan) }}:</strong><br>
         <strong>Total Barang:</strong> {{ $totalBarang }} item | 
         <strong>Total Unit:</strong> {{ $totalUnit }} unit | 
         <strong>Total Nilai:</strong> Rp {{ number_format($totalNilai, 0, ',', '.') }}

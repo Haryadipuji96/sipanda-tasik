@@ -42,7 +42,7 @@
         }
 
         .btn-secondary {
-            background-color: #6b7280;
+            background-color: #ff0000;
             color: white;
             padding: 0.5rem 1rem;
             border-radius: 0.375rem;
@@ -51,7 +51,7 @@
         }
 
         .btn-secondary:hover {
-            background-color: #4b5563;
+            background-color: #cc0000;
         }
     </style>
 
@@ -72,8 +72,8 @@
                                 </p>
                             </div>
                         </div>
-                        <a href="{{ route('ruangan.index') }}" 
-                           class="text-white hover:text-blue-100 transition flex items-center space-x-2">
+                        <a href="{{ route('ruangan.index') }}"
+                            class="text-white hover:text-blue-100 transition flex items-center space-x-2">
                             <i class="fas fa-arrow-left"></i>
                             <span>Kembali</span>
                         </a>
@@ -87,13 +87,13 @@
                         <div>
                             <h4 class="font-medium text-blue-800 mb-1">Informasi Ruangan</h4>
                             <p class="text-blue-700 text-sm">
-                                <strong>Tipe:</strong> 
-                                @if($ruangan->tipe_ruangan == 'sarana')
+                                <strong>Tipe:</strong>
+                                @if ($ruangan->tipe_ruangan == 'sarana')
                                     <span class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs">Sarana</span>
                                 @else
                                     <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Prasarana</span>
                                 @endif
-                                | 
+                                |
                                 <strong>Dibuat:</strong> {{ $ruangan->created_at->format('d F Y') }}
                             </p>
                         </div>
@@ -111,36 +111,44 @@
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 Nama Ruangan <span class="text-red-500">*</span>
                             </label>
-                            <input type="text" 
-                                   name="nama_ruangan" 
-                                   value="{{ old('nama_ruangan', $ruangan->nama_ruangan) }}"
-                                   class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                                   placeholder="Masukkan nama ruangan"
-                                   required>
+                            <input type="text" name="nama_ruangan"
+                                value="{{ old('nama_ruangan', $ruangan->nama_ruangan) }}"
+                                class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                placeholder="Masukkan nama ruangan" required>
                             @error('nama_ruangan')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <!-- Form berdasarkan tipe ruangan -->
-                        @if($ruangan->tipe_ruangan == 'sarana')
-                            <!-- Form Ruangan Sarana -->
+                        @if ($ruangan->tipe_ruangan == 'sarana')
+                            <!-- Form Ruangan Sarana - MULTIPLE PRODI -->
                             <div class="mb-6">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
                                     Program Studi <span class="text-red-500">*</span>
+                                    <span class="text-sm text-gray-500 font-normal">(Bisa pilih lebih dari satu)</span>
                                 </label>
-                                <select name="id_prodi" 
-                                        class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                                        required>
-                                    <option value="">-- Pilih Program Studi --</option>
-                                    @foreach($prodi as $p)
-                                        <option value="{{ $p->id }}" 
-                                            {{ old('id_prodi', $ruangan->id_prodi) == $p->id ? 'selected' : '' }}>
+
+                                <!-- Pilihan Prodi (Multiple) -->
+                                <select name="prodi_ids[]" id="prodi_ids" multiple
+                                    class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                    required>
+                                    @foreach ($prodi as $p)
+                                        <option value="{{ $p->id }}"
+                                            {{ in_array($p->id, old('prodi_ids', $ruangan->prodis->pluck('id')->toArray())) ? 'selected' : '' }}>
                                             {{ $p->nama_prodi }} - {{ $p->fakultas->nama_fakultas }}
                                         </option>
                                     @endforeach
                                 </select>
-                                @error('id_prodi')
+                                <p class="text-gray-500 text-sm mt-1">
+                                    Gunakan <kbd class="px-1 py-0.5 bg-gray-100 border rounded">Ctrl</kbd> +
+                                    <kbd class="px-1 py-0.5 bg-gray-100 border rounded">Click</kbd> untuk memilih lebih
+                                    dari satu
+                                </p>
+                                @error('prodi_ids')
+                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                                @error('prodi_ids.*')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
@@ -150,12 +158,10 @@
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
                                     Unit Prasarana <span class="text-red-500">*</span>
                                 </label>
-                                <input type="text" 
-                                       name="unit_prasarana" 
-                                       value="{{ old('unit_prasarana', $ruangan->unit_prasarana) }}"
-                                       class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                                       placeholder="Contoh: Rektorat, Perpustakaan, Gedung Yayasan"
-                                       required>
+                                <input type="text" name="unit_prasarana"
+                                    value="{{ old('unit_prasarana', $ruangan->unit_prasarana) }}"
+                                    class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                    placeholder="Contoh: Rektorat, Perpustakaan, Gedung Yayasan" required>
                                 @error('unit_prasarana')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -167,43 +173,33 @@
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 Kondisi Ruangan <span class="text-red-500">*</span>
                             </label>
-                            <select name="kondisi_ruangan" 
-                                    class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                                    required>
+                            <select name="kondisi_ruangan"
+                                class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                required>
                                 <option value="">-- Pilih Kondisi --</option>
-                                <option value="Baik" {{ old('kondisi_ruangan', $ruangan->kondisi_ruangan) == 'Baik' ? 'selected' : '' }}>Baik</option>
-                                <option value="Rusak Ringan" {{ old('kondisi_ruangan', $ruangan->kondisi_ruangan) == 'Rusak Ringan' ? 'selected' : '' }}>Rusak Ringan</option>
-                                <option value="Rusak Berat" {{ old('kondisi_ruangan', $ruangan->kondisi_ruangan) == 'Rusak Berat' ? 'selected' : '' }}>Rusak Berat</option>
+                                <option value="Baik"
+                                    {{ old('kondisi_ruangan', $ruangan->kondisi_ruangan) == 'Baik' ? 'selected' : '' }}>
+                                    Baik</option>
+                                <option value="Rusak Ringan"
+                                    {{ old('kondisi_ruangan', $ruangan->kondisi_ruangan) == 'Rusak Ringan' ? 'selected' : '' }}>
+                                    Rusak Ringan</option>
+                                <option value="Rusak Berat"
+                                    {{ old('kondisi_ruangan', $ruangan->kondisi_ruangan) == 'Rusak Berat' ? 'selected' : '' }}>
+                                    Rusak Berat</option>
                             </select>
                             @error('kondisi_ruangan')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <!-- HAPUS BAGIAN KETERANGAN - KARENA KOLOM TIDAK ADA DI DATABASE -->
-                        {{--
-                        <div class="mb-6">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                Keterangan (Opsional)
-                            </label>
-                            <textarea name="keterangan" 
-                                      rows="3"
-                                      class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                                      placeholder="Tambahkan keterangan tentang ruangan...">{{ old('keterangan', $ruangan->keterangan) }}</textarea>
-                            @error('keterangan')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        --}}
-
                         <!-- Tombol -->
                         <div class="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t">
-                            <a href="{{ route('ruangan.index') }}" 
-                               class="btn-secondary text-center order-2 sm:order-1">
+                            <a href="{{ route('ruangan.index') }}"
+                                class="btn-secondary text-center order-2 sm:order-1">
                                 Batal
                             </a>
-                            <button type="submit" 
-                                    class="btn-primary flex items-center justify-center order-1 sm:order-2">
+                            <button type="submit"
+                                class="btn-primary flex items-center justify-center order-1 sm:order-2">
                                 <i class="fas fa-save mr-2"></i>
                                 Simpan Perubahan
                             </button>
@@ -240,6 +236,26 @@
                     showConfirmButton: true
                 });
             @endif
+
+            // Form validation for multiple prodi selection
+            const form = document.querySelector('form');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    const prodiSelect = document.getElementById('prodi_ids');
+                    if (prodiSelect && {{ $ruangan->tipe_ruangan == 'sarana' ? 'true' : 'false' }}) {
+                        const selectedProdis = Array.from(prodiSelect.selectedOptions);
+                        if (selectedProdis.length === 0) {
+                            e.preventDefault();
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Peringatan',
+                                text: 'Pilih minimal satu Program Studi',
+                                confirmButtonColor: '#3b82f6'
+                            });
+                        }
+                    }
+                });
+            }
         });
     </script>
 </x-app-layout>

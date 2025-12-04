@@ -179,7 +179,7 @@
                             );
                         }
                     @endphp
-                    
+
                     @forelse ($prodi as $index => $p)
                         <tr>
                             <td class="border px-3 py-2">{{ $index + $prodi->firstItem() }}</td>
@@ -249,7 +249,8 @@
                                     <div class="text-gray-500">
                                         <i class="fas fa-search fa-2x mb-2"></i>
                                         <p>Tidak ditemukan program studi dengan kata kunci "{{ request('search') }}"</p>
-                                        <a href="{{ route('prodi.index') }}" class="text-blue-500 hover:text-blue-700 text-sm mt-2 inline-block">
+                                        <a href="{{ route('prodi.index') }}"
+                                            class="text-blue-500 hover:text-blue-700 text-sm mt-2 inline-block">
                                             Tampilkan semua data
                                         </a>
                                     </div>
@@ -274,13 +275,18 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // DELETE
-            const deleteButtons = document.querySelectorAll('.btn-delete');
-            deleteButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const form = this.closest('form');
+            // ✅ FIX 1: Gunakan event delegation untuk tombol delete
+            document.addEventListener('click', function(e) {
+                // Cek jika klik berasal dari tombol delete atau elemen di dalamnya
+                const deleteBtn = e.target.closest('.btn-delete');
+                if (deleteBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const form = deleteBtn.closest('form');
+
                     Swal.fire({
-                        title: 'Apakah anda yakin?',
+                        title: 'Apakah anda yakin??',
                         text: "Data yang sudah dihapus tidak bisa dikembalikan!",
                         icon: 'warning',
                         showCancelButton: true,
@@ -290,13 +296,14 @@
                         cancelButtonText: 'Batal'
                     }).then((result) => {
                         if (result.isConfirmed) {
+                            // Submit form
                             form.submit();
                         }
                     });
-                });
+                }
             });
 
-            // NOTIFIKASI SUKSES
+            // ✅ FIX 2: Tampilkan notifikasi sukses
             @if (session('success'))
                 Swal.fire({
                     icon: 'success',
@@ -304,6 +311,18 @@
                     text: "{{ session('success') }}",
                     timer: 2000,
                     showConfirmButton: false
+                });
+            @endif
+
+            // ✅ FIX 3: Tampilkan notifikasi error
+            @if (session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: "{{ session('error') }}",
+                    timer: 5000,
+                    showConfirmButton: true,
+                    confirmButtonText: 'OK'
                 });
             @endif
         });

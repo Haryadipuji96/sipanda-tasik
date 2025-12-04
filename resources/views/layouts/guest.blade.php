@@ -57,7 +57,7 @@
 <body class="font-sans text-gray-900 antialiased">
     <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
         <div class="login-container">
-            <h1 class="login-title">SIPANDA IAIT</h1>
+            <h1 class="login-title"></h1>
             {{ $slot }}
         </div>
     </div>

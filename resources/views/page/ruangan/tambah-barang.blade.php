@@ -320,7 +320,7 @@
 
                                 <!-- Tanggal & Tahun Pengadaan -->
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
+                                    {{-- <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-2">
                                             Tanggal Pengadaan
                                         </label>
@@ -330,7 +330,7 @@
                                         @error('tanggal_pengadaan')
                                             <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
                                         @enderror
-                                    </div>
+                                    </div> --}}
 
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -462,14 +462,14 @@
 
                         <!-- Tombol -->
                         <div class="flex flex-col sm:flex-row justify-end gap-3 pt-4 sm:pt-6 border-t">
+                            <a href="{{ route('ruangan.index') }}"
+                                class="btn-secondary text-center order-2 sm:order-1">
+                                Batal
+                            </a>
                             <a href="{{ route('ruangan.import-barang-form', $ruangan->id) }}"
                                 class="btn-success flex items-center justify-center order-2 sm:order-1 px-4 py-2 text-sm sm:text-base">
                                 <i class="fas fa-file-import mr-2"></i>
                                 Import Barang Massal
-                            </a>
-                            <a href="{{ route('ruangan.index') }}"
-                                class="btn-secondary text-center order-2 sm:order-1">
-                                Batal
                             </a>
                             <button type="submit" name="add_another" value="1"
                                 class="btn-warning flex items-center justify-center order-1 sm:order-3 px-4 py-2 text-sm sm:text-base">

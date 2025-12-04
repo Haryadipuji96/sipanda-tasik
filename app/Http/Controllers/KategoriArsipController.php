@@ -22,7 +22,7 @@ class KategoriArsipController extends Controller
                     ->orWhere('deskripsi', 'like', '%' . $search . '%');
             });
         })
-            ->latest()
+            ->oldest()
             ->paginate(20);
 
         return view('page.kategori_arsip.index', compact('kategori', 'search'));

@@ -108,14 +108,16 @@
 
         /* Zebra striping untuk baris - DIPERBARUI */
         .table-custom tbody tr:nth-child(odd) {
-            background-color: #ffffff; /* Putih untuk baris ganjil */
+            background-color: #ffffff;
+            /* Putih untuk baris ganjil */
         }
 
         .table-custom tbody tr:nth-child(even) {
-            background-color: #e3f4ff; /* Biru sangat muda untuk baris genap */
+            background-color: #e3f4ff;
+            /* Biru sangat muda untuk baris genap */
         }
 
-       
+
 
         /* Styling untuk sel aksi */
         .table-custom .action-cell {
@@ -216,11 +218,14 @@
                         <tr>
                             <td colspan="5" class="px-4 py-6 text-center text-gray-500 bg-white">
                                 <div class="flex flex-col items-center justify-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2M4 13h2m8-8V4a1 1 0 00-1-1h-2a1 1 0 00-1 1v1M9 7h6" />
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-gray-400 mb-2"
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+                                            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2M4 13h2m8-8V4a1 1 0 00-1-1h-2a1 1 0 00-1 1v1M9 7h6" />
                                     </svg>
                                     <span class="text-lg font-medium">Belum ada data fakultas</span>
-                                    <p class="text-sm text-gray-400 mt-1">Klik tombol "Tambah" untuk menambahkan data baru</p>
+                                    <p class="text-sm text-gray-400 mt-1">Klik tombol "Tambah" untuk menambahkan data
+                                        baru</p>
                                 </div>
                             </td>
                         </tr>
@@ -239,15 +244,19 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // ✅ FIX 1: Gunakan event delegation untuk tombol delete
+            document.addEventListener('click', function(e) {
+                // Cek jika klik berasal dari tombol delete atau elemen di dalamnya
+                const deleteBtn = e.target.closest('.btn-delete');
+                if (deleteBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
 
-            // DELETE
-            const deleteButtons = document.querySelectorAll('.btn-delete');
-            deleteButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const form = this.closest('form');
+                    const form = deleteBtn.closest('form');
+
                     Swal.fire({
                         title: 'Apakah anda yakin??',
-                        text: "Data yang sudah dihapus tidak bisa di kembalikan!",
+                        text: "Data yang sudah dihapus tidak bisa dikembalikan!",
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonColor: '#16a34a',
@@ -256,13 +265,14 @@
                         cancelButtonText: 'Batal'
                     }).then((result) => {
                         if (result.isConfirmed) {
+                            // Submit form
                             form.submit();
                         }
                     });
-                });
+                }
             });
 
-            // Tampilkan SweetAlert untuk CREATE / UPDATE / DELETE sukses
+            // ✅ FIX 2: Tampilkan notifikasi sukses
             @if (session('success'))
                 Swal.fire({
                     icon: 'success',
@@ -270,6 +280,18 @@
                     text: "{{ session('success') }}",
                     timer: 2000,
                     showConfirmButton: false
+                });
+            @endif
+
+            // ✅ FIX 3: Tampilkan notifikasi error
+            @if (session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: "{{ session('error') }}",
+                    timer: 5000,
+                    showConfirmButton: true,
+                    confirmButtonText: 'OK'
                 });
             @endif
         });

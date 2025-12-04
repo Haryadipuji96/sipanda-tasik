@@ -11,13 +11,14 @@
                 @endif
             </h2>
             <div class="flex gap-2 w-full sm:w-auto">
-                <a href="{{ route('dosen.index') }}"
-                    class="flex-1 sm:flex-none bg-gray-500 text-white px-3 py-2 rounded hover:bg-gray-600 text-sm text-center">
-                    Kembali
-                </a>
+
                 <a href="{{ route('dosen.download-all.pdf', request()->query()) }}"
                     class="flex-1 sm:flex-none bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700 text-sm text-center">
                     Download PDF
+                </a>
+                <a href="{{ route('dosen.index') }}"
+                    class="flex-1 sm:flex-none bg-gray-500 text-white px-3 py-2 rounded hover:bg-gray-600 text-sm text-center">
+                    Kembali
                 </a>
             </div>
         </div>

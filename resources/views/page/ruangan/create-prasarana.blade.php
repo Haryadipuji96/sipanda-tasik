@@ -111,7 +111,7 @@
                                 required>
                                 <option value="">-- Pilih Unit Prasarana --</option>
                                 <option value="Rektorat" {{ old('unit_prasarana') == 'Rektorat' ? 'selected' : '' }}>
-                                    Rektorat</option>
+                                    Gedung Rektorat</option>
                                 <option value="Perpustakaan"
                                     {{ old('unit_prasarana') == 'Perpustakaan' ? 'selected' : '' }}>Perpustakaan
                                 </option>

@@ -65,6 +65,12 @@ class TenagaPendidikExport implements FromCollection, WithHeadings, WithMapping,
             'Tempat Lahir',
             'Tanggal Lahir',
             'TMT Kerja',
+            'Masa Kerja Tahun',
+            'Masa Kerja Bulan',
+            'Masa Kerja Golongan Tahun',
+            'Masa Kerja Golongan Bulan',
+            'Golongan (Gol)',
+            'KNP YAD',
             'Pendidikan Terakhir',
             'NIP/NIK',
             'Email',
@@ -99,10 +105,10 @@ class TenagaPendidikExport implements FromCollection, WithHeadings, WithMapping,
         // Format riwayat golongan
         $riwayatGolongan = '';
         if (!empty($tendik->golongan_array)) {
-            $golonganArray = is_array($tendik->golongan_array) 
-                ? $tendik->golongan_array 
+            $golonganArray = is_array($tendik->golongan_array)
+                ? $tendik->golongan_array
                 : json_decode($tendik->golongan_array, true);
-            
+
             if (is_array($golonganArray)) {
                 foreach ($golonganArray as $index => $gol) {
                     if (!empty($gol['tahun']) || !empty($gol['golongan'])) {
@@ -125,6 +131,12 @@ class TenagaPendidikExport implements FromCollection, WithHeadings, WithMapping,
             $tendik->tempat_lahir ?? '-',
             $tendik->tanggal_lahir ? \Carbon\Carbon::parse($tendik->tanggal_lahir)->format('d-m-Y') : '-',
             $tendik->tmt_kerja ? \Carbon\Carbon::parse($tendik->tmt_kerja)->format('d-m-Y') : '-',
+            $tendik->masa_kerja_tahun ?? '0',
+            $tendik->masa_kerja_bulan ?? '0',
+            $tendik->masa_kerja_golongan_tahun ?? '0',
+            $tendik->masa_kerja_golongan_bulan ?? '0',
+            $tendik->gol ?? '-',
+            $tendik->knp_yad ? \Carbon\Carbon::parse($tendik->knp_yad)->format('d-m-Y') : '-',
             $tendik->pendidikan_terakhir ?? '-',
             $tendik->nip ?? '-',
             $tendik->email ?? '-',
@@ -212,6 +224,12 @@ class TenagaPendidikExport implements FromCollection, WithHeadings, WithMapping,
             'AC' => 8,  // File SK
             'AD' => 12, // File Surat Tugas
             'AE' => 12, // File Dokumen Lainnya
+            'AE' => 10,  // Masa Kerja Tahun
+            'AF' => 10,  // Masa Kerja Bulan
+            'AG' => 12,  // Masa Kerja Golongan Tahun
+            'AH' => 12,  // Masa Kerja Golongan Bulan
+            'AI' => 8,   // Golongan (Gol)
+            'AJ' => 12,  // KNP YAD
         ];
     }
 
@@ -227,7 +245,7 @@ class TenagaPendidikExport implements FromCollection, WithHeadings, WithMapping,
         // Style untuk header (baris 1)
         $sheet->getStyle('A1:AE1')->applyFromArray([
             'font' => [
-                'bold' => true, 
+                'bold' => true,
                 'size' => 10,
                 'color' => ['rgb' => 'FFFFFF']
             ],
@@ -250,50 +268,50 @@ class TenagaPendidikExport implements FromCollection, WithHeadings, WithMapping,
 
         // Style untuk data
         $sheet->getStyle('A2:AE' . $highestRow)
-              ->applyFromArray([
-                  'alignment' => [
-                      'vertical' => Alignment::VERTICAL_TOP,
-                      'wrapText' => true
-                  ],
-                  'borders' => [
-                      'allBorders' => [
-                          'borderStyle' => Border::BORDER_THIN
-                      ]
-                  ]
-              ]);
+            ->applyFromArray([
+                'alignment' => [
+                    'vertical' => Alignment::VERTICAL_TOP,
+                    'wrapText' => true
+                ],
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => Border::BORDER_THIN
+                    ]
+                ]
+            ]);
 
         // Border untuk semua data
         $sheet->getStyle('A1:AE' . $highestRow)
-              ->getBorders()
-              ->getAllBorders()
-              ->setBorderStyle(Border::BORDER_THIN);
+            ->getBorders()
+            ->getAllBorders()
+            ->setBorderStyle(Border::BORDER_THIN);
 
         // Auto filter
         $sheet->setAutoFilter('A1:AE' . $highestRow);
 
         // Set wrap text untuk kolom tertentu yang butuh
         $sheet->getStyle('R2:R' . $highestRow)
-              ->getAlignment()
-              ->setWrapText(true);
+            ->getAlignment()
+            ->setWrapText(true);
         $sheet->getStyle('S2:S' . $highestRow)
-              ->getAlignment()
-              ->setWrapText(true);
+            ->getAlignment()
+            ->setWrapText(true);
 
         // Style untuk kolom tertentu
         $sheet->getStyle('A2:A' . $highestRow)
-              ->getAlignment()
-              ->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        
+            ->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
         $sheet->getStyle('K2:L' . $highestRow)
-              ->getAlignment()
-              ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            ->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
         // Style untuk kolom status file (center alignment)
         $fileColumns = ['T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE'];
         foreach ($fileColumns as $col) {
             $sheet->getStyle($col . '2:' . $col . $highestRow)
-                  ->getAlignment()
-                  ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                ->getAlignment()
+                ->setHorizontal(Alignment::HORIZONTAL_CENTER);
         }
 
         // Freeze pane untuk header
@@ -302,7 +320,7 @@ class TenagaPendidikExport implements FromCollection, WithHeadings, WithMapping,
         return [
             1 => [
                 'font' => [
-                    'bold' => true, 
+                    'bold' => true,
                     'size' => 10,
                     'color' => ['rgb' => 'FFFFFF']
                 ],

@@ -100,15 +100,15 @@
         <!-- Grafik -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
             <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6">
-                <h2 class="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Dosen per Prodi</h2>
-                <div class="chart-container">
-                    <canvas id="chartDosenPerProdi"></canvas>
+                <h2 class="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Tenaga Pendidik per Status Kepegawaian</h2>
+                <div class="chart-container" style="position: relative; height: 300px;">
+                    <canvas id="chartTendikStatus" height="300"></canvas>
                 </div>
             </div>
             <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6">
                 <h2 class="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Dokumen per Bulan</h2>
-                <div class="chart-container">
-                    <canvas id="chartArsipPerBulan"></canvas>
+                <div class="chart-container" style="position: relative; height: 300px;">
+                    <canvas id="chartArsipPerBulan" height="300"></canvas>
                 </div>
             </div>
         </div>
@@ -217,219 +217,238 @@
     </div>
 
     @push('scripts')
+        // Chart.js Library
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
         <script>
-            // ------------------ Data dari Controller ------------------
-            const dosenPerProdi = @json($dosenPerProdi ?? []);
-            const arsipPerBulan = @json($arsipPerBulan ?? []);
-            const ruanganPerTipe = @json($ruanganPerTipe ?? []); // TAMBAHKAN INI
-            const kondisiBarang = @json($kondisiBarang ?? []);
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('Dashboard loaded - initializing charts');
 
-            // Function untuk menampilkan pesan no data
-            function showNoDataMessage(canvasId, message) {
-                document.getElementById(canvasId).parentElement.innerHTML = `
-            <div class="flex items-center justify-center h-48 text-gray-500">
-                <div class="text-center">
-                    <i class="fas fa-chart-bar text-3xl mb-2"></i>
-                    <p class="text-sm">${message}</p>
-                </div>
-            </div>
-        `;
-            }
+                // =============================================
+                // 1. CHART TENAGA PENDIDIK PER STATUS KEPEGAWAIAN
+                // =============================================
+                const tendikStatusData = @json($tendikStatus ?? []);
+                if (tendikStatusData.length > 0) {
+                    const labels = tendikStatusData.map(item => item.status);
+                    const data = tendikStatusData.map(item => item.total);
 
-            // Function untuk membuat chart dengan responsive options
-            function createResponsiveChart(canvasId, config) {
-                const ctx = document.getElementById(canvasId).getContext('2d');
-                return new Chart(ctx, {
-                    ...config,
-                    options: {
-                        ...config.options,
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            ...config.options?.plugins,
-                            legend: {
-                                position: 'bottom',
-                                labels: {
-                                    boxWidth: 12,
-                                    font: {
-                                        size: window.innerWidth < 640 ? 10 : 12
-                                    }
-                                }
-                            }
-                        },
-                        scales: config.options?.scales ? {
-                            ...config.options.scales,
-                            x: {
-                                ...config.options.scales?.x,
-                                ticks: {
-                                    font: {
-                                        size: window.innerWidth < 640 ? 10 : 12
-                                    }
-                                }
+                    const ctxTendik = document.getElementById('chartTendikStatus');
+                    if (ctxTendik) {
+                        new Chart(ctxTendik, {
+                            type: 'pie',
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    label: 'Jumlah Tenaga Pendidik',
+                                    data: data,
+                                    backgroundColor: [
+                                        'rgba(54, 162, 235, 0.8)', // Blue for TETAP
+                                        'rgba(255, 99, 132, 0.8)', // Red for KONTRAK
+                                        'rgba(255, 206, 86, 0.8)', // Yellow for others
+                                        'rgba(75, 192, 192, 0.8)', // Teal
+                                        'rgba(153, 102, 255, 0.8)', // Purple
+                                    ],
+                                    borderColor: [
+                                        'rgba(54, 162, 235, 1)',
+                                        'rgba(255, 99, 132, 1)',
+                                        'rgba(255, 206, 86, 1)',
+                                        'rgba(75, 192, 192, 1)',
+                                        'rgba(153, 102, 255, 1)',
+                                    ],
+                                    borderWidth: 2
+                                }]
                             },
-                            y: {
-                                ...config.options.scales?.y,
-                                ticks: {
-                                    font: {
-                                        size: window.innerWidth < 640 ? 10 : 12
-                                    }
-                                }
-                            }
-                        } : {}
-                    }
-                });
-            }
-
-            // ------------------ Chart Dosen Per Prodi ------------------
-            if (dosenPerProdi.length > 0) {
-                const dosenLabels = dosenPerProdi.map(d => d.prodi);
-                const dosenData = dosenPerProdi.map(d => d.total);
-
-                createResponsiveChart('chartDosenPerProdi', {
-                    type: 'bar',
-                    data: {
-                        labels: dosenLabels,
-                        datasets: [{
-                            label: 'Jumlah Dosen',
-                            data: dosenData,
-                            backgroundColor: [
-                                'rgba(236, 72, 153, 0.7)',
-                                'rgba(168, 85, 247, 0.7)',
-                                'rgba(251, 146, 60, 0.7)',
-                                'rgba(59, 130, 246, 0.7)',
-                                'rgba(34, 197, 94, 0.7)'
-                            ]
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
-                    }
-                });
-            } else {
-                showNoDataMessage('chartDosenPerProdi', 'Data dosen per prodi tidak tersedia');
-            }
-
-            // ------------------ Chart Arsip Per Bulan ------------------
-            if (arsipPerBulan.length > 0) {
-                const arsipLabels = arsipPerBulan.map(a => a.bulan);
-                const arsipData = arsipPerBulan.map(a => a.total);
-
-                createResponsiveChart('chartArsipPerBulan', {
-                    type: 'line',
-                    data: {
-                        labels: arsipLabels,
-                        datasets: [{
-                            label: 'Jumlah Dokumen',
-                            data: arsipData,
-                            borderColor: 'rgba(236, 72, 153, 0.9)',
-                            backgroundColor: 'rgba(236, 72, 153, 0.15)',
-                            fill: true,
-                            tension: 0.4,
-                            pointBackgroundColor: 'rgba(236, 72, 153, 0.9)',
-                            pointBorderWidth: 2
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
-                    }
-                });
-            } else {
-                showNoDataMessage('chartArsipPerBulan', 'Data arsip per bulan tidak tersedia');
-            }
-
-            // ------------------ Chart Ruangan Per Tipe ------------------
-            if (ruanganPerTipe && ruanganPerTipe.length > 0) {
-                const tipeLabels = ruanganPerTipe.map(r => r.tipe);
-                const tipeData = ruanganPerTipe.map(r => r.total);
-
-                const hasData = tipeData.some(total => total > 0);
-
-                if (hasData) {
-                    createResponsiveChart('chartRuanganPerTipe', {
-                        type: 'doughnut',
-                        data: {
-                            labels: tipeLabels,
-                            datasets: [{
-                                label: 'Jumlah Ruangan',
-                                data: tipeData,
-                                backgroundColor: [
-                                    'rgba(251, 146, 60, 0.8)', // Orange untuk Sarana
-                                    'rgba(16, 185, 129, 0.8)', // Hijau untuk Prasarana
-                                ],
-                                borderColor: [
-                                    'rgba(251, 146, 60, 1)', // Orange untuk Sarana
-                                    'rgba(16, 185, 129, 1)', // Hijau untuk Prasarana
-                                ],
-                                borderWidth: 2
-                            }]
-                        },
-                        options: {
-                            plugins: {
-                                legend: {
-                                    position: 'bottom',
-                                },
-                                tooltip: {
-                                    callbacks: {
-                                        label: function(context) {
-                                            const label = context.label || '';
-                                            const value = context.raw || 0;
-                                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                            const percentage = Math.round((value / total) * 100);
-                                            return `${label}: ${value} ruangan (${percentage}%)`;
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        position: 'bottom',
+                                        labels: {
+                                            padding: 20,
+                                            font: {
+                                                size: window.innerWidth < 640 ? 10 : 12
+                                            }
+                                        }
+                                    },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function(context) {
+                                                let label = context.label || '';
+                                                if (label) {
+                                                    label += ': ';
+                                                }
+                                                label += context.raw + ' orang';
+                                                return label;
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
-                    });
-                } else {
-                    showNoDataMessage('chartRuanganPerTipe', 'Data ruangan per tipe tidak tersedia');
-                }
-            } else {
-                showNoDataMessage('chartRuanganPerTipe', 'Data ruangan per tipe tidak tersedia');
-            }
-
-            // ------------------ Chart Kondisi Barang ------------------
-            if (kondisiBarang.length > 0) {
-                const kondisiLabels = kondisiBarang.map(k => k.kondisi);
-                const kondisiData = kondisiBarang.map(k => k.total);
-
-                createResponsiveChart('chartKondisiBarang', {
-                    type: 'pie',
-                    data: {
-                        labels: kondisiLabels,
-                        datasets: [{
-                            label: 'Jumlah Barang',
-                            data: kondisiData,
-                            backgroundColor: [
-                                'rgba(16, 185, 129, 0.8)',
-                                'rgba(245, 158, 11, 0.8)',
-                                'rgba(239, 68, 68, 0.8)',
-                                'rgba(156, 163, 175, 0.8)'
-                            ]
-                        }]
+                        });
+                        console.log('Chart Tendik Status initialized');
                     }
-                });
-            } else {
-                showNoDataMessage('chartKondisiBarang', 'Data kondisi barang tidak tersedia');
-            }
+                } else {
+                    // Show no data message
+                    const container = document.querySelector('#chartTendikStatus').parentElement;
+                    container.innerHTML = `
+                <div class="flex items-center justify-center h-full text-gray-500">
+                    <div class="text-center">
+                        <i class="fas fa-chart-pie text-3xl mb-2"></i>
+                        <p class="text-sm">Data tenaga pendidik tidak tersedia</p>
+                    </div>
+                </div>
+            `;
+                }
 
-            // Handle window resize untuk update chart
-            let resizeTimer;
-            window.addEventListener('resize', function() {
-                clearTimeout(resizeTimer);
-                resizeTimer = setTimeout(function() {
-                    // Charts akan otomatis responsive karena maintainAspectRatio: false
-                }, 250);
+                // =============================================
+                // 2. CHART ARSIP PER BULAN
+                // =============================================
+                const arsipData = @json($arsipPerBulan ?? []);
+                if (arsipData.length > 0) {
+                    const labels = arsipData.map(item => item.bulan);
+                    const data = arsipData.map(item => item.total);
+
+                    const ctxArsip = document.getElementById('chartArsipPerBulan');
+                    if (ctxArsip) {
+                        new Chart(ctxArsip, {
+                            type: 'line',
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    label: 'Jumlah Dokumen',
+                                    data: data,
+                                    borderColor: 'rgba(236, 72, 153, 0.9)',
+                                    backgroundColor: 'rgba(236, 72, 153, 0.15)',
+                                    fill: true,
+                                    tension: 0.4,
+                                    pointBackgroundColor: 'rgba(236, 72, 153, 0.9)',
+                                    pointBorderWidth: 2
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true
+                                    }
+                                },
+                                plugins: {
+                                    legend: {
+                                        display: false
+                                    }
+                                }
+                            }
+                        });
+                    }
+                } else {
+                    // Show no data message
+                    const container = document.querySelector('#chartArsipPerBulan').parentElement;
+                    container.innerHTML = `
+                <div class="flex items-center justify-center h-full text-gray-500">
+                    <div class="text-center">
+                        <i class="fas fa-chart-line text-3xl mb-2"></i>
+                        <p class="text-sm">Data arsip per bulan tidak tersedia</p>
+                    </div>
+                </div>
+            `;
+                }
+
+                // =============================================
+                // 3. CHART RUANGAN PER TIPE
+                // =============================================
+                const ruanganData = @json($ruanganPerTipe ?? []);
+                if (ruanganData && ruanganData.length > 0) {
+                    const labels = ruanganData.map(item => item.tipe);
+                    const data = ruanganData.map(item => item.total);
+
+                    const hasData = data.some(total => total > 0);
+
+                    if (hasData) {
+                        const ctxRuangan = document.getElementById('chartRuanganPerTipe');
+                        if (ctxRuangan) {
+                            new Chart(ctxRuangan, {
+                                type: 'doughnut',
+                                data: {
+                                    labels: labels,
+                                    datasets: [{
+                                        label: 'Jumlah Ruangan',
+                                        data: data,
+                                        backgroundColor: [
+                                            'rgba(251, 146, 60, 0.8)', // Orange untuk Sarana
+                                            'rgba(16, 185, 129, 0.8)', // Hijau untuk Prasarana
+                                        ],
+                                        borderColor: [
+                                            'rgba(251, 146, 60, 1)', // Orange untuk Sarana
+                                            'rgba(16, 185, 129, 1)', // Hijau untuk Prasarana
+                                        ],
+                                        borderWidth: 2
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: {
+                                        legend: {
+                                            position: 'bottom',
+                                        },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function(context) {
+                                                    const label = context.label || '';
+                                                    const value = context.raw || 0;
+                                                    const total = context.dataset.data.reduce((a, b) => a +
+                                                        b, 0);
+                                                    const percentage = Math.round((value / total) * 100);
+                                                    return `${label}: ${value} ruangan (${percentage}%)`;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+
+                // =============================================
+                // 4. CHART KONDISI BARANG
+                // =============================================
+                const kondisiData = @json($kondisiBarang ?? []);
+                if (kondisiData.length > 0) {
+                    const labels = kondisiData.map(item => item.kondisi);
+                    const data = kondisiData.map(item => item.total);
+
+                    const ctxKondisi = document.getElementById('chartKondisiBarang');
+                    if (ctxKondisi) {
+                        new Chart(ctxKondisi, {
+                            type: 'pie',
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    label: 'Jumlah Barang',
+                                    data: data,
+                                    backgroundColor: [
+                                        'rgba(16, 185, 129, 0.8)', // Green - Baik
+                                        'rgba(245, 158, 11, 0.8)', // Yellow - Rusak Ringan
+                                        'rgba(239, 68, 68, 0.8)', // Red - Rusak Berat
+                                        'rgba(156, 163, 175, 0.8)' // Gray - Lainnya
+                                    ]
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        position: 'bottom',
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
             });
         </script>
     @endpush

@@ -119,7 +119,7 @@
                             <h3 class="text-lg font-semibold text-green-700 mb-2">Ruangan Prasarana</h3>
                             <p class="text-green-600 text-center text-sm mb-4">
                                 Ruangan umum institusi<br>
-                                (Rektorat, Perpustakaan, Gedung Yayasan, dll)
+                                (Gedung Rektorat, Perpustakaan, Gedung Yayasan, dll)
                             </p>
                             <div class="flex items-center text-green-600 font-medium">
                                 <span class="mr-2">Pilih</span>

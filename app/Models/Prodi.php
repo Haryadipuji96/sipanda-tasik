@@ -16,7 +16,7 @@ class Prodi extends Model
         'id_fakultas',
         'nama_prodi',
         'jenjang',
-        'ketua_prodi', // ID dosen yang menjadi ketua
+        'ketua_prodi',
         'deskripsi',
     ];
 
@@ -26,10 +26,16 @@ class Prodi extends Model
         return $this->belongsTo(Fakultas::class, 'id_fakultas');
     }
 
-    // Relasi ke ruangan
+    // Relasi one-to-many ke ruangan (untuk backward compatibility)
     public function ruangan()
     {
         return $this->hasMany(Ruangan::class, 'id_prodi');
+    }
+
+    // ✅ RELASI BARU: Many-to-many dengan ruangan
+    public function ruangans()
+    {
+        return $this->belongsToMany(Ruangan::class, 'ruangan_prodi', 'prodi_id', 'ruangan_id');
     }
 
     // Relasi ke sarpras
@@ -48,5 +54,10 @@ class Prodi extends Model
     public function dosen()
     {
         return $this->hasMany(Dosen::class, 'id_prodi');
+    }
+
+    public function dokumenMahasiswa()
+    {
+        return $this->hasMany(DokumenMahasiswa::class, 'prodi_id');
     }
 }

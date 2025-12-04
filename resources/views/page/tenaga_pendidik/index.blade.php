@@ -118,21 +118,70 @@
         .table-custom .action-cell {
             background-color: transparent !important;
         }
+
+        /* Tambahkan di style section */
+        .table-custom th {
+            border-right: 1px solid #93c5fd;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            color: white;
+            padding: 12px 8px;
+            /* Padding lebih kecil */
+            white-space: nowrap;
+            /* Agar teks tidak wrap */
+        }
+
+        .table-custom td {
+            border-right: 1px solid #e5e7eb;
+            vertical-align: middle;
+            /* Center vertical */
+            padding: 12px 8px;
+            /* Padding lebih kecil */
+            text-align: center;
+            /* Center align semua */
+            font-size: 0.85rem;
+            /* Font sedikit lebih kecil */
+        }
+
+        /* Untuk kolom nama dan jabatan biarkan left align */
+        .table-custom td:nth-child(3),
+        /* Kolom Nama Lengkap */
+        .table-custom td:nth-child(4),
+        /* Kolom Posisi/Jabatan */
+        .table-custom td:nth-child(7)
+
+        /* Kolom Program Studi */
+            {
+            text-align: left;
+        }
     </style>
 
     <div class="py-10 px-6" x-data="{ openModal: null }">
         <!-- Header -->
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="text-2xl font-semibold text-gray-800">Data Tenaga Pendidik</h2>
-            @if (auth()->check() && auth()->user()->canCrud('tenaga-pendidik'))
-                <button onclick="window.location='{{ route('tenaga-pendidik.create') }}'" class="cssbuttons-io-button">
-                    <svg height="18" width="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M0 0h24v24H0z" fill="none" />
-                        <path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z" fill="currentColor" />
-                    </svg>
-                    <span>Tambah</span>
-                </button>
-            @endif
+        <!-- Di dalam div flex justify-between items-center mb-4 -->
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-xl font-semibold">Data Tenaga Pendidik</h1>
+            <div class="flex gap-2">
+                @if (auth()->check() && auth()->user()->canCrud('tenaga-pendidik'))
+                    <button onclick="window.location='{{ route('tenaga-pendidik.create') }}'"
+                        class="cssbuttons-io-button">
+                        <svg height="18" width="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z" fill="currentColor"></path>
+                        </svg>
+                        <span>Tambah</span>
+                    </button>
+
+                    <!-- TAMBAH TOMBOL IMPORT -->
+                    <button onclick="window.location='{{ route('tenaga-pendidik.import-form') }}'"
+                        class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm">
+                        <i class="fas fa-file-import mr-2"></i>
+                        Import Excel
+                    </button>
+                @endif
+            </div>
         </div>
 
         <x-search-bar route="tenaga-pendidik.index" placeholder="Cari nama / NIP / prodi..." />
@@ -179,10 +228,11 @@
         <!-- Table -->
         <div class="table-wrapper border border-gray-200 rounded-lg">
             <table class="table-custom">
+                <!-- Ganti struktur thead dari tabel tendik dengan ini -->
                 <thead class="bg-blue-500 text-white">
                     <tr>
                         @if (auth()->check() && auth()->user()->canCrud('tenaga-pendidik'))
-                            <th rowspan="2" class="px-4 py-2 border text-center w-12">
+                            <th class="px-4 py-2 border text-center w-12" rowspan="2">
                                 <input type="checkbox" id="select-all">
                             </th>
                         @endif
@@ -195,11 +245,19 @@
                         <th rowspan="2" class="border px-4 py-2">Status Kepegawaian</th>
                         <th rowspan="2" class="border px-4 py-2">Jenis Kelamin</th>
                         <th rowspan="2" class="border px-4 py-2">TMT Kerja</th>
+                        <th colspan="2" class="border px-4 py-2 text-center">Masa Kerja</th>
+                        <th rowspan="2" class="border px-4 py-2">Gol</th>
+                        <th colspan="2" class="border px-4 py-2 text-center">Masa Kerja Golongan</th>
+                        <th rowspan="2" class="border px-4 py-2">KNP YAD</th>
                         <th rowspan="2" class="border px-4 py-2 text-center">NIP/NIK</th>
                         <th rowspan="2" class="border px-4 py-2 text-center">Keterangan</th>
-
                         <th rowspan="2" class="border px-4 py-2 text-center w-40">Aksi</th>
-
+                    </tr>
+                    <tr>
+                        <th class="border px-2 py-1">Thn</th>
+                        <th class="border px-2 py-1">Bln</th>
+                        <th class="border px-2 py-1">Thn</th>
+                        <th class="border px-2 py-1">Bln</th>
                     </tr>
                 </thead>
 
@@ -232,7 +290,7 @@
                             <td class="border px-4 py-2">
                                 {!! highlight($t->nama_tendik, request('search')) !!}
                             </td>
-                            <td class="border px-4 py-2"> <!-- KOLOM BARU -->
+                            <td class="border px-4 py-2">
                                 {!! highlight($t->jabatan_struktural ?? '-', request('search')) !!}
                             </td>
                             <td class="border px-4 py-2">
@@ -259,6 +317,35 @@
                             <td class="border px-4 py-2 text-center">
                                 {{ $t->tmt_kerja ? $t->tmt_kerja->format('d/m/Y') : '-' }}
                             </td>
+
+                            <!-- MASA KERJA (2 KOLOM TERPISAH) -->
+                            <td class="border px-4 py-2 text-center">
+                                {{ $t->masa_kerja_tahun ?? 0 }}
+                            </td>
+                            <td class="border px-4 py-2 text-center">
+                                {{ $t->masa_kerja_bulan ?? 0 }}
+                            </td>
+
+                            <!-- GOL -->
+                            <td class="border px-4 py-2 text-center">
+                                {{ $t->gol ?? '-' }}
+                            </td>
+
+
+
+                            <!-- MASA KERJA GOLONGAN (2 KOLOM TERPISAH) -->
+                            <td class="border px-4 py-2 text-center">
+                                {{ $t->masa_kerja_golongan_tahun ?? 0 }}
+                            </td>
+                            <td class="border px-4 py-2 text-center">
+                                {{ $t->masa_kerja_golongan_bulan ?? 0 }}
+                            </td>
+
+                            <!-- KNP YAD -->
+                            <td class="border px-4 py-2 text-center">
+                                {{ $t->knp_yad ? $t->knp_yad->format('d/m/Y') : '-' }}
+                            </td>
+
                             <td class="border px-4 py-2 text-center">
                                 {!! highlight($t->nip ?? '-', request('search')) !!}
                             </td>

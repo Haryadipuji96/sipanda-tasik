@@ -20,6 +20,12 @@ class TenagaPendidik extends Model
         'tempat_lahir',
         'tanggal_lahir',
         'tmt_kerja',
+        'masa_kerja_tahun',
+        'masa_kerja_bulan',
+        'masa_kerja_golongan_tahun',
+        'masa_kerja_golongan_bulan',
+        'gol',
+        'knp_yad',
         'golongan_history',
         'nip',
         'status_kepegawaian',
@@ -47,6 +53,7 @@ class TenagaPendidik extends Model
     protected $casts = [
         'tanggal_lahir' => 'date',
         'tmt_kerja' => 'date',
+        'knp_yad' => 'date',
         'golongan_history' => 'array',
     ];
 
@@ -103,6 +110,7 @@ class TenagaPendidik extends Model
             'Kepala Pusat Pengembangan Bahasa',
             'Sekretaris Pusat Pengembangan Bahasa',
             'Plt. Kepala Pusat Teknologi & Informasi',
+            'Lainnya'
         ];
     }
 

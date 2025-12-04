@@ -26,50 +26,64 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // ==========================================
-// ROUTE UNTUK DOSEN
+// ROUTE UNTUK DOSEN - DIPERBAIKI
 // ==========================================
 Route::prefix('dosen')->group(function () {
-    Route::get('/', [DosenController::class, 'index'])->name('dosen.index');
-    Route::get('/create', [DosenController::class, 'create'])->name('dosen.create');
-    Route::post('/store', [DosenController::class, 'store'])->name('dosen.store');
-    Route::get('/{id}', [DosenController::class, 'show'])->name('dosen.show');
-    Route::get('/dosen/{id}/edit', [DosenController::class, 'edit'])->name('dosen.edit');
-    Route::put('/{id}', [DosenController::class, 'update'])->name('dosen.update');
-    Route::delete('/{id}', [DosenController::class, 'destroy'])->name('dosen.destroy');
-    Route::post('/delete-selected', [DosenController::class, 'deleteSelected'])->name('dosen.deleteSelected');
-
-    // Export Routes
+    // =================== IMPORT/EXPORT ROUTES ===================
+    Route::get('/import/form', [DosenController::class, 'showImportForm'])->name('dosen.import.form');
+    Route::post('/import/process', [DosenController::class, 'import'])->name('dosen.import.process');
+    
+    // PERBAIKAN: Nama route konsisten dengan pattern
+    Route::get('/download-template', [DosenController::class, 'downloadTemplate'])->name('dosen.download-template');
     Route::get('/export/excel', [DosenController::class, 'exportExcel'])->name('dosen.export.excel');
     Route::get('/preview/pdf', [DosenController::class, 'previewAllPdf'])->name('dosen.preview.pdf');
     Route::get('/download/pdf', [DosenController::class, 'downloadAllPdf'])->name('dosen.download-all.pdf');
 
+    // =================== CRUD ROUTES ===================
+    Route::get('/', [DosenController::class, 'index'])->name('dosen.index');
+    Route::get('/create', [DosenController::class, 'create'])->name('dosen.create');
+    Route::post('/store', [DosenController::class, 'store'])->name('dosen.store');
+
     // PDF Single Routes
     Route::get('/{id}/preview-pdf', [DosenController::class, 'previewPdfSingle'])->name('dosen.preview-single.pdf');
     Route::get('/{id}/download-pdf', [DosenController::class, 'downloadPdfSingle'])->name('dosen.download-single.pdf');
+
+    // Route dengan {id}
+    Route::get('/{id}', [DosenController::class, 'show'])->name('dosen.show');
+    Route::get('/{id}/edit', [DosenController::class, 'edit'])->name('dosen.edit');
+    Route::put('/{id}', [DosenController::class, 'update'])->name('dosen.update');
+    Route::delete('/{id}', [DosenController::class, 'destroy'])->name('dosen.destroy');
+
+    Route::post('/delete-selected', [DosenController::class, 'deleteSelected'])->name('dosen.deleteSelected');
 });
+
 
 // ==========================================
 // ROUTE UNTUK TENAGA PENDIDIK
 // ==========================================
-Route::prefix('tenaga-pendidik')->group(function () {
-    Route::get('/', [TenagaPendidikController::class, 'index'])->name('tenaga-pendidik.index');
-    Route::get('/create', [TenagaPendidikController::class, 'create'])->name('tenaga-pendidik.create');
-    Route::post('/store', [TenagaPendidikController::class, 'store'])->name('tenaga-pendidik.store');
+Route::prefix('tenaga-pendidik')->name('tenaga-pendidik.')->group(function () {
+    // Basic CRUD Routes
+    Route::get('/', [TenagaPendidikController::class, 'index'])->name('index');
+    Route::get('/create', [TenagaPendidikController::class, 'create'])->name('create');
+    Route::post('/store', [TenagaPendidikController::class, 'store'])->name('store');
 
-    // Export Routes - HARUS DITARUH SEBELUM DYNAMIC ROUTES
-    Route::get('/export/excel', [TenagaPendidikController::class, 'exportExcel'])->name('tenaga-pendidik.export.excel');
-    Route::get('/preview-all-pdf', [TenagaPendidikController::class, 'previewAllPdf'])->name('tenaga-pendidik.preview-all.pdf');
-    Route::get('/download-all-pdf', [TenagaPendidikController::class, 'downloadAllPdf'])->name('tenaga-pendidik.download-all.pdf');
+    // IMPORT/EXPORT Routes - DITARUH SEBELUM DYNAMIC ROUTES
+    Route::get('/import', [TenagaPendidikController::class, 'showImportForm'])->name('import-form');
+    Route::post('/import', [TenagaPendidikController::class, 'import'])->name('import');
+    Route::get('/download-template', [TenagaPendidikController::class, 'downloadTemplate'])->name('download-template');
+    Route::get('/export/excel', [TenagaPendidikController::class, 'exportExcel'])->name('export.excel');
+    Route::get('/preview-all-pdf', [TenagaPendidikController::class, 'previewAllPdf'])->name('preview-all.pdf');
+    Route::get('/download-all-pdf', [TenagaPendidikController::class, 'downloadAllPdf'])->name('download-all.pdf');
 
     // Dynamic routes - HARUS DITARUH DI BAWAH
-    Route::get('/{id}', [TenagaPendidikController::class, 'show'])->name('tenaga-pendidik.show');
-    Route::get('/tenaga-pendidik/{id}/edit', [TenagaPendidikController::class, 'edit'])->name('tenaga-pendidik.edit');
-    Route::put('/{id}', [TenagaPendidikController::class, 'update'])->name('tenaga-pendidik.update');
-    Route::delete('/{id}', [TenagaPendidikController::class, 'destroy'])->name('tenaga-pendidik.destroy');
-    Route::get('/{id}/preview-pdf', [TenagaPendidikController::class, 'previewPDF'])->name('tenaga-pendidik.preview-pdf');
-    Route::get('/{id}/download-pdf', [TenagaPendidikController::class, 'downloadPDF'])->name('tenaga-pendidik.download-pdf');
+    Route::get('/{id}', [TenagaPendidikController::class, 'show'])->name('show');
+    Route::get('/{id}/edit', [TenagaPendidikController::class, 'edit'])->name('edit');
+    Route::put('/{id}', [TenagaPendidikController::class, 'update'])->name('update');
+    Route::delete('/{id}', [TenagaPendidikController::class, 'destroy'])->name('destroy');
+    Route::get('/{id}/preview-pdf', [TenagaPendidikController::class, 'previewPDF'])->name('preview-pdf');
+    Route::get('/{id}/download-pdf', [TenagaPendidikController::class, 'downloadPDF'])->name('download-pdf');
 
-    Route::post('/delete-selected', [TenagaPendidikController::class, 'deleteSelected'])->name('tenaga-pendidik.deleteSelected');
+    Route::post('/delete-selected', [TenagaPendidikController::class, 'deleteSelected'])->name('deleteSelected');
 });
 // ==========================================
 // ROUTE UNTUK SARPRAS

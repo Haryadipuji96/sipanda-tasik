@@ -139,10 +139,74 @@
                     </div>
                 </div>
 
+                <!-- Tambahkan setelah section Data Pribadi -->
+                <div class="mb-6">
+                    <h2 class="text-lg font-semibold text-gray-700 mb-3 flex items-center">
+                        <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm font-medium">📈
+                            Informasi Masa Kerja & Golongan</span>
+                    </h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm border">
+                            <tr class="bg-gray-50">
+                                <td class="border px-4 py-3 font-medium w-1/4">Masa Kerja</td>
+                                <td class="border px-4 py-3">
+                                    @if ($tenagaPendidik->masa_kerja_tahun || $tenagaPendidik->masa_kerja_bulan)
+                                        <span class="font-semibold text-blue-600">
+                                            {{ $tenagaPendidik->masa_kerja_tahun ?? '0' }} Tahun
+                                            {{ $tenagaPendidik->masa_kerja_bulan ?? '0' }} Bulan
+                                        </span>
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border px-4 py-3 font-medium bg-gray-50">Masa Kerja Golongan</td>
+                                <td class="border px-4 py-3">
+                                    @if ($tenagaPendidik->masa_kerja_golongan_tahun || $tenagaPendidik->masa_kerja_golongan_bulan)
+                                        <span class="font-semibold text-purple-600">
+                                            {{ $tenagaPendidik->masa_kerja_golongan_tahun ?? '0' }} Tahun
+                                            {{ $tenagaPendidik->masa_kerja_golongan_bulan ?? '0' }} Bulan
+                                        </span>
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+                            </tr>
+                            <tr class="bg-gray-50">
+                                <td class="border px-4 py-3 font-medium">Golongan (Gol)</td>
+                                <td class="border px-4 py-3">
+                                    @if ($tenagaPendidik->gol)
+                                        <span
+                                            class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                                            {{ $tenagaPendidik->gol }}
+                                        </span>
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border px-4 py-3 font-medium bg-gray-50">KNP YAD</td>
+                                <td class="border px-4 py-3">
+                                    @if ($tenagaPendidik->knp_yad)
+                                        <span class="font-semibold">
+                                            {{ \Carbon\Carbon::parse($tenagaPendidik->knp_yad)->format('d/m/Y') }}
+                                        </span>
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
                 <!-- KONTAK DAN ALAMAT -->
                 <div class="mb-6">
                     <h2 class="text-lg font-semibold text-gray-700 mb-3 flex items-center">
-                        <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">📞 Kontak &
+                        <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">📞 Kontak
+                            &
                             Alamat</span>
                     </h2>
                     <div class="overflow-x-auto">

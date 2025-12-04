@@ -8,7 +8,11 @@ use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\DosenExport;
+use App\Exports\TemplateDosenExport;
+use App\Imports\DosenImport;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class DosenController extends Controller
 {
@@ -631,5 +635,85 @@ class DosenController extends Controller
             ->setPaper('a4', 'portrait');
 
         return $pdf->download('Detail_Dosen_' . $dosen->nama . '_' . date('Y-m-d_His') . '.pdf');
+    }
+
+    public function showImportForm()
+    {
+        if (!Auth::user()->canCrud('dosen')) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        return view('page.dosen.import');
+    }
+
+    public function import(Request $request)
+    {
+        try {
+            $request->validate([
+                'file' => 'required|mimes:xlsx,xls,csv|max:5120',
+            ]);
+
+            $file = $request->file('file');
+
+            $import = new DosenImport();
+
+            Excel::import($import, $file);
+
+            $importedCount = $import->getImportedCount();
+            $skippedCount = $import->getSkippedCount();
+            $errors = $import->getErrors();
+
+            if ($importedCount > 0) {
+                if (!empty($errors)) {
+                    return redirect()->back()
+                        ->with('success', "Berhasil mengimport {$importedCount} data dosen. {$skippedCount} data dilewati karena error.")
+                        ->with('imported_count', $importedCount) // TAMBAHKAN INI
+                        ->with('skipped_count', $skippedCount)   // TAMBAHKAN INI (optional)
+                        ->with('import_errors', $errors);
+                }
+
+                return redirect()->back()
+                    ->with('success', "Berhasil mengimport {$importedCount} data dosen.")
+                    ->with('imported_count', $importedCount); // TAMBAHKAN INI
+            } else {
+                if (!empty($errors)) {
+                    return redirect()->back()
+                        ->with('error', 'Tidak ada data yang berhasil diimport.')
+                        ->with('import_errors', $errors);
+                }
+
+                return redirect()->back()
+                    ->with('warning', 'Tidak ada data yang valid untuk diimport.');
+            }
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+            $errorDetails = [];
+
+            foreach ($failures as $failure) {
+                $errorDetails[] = [
+                    'row' => $failure->row(),
+                    'field' => $failure->attribute(),
+                    'errors' => $failure->errors(),
+                    'value' => $failure->values()[$failure->attribute()] ?? null,
+                ];
+            }
+
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan validasi data.')
+                ->with('error_details', $errorDetails);
+        } catch (\Exception $e) {
+            Log::error('Import error:', ['error' => $e->getMessage()]);
+
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Download template
+     */
+    public function downloadTemplate()
+    {
+        return Excel::download(new TemplateDosenExport(), 'template-import-dosen.xlsx');
     }
 }

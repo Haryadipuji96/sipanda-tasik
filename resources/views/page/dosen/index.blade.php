@@ -89,8 +89,8 @@
         }
 
         /* =======================
-           Zebra Stripe Table - DIPERBARUI
-        ======================= */
+   Zebra Stripe Table - FIXED untuk rowspan
+======================= */
         .table-custom {
             border-collapse: collapse;
             width: 100%;
@@ -124,18 +124,29 @@
             border-right: none;
         }
 
-        /* Zebra striping untuk baris - DIPERBARUI */
-        .table-custom tbody tr:nth-child(odd) {
+        /* =======================
+   FIX: Zebra striping yang benar untuk rowspan
+======================= */
+        /* HAPUS yang ini: */
+        /* .table-custom tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+.table-custom tbody tr:nth-child(even) {
+    background-color: #e3f4ff;
+} */
+
+        /* GANTI dengan ini: */
+        .table-custom tbody tr:nth-child(4n+1),
+        .table-custom tbody tr:nth-child(4n) {
             background-color: #ffffff;
-            /* Putih untuk baris ganjil */
+            /* Putih */
         }
 
-        .table-custom tbody tr:nth-child(even) {
+        .table-custom tbody tr:nth-child(4n+2),
+        .table-custom tbody tr:nth-child(4n+3) {
             background-color: #e3f4ff;
-            /* Biru sangat muda untuk baris genap */
+            /* Biru muda */
         }
-
-
 
         /* Styling untuk sel aksi */
         .table-custom .action-cell {
@@ -146,15 +157,24 @@
     <div class="p-6">
         <div class="flex justify-between items-center mb-4">
             <h1 class="text-xl font-semibold">Data Dosen</h1>
-            @if (auth()->check() && auth()->user()->canCrud('dosen'))
-                <button onclick="window.location='{{ route('dosen.create') }}'" class="cssbuttons-io-button">
-                    <svg height="18" width="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M0 0h24v24H0z" fill="none"></path>
-                        <path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z" fill="currentColor"></path>
-                    </svg>
-                    <span>Tambah</span>
-                </button>
-            @endif
+            <div class="flex gap-2">
+                @if (auth()->check() && auth()->user()->canCrud('dosen'))
+                    <!-- TOMBOL TAMBAH -->
+                    <button onclick="window.location='{{ route('dosen.create') }}'" class="cssbuttons-io-button">
+                        <svg height="18" width="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z" fill="currentColor"></path>
+                        </svg>
+                        <span>Tambah</span>
+                    </button>
+
+                    {{-- <a href="{{ route('dosen.import.form') }}"
+                        class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm transition duration-200">
+                        <i class="fas fa-file-import mr-2"></i>
+                        Import Excel
+                    </a> --}}
+                @endif
+            </div>
         </div>
 
         <x-search-bar route="dosen.index" placeholder="Cari nama / prodi / jabatan / NUPTK..." />
@@ -776,6 +796,78 @@
                         }
                     }
                 }
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            function fixZebraStriping() {
+                const table = document.querySelector('.table-custom');
+                if (!table) return;
+
+                const tbody = table.querySelector('tbody');
+                const rows = tbody.querySelectorAll('tr:not([style*="display: none"])');
+
+                // Reset semua warna
+                rows.forEach(row => {
+                    row.style.backgroundColor = '';
+                });
+
+                let groupIndex = 0;
+                let currentColor = 'white';
+
+                // Loop setiap baris
+                for (let i = 0; i < rows.length; i++) {
+                    const row = rows[i];
+
+                    // Cek apakah ini baris pertama dari sebuah dosen (punya rowspan > 1)
+                    const hasRowspan = row.querySelector('[rowspan]') !== null;
+
+                    if (hasRowspan) {
+                        // Ini awal grup dosen baru
+                        groupIndex++;
+
+                        // Ganti warna setiap grup baru
+                        if (groupIndex % 2 === 0) {
+                            currentColor = '#e3f4ff'; // Biru muda
+                        } else {
+                            currentColor = '#ffffff'; // Putih
+                        }
+                    }
+
+                    // Terapkan warna ke baris ini
+                    row.style.backgroundColor = currentColor;
+
+                    // Juga terapkan ke semua td di baris ini
+                    const cells = row.querySelectorAll('td');
+                    cells.forEach(cell => {
+                        cell.style.backgroundColor = currentColor;
+                    });
+
+                    // Kecuali action cell
+                    const actionCells = row.querySelectorAll('.action-cell');
+                    actionCells.forEach(cell => {
+                        cell.style.backgroundColor = 'transparent';
+                    });
+                }
+            }
+
+            // Jalankan saat halaman dimuat
+            fixZebraStriping();
+
+            // Jalankan lagi setelah pagination berubah (jika menggunakan AJAX)
+            const observer = new MutationObserver(fixZebraStriping);
+            observer.observe(document.querySelector('.table-custom tbody'), {
+                childList: true,
+                subtree: true
+            });
+
+            // Untuk pagination biasa (reload halaman)
+            const paginationLinks = document.querySelectorAll('a[href*="page"]');
+            paginationLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    setTimeout(fixZebraStriping, 100); // Tunggu halaman selesai loading
+                });
             });
         });
     </script>

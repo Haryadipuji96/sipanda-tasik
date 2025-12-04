@@ -65,9 +65,7 @@
             font-weight: 500;
         }
 
-        /* =======================
-           Zebra Stripe Table - DIPERBARUI
-        ======================= */
+        /* ======================= Zebra Stripe Table ======================= */
         .table-custom {
             border-collapse: collapse;
             width: 100%;
@@ -101,7 +99,6 @@
             border-right: none;
         }
 
-        /* Zebra striping untuk baris - DIPERBARUI */
         .table-custom tbody tr:nth-child(odd) {
             background-color: #ffffff;
         }
@@ -110,12 +107,11 @@
             background-color: #e3f4ff;
         }
 
-        /* Styling untuk sel aksi */
         .table-custom .action-cell {
             background-color: transparent !important;
         }
 
-        /* Highlight Animasi */
+        /* ======================= Highlight Animasi ======================= */
         .highlight {
             background-color: #fde68a;
             font-weight: 600;
@@ -138,23 +134,65 @@
                 box-shadow: none;
             }
         }
+
+        /* ======================= Prodi Badge ======================= */
+        .prodi-badge-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .prodi-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background-color: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+
+        .digunakan-bersama {
+            background-color: #dbeafe;
+            color: #1e40af;
+            border-color: #93c5fd;
+        }
     </style>
 
     <div class="p-6">
         <div class="max-w-7xl mx-auto">
-            <!-- Header -->
+            <!-- Header Section -->
             <div class="bg-white rounded-lg shadow-sm border p-6 mb-6">
-                <div class="flex flex-col md:flex-row md:items-center md:justify-between">
-                    <div>
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <!-- Title and Prodi Info -->
+                    <div class="flex-1">
                         <h1 class="text-2xl font-bold text-gray-800">{{ $ruangan->nama_ruangan }}</h1>
                         <div class="flex items-center gap-4 mt-2 text-sm text-gray-600">
                             @if ($ruangan->tipe_ruangan == 'sarana')
-                                <span class="badge bg-orange-100 text-orange-800">
-                                    🎓 {{ $ruangan->prodi->nama_prodi ?? '-' }}
-                                </span>
-                                <span class="badge bg-green-100 text-green-800">
-                                    🏛️ {{ $ruangan->prodi->fakultas->nama_fakultas ?? '-' }}
-                                </span>
+                                <div class="flex flex-wrap gap-2">
+                                    @if ($ruangan->prodis->count() > 0)
+                                        @foreach ($ruangan->prodis as $prodi)
+                                            <span class="badge bg-orange-100 text-orange-800">
+                                                🎓 {{ $prodi->nama_prodi }}
+                                            </span>
+                                        @endforeach
+                                        <span class="badge bg-blue-100 text-blue-800">
+                                            🏛️ {{ $ruangan->prodis->first()->fakultas->nama_fakultas ?? '-' }}
+                                        </span>
+                                    @elseif ($ruangan->prodi)
+                                        <!-- Fallback untuk data lama -->
+                                        <span class="badge bg-orange-100 text-orange-800">
+                                            🎓 {{ $ruangan->prodi->nama_prodi ?? '-' }}
+                                        </span>
+                                        <span class="badge bg-green-100 text-green-800">
+                                            🏛️ {{ $ruangan->prodi->fakultas->nama_fakultas ?? '-' }}
+                                        </span>
+                                    @endif
+                                </div>
                             @else
                                 <span class="badge bg-gray-100 text-gray-800">
                                     🏢 Unit Prasarana - {{ $ruangan->unit_prasarana }}
@@ -162,22 +200,21 @@
                             @endif
                         </div>
                     </div>
-                    <div class="flex flex-col sm:flex-row gap-2 mt-4 md:mt-0">
-                        <!-- Tombol Tambah Barang -->
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-2 min-w-max">
                         <a href="{{ route('ruangan.tambah-barang', $ruangan->id) }}"
-                            class="btn-action btn-primary gap-2 px-4 py-2 order-2 sm:order-1">
+                           class="btn-action btn-primary gap-2 px-4 py-2">
                             <i class="fas fa-plus w-4 h-4"></i>
                             Tambah Barang
                         </a>
-
                         <a href="{{ route('ruangan.pdf', $ruangan->id) }}"
-                            class="flex-1 sm:flex-none bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700 text-sm text-center flex items-center justify-center order-3 sm:order-2">
+                           class="flex-1 sm:flex-none bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm text-center flex items-center justify-center">
                             <i class="fas fa-file-pdf mr-2"></i>
                             Download PDF
                         </a>
-
-                        <!-- Tombol Kembali -->
-                        <a href="{{ route('ruangan.index') }}" class="btn-action btn-secondary px-4 py-2 order-1 sm:order-3">
+                        <a href="{{ route('ruangan.index') }}"
+                           class="btn-action btn-secondary px-4 py-2">
                             <i class="fas fa-arrow-left w-4 h-4"></i>
                             Kembali
                         </a>
@@ -217,103 +254,43 @@
                     <!-- Search Bar -->
                     <div class="mb-4">
                         <div class="relative w-full" id="input">
-                            <input type="text" name="search" value="{{ request('search') }}" id="floating_outlined" 
-                                placeholder="Cari nama barang, kategori, merk, kondisi..."
-                                class="block w-full text-sm h-[50px] px-4 text-blue-900 bg-white rounded-[8px] border border-blue-300 appearance-none 
-                                       focus:border-transparent focus:outline focus:outline-2 focus:outline-blue-500 focus:ring-0 
-                                       hover:border-blue-400 peer invalid:border-red-500 invalid:focus:border-red-500 overflow-ellipsis overflow-hidden text-nowrap pr-[48px]" />
+                            <input type="text" name="search" value="{{ request('search') }}" id="floating_outlined"
+                                   placeholder="Cari nama barang, kategori, merk, kondisi..."
+                                   class="block w-full text-sm h-[50px] px-4 text-blue-900 bg-white rounded-[8px] border border-blue-300 appearance-none 
+                                          focus:border-transparent focus:outline focus:outline-2 focus:outline-blue-500 focus:ring-0 
+                                          hover:border-blue-400 peer invalid:border-red-500 invalid:focus:border-red-500 
+                                          overflow-ellipsis overflow-hidden text-nowrap pr-[48px]" />
 
                             <label for="floating_outlined"
-                                class="peer-placeholder-shown:-z-10 peer-focus:z-10 absolute text-[14px] leading-[150%] text-blue-500 
-                                       peer-focus:text-blue-500 peer-invalid:text-red-500 focus:invalid:text-red-500 duration-300 
-                                       transform -translate-y-[1.2rem] scale-75 top-2 z-10 origin-[0] bg-white px-2 
-                                       peer-focus:px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 
-                                       peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-[1.2rem]">
+                                   class="peer-placeholder-shown:-z-10 peer-focus:z-10 absolute text-[14px] leading-[150%] text-blue-500 
+                                          peer-focus:text-blue-500 peer-invalid:text-red-500 focus:invalid:text-red-500 duration-300 
+                                          transform -translate-y-[1.2rem] scale-75 top-2 z-10 origin-[0] bg-white px-2 
+                                          peer-focus:px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 
+                                          peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-[1.2rem]">
                                 Cari Barang
                             </label>
 
                             <!-- Icon search -->
                             <div class="absolute top-3 right-3 text-blue-400">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" height="24" width="24">
-                                    <path
-                                        d="M10.979 16.8991C11.0591 17.4633 10.6657 17.9926 10.0959 17.9994C8.52021 18.0183 6.96549 17.5712 5.63246 16.7026C4.00976 15.6452 2.82575 14.035 2.30018 12.1709C1.77461 10.3068 1.94315 8.31525 2.77453 6.56596C3.60592 4.81667 5.04368 3.42838 6.82101 2.65875C8.59833 1.88911 10.5945 1.79039 12.4391 2.3809C14.2837 2.97141 15.8514 4.21105 16.8514 5.86977C17.8513 7.52849 18.2155 9.49365 17.8764 11.4005C17.5979 12.967 16.8603 14.4068 15.7684 15.543C15.3736 15.9539 14.7184 15.8787 14.3617 15.4343C14.0051 14.9899 14.0846 14.3455 14.4606 13.9173C15.1719 13.1073 15.6538 12.1134 15.8448 11.0393C16.0964 9.62426 15.8261 8.166 15.0841 6.93513C14.3421 5.70426 13.1788 4.78438 11.81 4.34618C10.4412 3.90799 8.95988 3.98125 7.641 4.55236C6.32213 5.12348 5.25522 6.15367 4.63828 7.45174C4.02135 8.74982 3.89628 10.2276 4.28629 11.6109C4.67629 12.9942 5.55489 14.1891 6.75903 14.9737C7.67308 15.5693 8.72759 15.8979 9.80504 15.9333C10.3746 15.952 10.8989 16.3349 10.979 16.8991Z">
-                                    </path>
-                                    <rect transform="rotate(-49.6812 12.2469 14.8859)" rx="1" height="10.1881" width="2"
-                                        y="14.8859" x="12.2469"></rect>
+                                    <path d="M10.979 16.8991C11.0591 17.4633 10.6657 17.9926 10.0959 17.9994C8.52021 18.0183 6.96549 17.5712 5.63246 16.7026C4.00976 15.6452 2.82575 14.035 2.30018 12.1709C1.77461 10.3068 1.94315 8.31525 2.77453 6.56596C3.60592 4.81667 5.04368 3.42838 6.82101 2.65875C8.59833 1.88911 10.5945 1.79039 12.4391 2.3809C14.2837 2.97141 15.8514 4.21105 16.8514 5.86977C17.8513 7.52849 18.2155 9.49365 17.8764 11.4005C17.5979 12.967 16.8603 14.4068 15.7684 15.543C15.3736 15.9539 14.7184 15.8787 14.3617 15.4343C14.0051 14.9899 14.0846 14.3455 14.4606 13.9173C15.1719 13.1073 15.6538 12.1134 15.8448 11.0393C16.0964 9.62426 15.8261 8.166 15.0841 6.93513C14.3421 5.70426 13.1788 4.78438 11.81 4.34618C10.4412 3.90799 8.95988 3.98125 7.641 4.55236C6.32213 5.12348 5.25522 6.15367 4.63828 7.45174C4.02135 8.74982 3.89628 10.2276 4.28629 11.6109C4.67629 12.9942 5.55489 14.1891 6.75903 14.9737C7.67308 15.5693 8.72759 15.8979 9.80504 15.9333C10.3746 15.952 10.8989 16.3349 10.979 16.8991Z" />
+                                    <rect transform="rotate(-49.6812 12.2469 14.8859)" rx="1" height="10.1881" width="2" y="14.8859" x="12.2469" />
                                 </svg>
                             </div>
 
                             <!-- Reset button -->
                             @if (request('search'))
                                 <a href="{{ route('ruangan.show', $ruangan->id) }}"
-                                    class="absolute top-3 right-10 bg-blue-100 text-blue-600 p-1.5 rounded-full hover:bg-blue-200 transition flex items-center justify-center"
-                                    title="Reset Pencarian">
+                                   class="absolute top-3 right-10 bg-blue-100 text-blue-600 p-1.5 rounded-full hover:bg-blue-200 transition flex items-center justify-center"
+                                   title="Reset Pencarian">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
-                                        stroke="currentColor" stroke-width="2">
+                                         stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                     </svg>
                                 </a>
                             @endif
                         </div>
                     </div>
-
-                    {{-- <!-- Filter Controls -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-                        <!-- Filter Kategori -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Kategori Barang</label>
-                            <select name="kategori"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="">Semua Kategori</option>
-                                <option value="PERABOTAN & FURNITURE" {{ request('kategori') == 'PERABOTAN & FURNITURE' ? 'selected' : '' }}>
-                                    PERABOTAN & FURNITURE
-                                </option>
-                                <option value="ELEKTRONIK & TEKNOLOGI" {{ request('kategori') == 'ELEKTRONIK & TEKNOLOGI' ? 'selected' : '' }}>
-                                    ELEKTRONIK & TEKNOLOGI
-                                </option>
-                                <option value="PERALATAN LABORATORIUM" {{ request('kategori') == 'PERALATAN LABORATORIUM' ? 'selected' : '' }}>
-                                    PERALATAN LABORATORIUM
-                                </option>
-                                <option value="PERALATAN KANTOR" {{ request('kategori') == 'PERALATAN KANTOR' ? 'selected' : '' }}>
-                                    PERALATAN KANTOR
-                                </option>
-                                <option value="ALAT KOMUNIKASI" {{ request('kategori') == 'ALAT KOMUNIKASI' ? 'selected' : '' }}>
-                                    ALAT KOMUNIKASI
-                                </option>
-                                <option value="LAINNYA" {{ request('kategori') == 'LAINNYA' ? 'selected' : '' }}>
-                                    LAINNYA
-                                </option>
-                            </select>
-                        </div>
-
-                        <!-- Filter Kondisi -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Kondisi Barang</label>
-                            <select name="kondisi_barang"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="">Semua Kondisi</option>
-                                <option value="Baik Sekali" {{ request('kondisi_barang') == 'Baik Sekali' ? 'selected' : '' }}>Baik Sekali</option>
-                                <option value="Baik" {{ request('kondisi_barang') == 'Baik' ? 'selected' : '' }}>Baik</option>
-                                <option value="Cukup" {{ request('kondisi_barang') == 'Cukup' ? 'selected' : '' }}>Cukup</option>
-                                <option value="Rusak Ringan" {{ request('kondisi_barang') == 'Rusak Ringan' ? 'selected' : '' }}>Rusak Ringan</option>
-                                <option value="Rusak Berat" {{ request('kondisi_barang') == 'Rusak Berat' ? 'selected' : '' }}>Rusak Berat</option>
-                            </select>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="flex flex-col xs:flex-row gap-2">
-                            <button type="submit"
-                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm flex items-center justify-center transition duration-200 shadow-sm hover:shadow-md flex-1">
-                                <i class="fas fa-search mr-2"></i>
-                                Cari
-                            </button>
-                            <a href="{{ route('ruangan.show', $ruangan->id) }}"
-                                class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm flex items-center justify-center transition duration-200 shadow-sm hover:shadow-md flex-1">
-                                <i class="fas fa-refresh mr-2"></i>
-                                Reset
-                            </a>
-                        </div>
-                    </div> --}}
 
                     <!-- Active Search Info -->
                     @if (request('search') || request('kategori') || request('kondisi_barang'))
@@ -345,7 +322,7 @@
                 </form>
             </div>
 
-            <!-- Daftar Barang -->
+            <!-- Daftar Barang Section -->
             <div class="bg-white rounded-lg shadow-sm border">
                 <div class="p-6 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                     <h2 class="text-lg font-semibold text-gray-800">Daftar Barang dalam Ruangan</h2>
@@ -436,45 +413,44 @@
                                             <div class="flex items-center justify-center gap-2">
                                                 <!-- Tombol Detail -->
                                                 <a href="{{ route('ruangan.barang.show', ['ruangan' => $ruangan->id, 'barang' => $barang->id]) }}"
-                                                    class="p-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full transition"
-                                                    title="Detail Barang">
+                                                   class="p-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full transition"
+                                                   title="Detail Barang">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5"
-                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                                                        stroke-width="2">
+                                                         fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                                         stroke-width="2">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                         <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                     </svg>
                                                 </a>
 
                                                 @canCrud('ruangan')
                                                 <!-- Tombol Edit -->
                                                 <a href="{{ route('ruangan.barang.edit', ['ruangan' => $ruangan->id, 'barang' => $barang->id]) }}"
-                                                    class="p-2 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-full transition"
-                                                    title="Edit Barang">
+                                                   class="p-2 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-full transition"
+                                                   title="Edit Barang">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5"
-                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                                                        stroke-width="2">
+                                                         fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                                         stroke-width="2">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M11 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                                              d="M11 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z" />
                                                     </svg>
                                                 </a>
 
                                                 <!-- Tombol Hapus -->
-                                                <form
-                                                    action="{{ route('ruangan.barang.destroy', ['ruangan' => $ruangan->id, 'barang' => $barang->id]) }}"
-                                                    method="POST" class="inline">
+                                                <form action="{{ route('ruangan.barang.destroy', ['ruangan' => $ruangan->id, 'barang' => $barang->id]) }}"
+                                                      method="POST" class="inline">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="button"
-                                                        class="btn-delete p-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-full transition delete-btn"
-                                                        title="Hapus Barang">
+                                                            class="btn-delete p-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-full transition delete-btn"
+                                                            title="Hapus Barang">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5"
-                                                            fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                                                            stroke-width="2">
+                                                             fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                                             stroke-width="2">
                                                             <path stroke-linecap="round" stroke-linejoin="round"
-                                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4h6v3m-9 0h12" />
+                                                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4h6v3m-9 0h12" />
                                                         </svg>
                                                     </button>
                                                 </form>
@@ -498,7 +474,7 @@
                         </p>
                         @canSuperadmin
                         <a href="{{ route('ruangan.tambah-barang', $ruangan->id) }}"
-                            class="btn-action btn-primary gap-2 px-6 py-2">
+                           class="btn-action btn-primary gap-2 px-6 py-2">
                             <i class="fas fa-plus w-4 h-4"></i>
                             Tambah Barang Pertama
                         </a>

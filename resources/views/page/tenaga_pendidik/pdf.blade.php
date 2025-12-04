@@ -214,6 +214,44 @@
             <td>Pendidikan Terakhir</td>
             <td>{{ $tenagaPendidik->pendidikan_terakhir ?? '-' }}</td>
         </tr>
+        <!-- Masa Kerja -->
+        <tr>
+            <td>Masa Kerja</td>
+            <td>
+                @if ($tenagaPendidik->masa_kerja_tahun || $tenagaPendidik->masa_kerja_bulan)
+                    {{ $tenagaPendidik->masa_kerja_tahun ?? '0' }} Tahun
+                    {{ $tenagaPendidik->masa_kerja_bulan ?? '0' }} Bulan
+                @else
+                    -
+                @endif
+            </td>
+        </tr>
+
+        <!-- Masa Kerja Golongan -->
+        <tr>
+            <td>Masa Kerja Golongan</td>
+            <td>
+                @if ($tenagaPendidik->masa_kerja_golongan_tahun || $tenagaPendidik->masa_kerja_golongan_bulan)
+                    {{ $tenagaPendidik->masa_kerja_golongan_tahun ?? '0' }} Tahun
+                    {{ $tenagaPendidik->masa_kerja_golongan_bulan ?? '0' }} Bulan
+                @else
+                    -
+                @endif
+            </td>
+        </tr>
+
+        <!-- Golongan (Gol) -->
+        <tr>
+            <td>Golongan (Gol)</td>
+            <td>{{ $tenagaPendidik->gol ?? '-' }}</td>
+        </tr>
+
+        <!-- KNP YAD -->
+        <tr>
+            <td>KNP YAD</td>
+            <td>{{ $tenagaPendidik->knp_yad ? \Carbon\Carbon::parse($tenagaPendidik->knp_yad)->format('d/m/Y') : '-' }}
+            </td>
+        </tr>
     </table>
 
     <!-- KONTAK DAN ALAMAT -->
@@ -286,14 +324,14 @@
                 'file_perjanjian_kerja' => 'Perjanjian Kerja',
                 'file_sk' => 'Surat Keputusan (SK)',
                 'file_surat_tugas' => 'Surat Tugas',
-                'file' => 'Dokumen Lainnya'
+                'file' => 'Dokumen Lainnya',
             ];
         @endphp
-        
-        @foreach($berkasFields as $field => $label)
+
+        @foreach ($berkasFields as $field => $label)
             <div class="berkas-item {{ $tenagaPendidik->$field ? 'berkas-ada' : 'berkas-tidak-ada' }}">
-                • {{ $label }}: 
-                @if($tenagaPendidik->$field)
+                • {{ $label }}:
+                @if ($tenagaPendidik->$field)
                     <strong>Tersedia</strong>
                 @else
                     <em>Belum diupload</em>

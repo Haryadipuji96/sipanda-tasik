@@ -72,8 +72,8 @@
                                 </p>
                             </div>
                         </div>
-                        <a href="{{ route('ruangan.create') }}" 
-                           class="text-white hover:text-orange-100 transition flex items-center space-x-2">
+                        <a href="{{ route('ruangan.create') }}"
+                            class="text-white hover:text-orange-100 transition flex items-center space-x-2">
                             <i class="fas fa-arrow-left"></i>
                             <span>Kembali</span>
                         </a>
@@ -87,8 +87,9 @@
                         <div>
                             <h4 class="font-medium text-orange-800 mb-1">Ruangan Sarana</h4>
                             <p class="text-orange-700 text-sm">
-                                Ruangan sarana digunakan untuk keperluan akademik Program Studi seperti laboratorium, 
-                                ruang kelas, ruang dosen, dll. Ruangan ini terkait langsung dengan Program Studi tertentu.
+                                Ruangan sarana digunakan untuk keperluan akademik Program Studi seperti laboratorium,
+                                ruang kelas, ruang dosen, dll. Ruangan ini terkait langsung dengan Program Studi
+                                tertentu.
                             </p>
                         </div>
                     </div>
@@ -125,13 +126,22 @@
                         <div class="mb-4">
                             <label class="block font-medium mb-2 text-gray-700">
                                 Program Studi <span class="text-red-500">*</span>
+                                <span class="text-sm text-gray-500 font-normal">(Bisa pilih lebih dari satu)</span>
                             </label>
-                            <select name="id_prodi" id="id_prodi"
+                            <select name="prodi_ids[]" id="prodi_ids" multiple
                                 class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
-                                required disabled>
+                                required>
                                 <option value="">-- Pilih Prodi --</option>
                             </select>
-                            @error('id_prodi')
+                            <p class="text-gray-500 text-sm mt-1">
+                                Gunakan <kbd class="px-1 py-0.5 bg-gray-100 border rounded">Ctrl</kbd> + <kbd
+                                    class="px-1 py-0.5 bg-gray-100 border rounded">Click</kbd>
+                                untuk memilih lebih dari satu prodi
+                            </p>
+                            @error('prodi_ids')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                            @error('prodi_ids.*')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
@@ -144,9 +154,14 @@
                             <select name="kondisi_ruangan"
                                 class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
                                 required>
-                                <option value="Baik" {{ old('kondisi_ruangan') == 'Baik' ? 'selected' : '' }}>Baik</option>
-                                <option value="Rusak Ringan" {{ old('kondisi_ruangan') == 'Rusak Ringan' ? 'selected' : '' }}>Rusak Ringan</option>
-                                <option value="Rusak Berat" {{ old('kondisi_ruangan') == 'Rusak Berat' ? 'selected' : '' }}>Rusak Berat</option>
+                                <option value="Baik" {{ old('kondisi_ruangan') == 'Baik' ? 'selected' : '' }}>Baik
+                                </option>
+                                <option value="Rusak Ringan"
+                                    {{ old('kondisi_ruangan') == 'Rusak Ringan' ? 'selected' : '' }}>Rusak Ringan
+                                </option>
+                                <option value="Rusak Berat"
+                                    {{ old('kondisi_ruangan') == 'Rusak Berat' ? 'selected' : '' }}>Rusak Berat
+                                </option>
                             </select>
                             @error('kondisi_ruangan')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -168,12 +183,12 @@
 
                         <!-- Tombol -->
                         <div class="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t">
-                            <a href="{{ route('ruangan.create') }}" 
-                               class="btn-secondary text-center order-2 sm:order-1">
+                            <a href="{{ route('ruangan.create') }}"
+                                class="btn-secondary text-center order-2 sm:order-1">
                                 Batal
                             </a>
-                            <button type="submit" 
-                                    class="btn-primary flex items-center justify-center order-1 sm:order-2">
+                            <button type="submit"
+                                class="btn-primary flex items-center justify-center order-1 sm:order-2">
                                 <i class="fas fa-save mr-2"></i>
                                 Simpan Ruangan Sarana
                             </button>
@@ -219,55 +234,112 @@
                         icon: 'error',
                         title: 'Terjadi Kesalahan!',
                         html: `
-                            <div class="text-left">
-                                <p class="mb-2">Mohon perbaiki kesalahan berikut:</p>
-                                <ul class="list-disc list-inside text-sm">
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        `,
+                        <div class="text-left">
+                            <p class="mb-2">Mohon perbaiki kesalahan berikut:</p>
+                            <ul class="list-disc list-inside text-sm">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    `,
                         showConfirmButton: true,
                         confirmButtonText: 'Mengerti'
                     });
                 @endif
             @endif
 
-            // Form submission confirmation
+            // Form submission confirmation dengan validasi manual
             const form = document.getElementById('createForm');
             if (form) {
                 form.addEventListener('submit', function(e) {
-                    const namaRuangan = document.querySelector('input[name="nama_ruangan"]').value;
-                    const fakultas = document.querySelector('select[name="id_fakultas"]');
-                    const prodi = document.querySelector('select[name="id_prodi"]');
-                    const kondisi = document.querySelector('select[name="kondisi_ruangan"]');
-                    
-                    const fakultasText = fakultas.options[fakultas.selectedIndex]?.text || '-';
-                    const prodiText = prodi.options[prodi.selectedIndex]?.text || '-';
-                    const kondisiText = kondisi.options[kondisi.selectedIndex]?.text || '-';
+                    e.preventDefault(); // Mencegah submit langsung
 
-                    e.preventDefault();
-                    
+                    // Ambil nilai form
+                    const namaRuangan = document.querySelector('input[name="nama_ruangan"]').value;
+                    const fakultasSelect = document.querySelector('select[name="id_fakultas"]');
+                    const prodiSelect = document.querySelector('select[name="prodi_ids[]"]');
+                    const kondisiSelect = document.querySelector('select[name="kondisi_ruangan"]');
+
+                    // Validasi manual sebelum menampilkan SweetAlert
+                    let isValid = true;
+                    let errorMessage = '';
+
+                    // Validasi Nama Ruangan
+                    if (!namaRuangan.trim()) {
+                        isValid = false;
+                        errorMessage += '• Nama Ruangan wajib diisi<br>';
+                    }
+
+                    // Validasi Fakultas
+                    if (!fakultasSelect.value) {
+                        isValid = false;
+                        errorMessage += '• Fakultas wajib dipilih<br>';
+                    }
+
+                    // Validasi Program Studi
+                    const selectedProdi = Array.from(prodiSelect.selectedOptions).map(option => option
+                        .value);
+                    if (selectedProdi.length === 0) {
+                        isValid = false;
+                        errorMessage += '• Program Studi wajib dipilih (minimal 1)<br>';
+                    }
+
+                    // Validasi Kondisi Ruangan
+                    if (!kondisiSelect.value) {
+                        isValid = false;
+                        errorMessage += '• Kondisi Ruangan wajib dipilih<br>';
+                    }
+
+                    // Jika validasi gagal, tampilkan error
+                    if (!isValid) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Validasi Gagal!',
+                            html: `
+                            <div class="text-left">
+                                <p class="mb-2">Silakan lengkapi data berikut:</p>
+                                ${errorMessage}
+                            </div>
+                        `,
+                            showConfirmButton: true,
+                            confirmButtonText: 'Mengerti'
+                        });
+                        return false; // Hentikan proses
+                    }
+
+                    // Jika semua validasi berhasil, tampilkan konfirmasi
+                    const fakultasText = fakultasSelect.options[fakultasSelect.selectedIndex]?.text || '-';
+                    const kondisiText = kondisiSelect.options[kondisiSelect.selectedIndex]?.text || '-';
+                    const prodiText = Array.from(prodiSelect.selectedOptions)
+                        .map(option => option.text)
+                        .join(', ');
+
                     Swal.fire({
                         title: 'Simpan Ruangan Sarana?',
                         html: `
-                            <div class="text-left text-sm">
-                                <p><strong>Nama Ruangan:</strong> ${namaRuangan}</p>
-                                <p><strong>Fakultas:</strong> ${fakultasText}</p>
-                                <p><strong>Program Studi:</strong> ${prodiText}</p>
-                                <p><strong>Kondisi:</strong> ${kondisiText}</p>
-                            </div>
-                        `,
+                        <div class="text-left text-sm">
+                            <p class="mb-1"><strong>Nama Ruangan:</strong> ${namaRuangan}</p>
+                            <p class="mb-1"><strong>Fakultas:</strong> ${fakultasText}</p>
+                            <p class="mb-1"><strong>Program Studi:</strong> ${prodiText}</p>
+                            <p class="mb-1"><strong>Kondisi:</strong> ${kondisiText}</p>
+                            <p class="mb-1"><strong>Tipe:</strong> Sarana</p>
+                        </div>
+                    `,
                         icon: 'question',
                         showCancelButton: true,
                         confirmButtonColor: '#f97316',
                         cancelButtonColor: '#6b7280',
                         confirmButtonText: 'Ya, Simpan!',
                         cancelButtonText: 'Batal',
-                        reverseButtons: true
+                        reverseButtons: true,
+                        allowOutsideClick: false,
+                        allowEscapeKey: false
                     }).then((result) => {
                         if (result.isConfirmed) {
+                            // Hapus event listener untuk mencegah loop infinity
+                            form.removeEventListener('submit', arguments.callee);
+                            // Submit form secara manual
                             form.submit();
                         }
                     });
@@ -279,28 +351,30 @@
                 var idFakultas = $(this).val();
 
                 if (idFakultas) {
-                    $('#id_prodi').prop('disabled', false);
-                    $('#id_prodi').html('<option value="">-- Loading... --</option>');
+                    $('#prodi_ids').prop('disabled', false);
+                    $('#prodi_ids').html('<option value="">-- Loading... --</option>');
 
-                    var url = '{{ route("get.prodi.by.fakultas", ":id") }}'.replace(':id', idFakultas);
+                    var url = '{{ route('get.prodi.by.fakultas', ':id') }}'.replace(':id', idFakultas);
 
                     $.get(url)
                         .done(function(data) {
-                            $('#id_prodi').html('<option value="">-- Pilih Prodi --</option>');
+                            $('#prodi_ids').html('');
                             if (data.length > 0) {
                                 $.each(data, function(key, value) {
-                                    $('#id_prodi').append('<option value="' + value.id + '">' +
-                                        value.nama_prodi + ' (' + (value.jenjang || '-') + ')' +
+                                    $('#prodi_ids').append('<option value="' + value.id + '">' +
+                                        value.nama_prodi + ' (' + (value.jenjang || '-') +
+                                        ')' +
                                         '</option>');
                                 });
                             } else {
-                                $('#id_prodi').append('<option value="">-- Tidak ada prodi --</option>');
+                                $('#prodi_ids').append(
+                                    '<option value="">-- Tidak ada prodi --</option>');
                             }
                         })
                         .fail(function(xhr) {
                             console.error('Error loading prodi:', xhr);
-                            $('#id_prodi').html('<option value="">-- Error loading prodi --</option>');
-                            
+                            $('#prodi_ids').html('<option value="">-- Error loading prodi --</option>');
+
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
@@ -310,8 +384,8 @@
                             });
                         });
                 } else {
-                    $('#id_prodi').prop('disabled', true);
-                    $('#id_prodi').html('<option value="">-- Pilih Prodi --</option>');
+                    $('#prodi_ids').prop('disabled', true);
+                    $('#prodi_ids').html('<option value="">-- Pilih Prodi --</option>');
                 }
             });
 
@@ -319,7 +393,9 @@
             @if (old('id_fakultas'))
                 $('#id_fakultas').trigger('change');
                 setTimeout(function() {
-                    $('#id_prodi').val('{{ old('id_prodi') }}');
+                    // Untuk multiple select, perlu set array
+                    var oldProdiIds = @json(old('prodi_ids', []));
+                    $('#prodi_ids').val(oldProdiIds);
                 }, 1000);
             @endif
         });

@@ -15,19 +15,27 @@ class Ruangan extends Model
         'id_prodi',
         'tipe_ruangan',
         'unit_prasarana',
-        'kapasitas', // ✅ DITAMBAHKAN
-        'fasilitas', // ✅ DITAMBAHKAN
+        'kapasitas',
+        'fasilitas',
         'nama_ruangan', 
         'kondisi_ruangan',
+        'file_dokumen', // Tambahkan jika belum ada
     ];
 
     protected $casts = [
         'tipe_ruangan' => 'string'
     ];
 
+    // Relasi one-to-many (untuk backward compatibility)
     public function prodi()
     {
         return $this->belongsTo(Prodi::class, 'id_prodi');
+    }
+
+    // ✅ RELASI BARU: Many-to-many dengan prodi
+    public function prodis()
+    {
+        return $this->belongsToMany(Prodi::class, 'ruangan_prodi', 'ruangan_id', 'prodi_id');
     }
 
     public function fakultas()
@@ -58,5 +66,11 @@ class Ruangan extends Model
     public function scopePrasarana($query)
     {
         return $query->where('tipe_ruangan', 'prasarana');
+    }
+    
+    // ✅ METHOD BARU: Cek apakah ruangan digunakan bersama
+    public function isDigunakanBersama()
+    {
+        return $this->prodis()->count() > 1;
     }
 }

@@ -7,18 +7,19 @@
             <h2 class="text-base md:text-lg font-semibold text-gray-700">
                 Preview Laporan Tenaga Pendidik
                 @if (request('status_kepegawaian'))
-                    <span
-                        class="block sm:inline text-sm text-gray-600">({{ ucfirst(request('status_kepegawaian')) }})</span>
+                    <span class="block sm:inline text-sm text-gray-600">
+                        ({{ ucfirst(request('status_kepegawaian')) }})
+                    </span>
                 @endif
             </h2>
             <div class="flex gap-2 w-full sm:w-auto">
-                <a href="{{ route('tenaga-pendidik.index') }}"
-                    class="flex-1 sm:flex-none bg-gray-500 text-white px-3 py-2 rounded hover:bg-gray-600 text-sm text-center">
-                    Kembali
-                </a>
                 <a href="{{ route('tenaga-pendidik.download-all.pdf', request()->query()) }}"
                     class="flex-1 sm:flex-none bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700 text-sm text-center">
                     Download PDF
+                </a>
+                <a href="{{ route('tenaga-pendidik.index') }}"
+                    class="flex-1 sm:flex-none bg-gray-500 text-white px-3 py-2 rounded hover:bg-gray-600 text-sm text-center">
+                    Kembali
                 </a>
             </div>
         </div>
@@ -66,6 +67,10 @@
                         <th class="border border-gray-300 px-3 py-2">Jenis Kelamin</th>
                         <th class="border border-gray-300 px-3 py-2">Pendidikan Terakhir</th>
                         <th class="border border-gray-300 px-3 py-2">TMT Kerja</th>
+                        <th class="border border-gray-300 px-3 py-2">Masa Kerja</th>
+                        <th class="border border-gray-300 px-3 py-2">Masa Kerja Gol</th>
+                        <th class="border border-gray-300 px-3 py-2">Gol</th>
+                        <th class="border border-gray-300 px-3 py-2">KNP YAD</th>
                         <th class="border border-gray-300 px-3 py-2">Email</th>
                         <th class="border border-gray-300 px-3 py-2">No HP</th>
                     </tr>
@@ -101,12 +106,46 @@
                             <td class="border border-gray-300 px-3 py-2">
                                 {{ $item->tmt_kerja ? \Carbon\Carbon::parse($item->tmt_kerja)->format('d/m/Y') : '-' }}
                             </td>
+                            <!-- Masa Kerja -->
+                            <td class="border border-gray-300 px-3 py-2 text-center">
+                                @if($item->masa_kerja_tahun || $item->masa_kerja_bulan)
+                                    <span class="font-medium">
+                                        {{ $item->masa_kerja_tahun ?? '0' }}T {{ $item->masa_kerja_bulan ?? '0' }}B
+                                    </span>
+                                @else
+                                    -
+                                @endif
+                            </td>
+                            <!-- Masa Kerja Golongan -->
+                            <td class="border border-gray-300 px-3 py-2 text-center">
+                                @if($item->masa_kerja_golongan_tahun || $item->masa_kerja_golongan_bulan)
+                                    <span class="font-medium">
+                                        {{ $item->masa_kerja_golongan_tahun ?? '0' }}T {{ $item->masa_kerja_golongan_bulan ?? '0' }}B
+                                    </span>
+                                @else
+                                    -
+                                @endif
+                            </td>
+                            <!-- Golongan (Gol) -->
+                            <td class="border border-gray-300 px-3 py-2 text-center">
+                                @if($item->gol)
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-semibold">
+                                        {{ $item->gol }}
+                                    </span>
+                                @else
+                                    -
+                                @endif
+                            </td>
+                            <!-- KNP YAD -->
+                            <td class="border border-gray-300 px-3 py-2 text-center">
+                                {{ $item->knp_yad ? \Carbon\Carbon::parse($item->knp_yad)->format('d/m/Y') : '-' }}
+                            </td>
                             <td class="border border-gray-300 px-3 py-2">{{ $item->email ?? '-' }}</td>
                             <td class="border border-gray-300 px-3 py-2">{{ $item->no_hp ?? '-' }}</td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="11" class="text-center py-4 text-gray-500">
+                            <td colspan="15" class="text-center py-4 text-gray-500">
                                 Tidak ada data tenaga pendidik.
                             </td>
                         </tr>
@@ -173,6 +212,44 @@
                                 {{ $item->tmt_kerja ? \Carbon\Carbon::parse($item->tmt_kerja)->format('d/m/Y') : '-' }}
                             </p>
                         </div>
+                        
+                        <!-- Masa Kerja -->
+                        @if($item->masa_kerja_tahun || $item->masa_kerja_bulan)
+                        <div>
+                            <p class="text-gray-500 text-xs mb-1">Masa Kerja</p>
+                            <p class="font-medium text-blue-600">
+                                {{ $item->masa_kerja_tahun ?? '0' }}T {{ $item->masa_kerja_bulan ?? '0' }}B
+                            </p>
+                        </div>
+                        @endif
+                        
+                        <!-- Masa Kerja Golongan -->
+                        @if($item->masa_kerja_golongan_tahun || $item->masa_kerja_golongan_bulan)
+                        <div>
+                            <p class="text-gray-500 text-xs mb-1">Masa Kerja Gol</p>
+                            <p class="font-medium text-purple-600">
+                                {{ $item->masa_kerja_golongan_tahun ?? '0' }}T {{ $item->masa_kerja_golongan_bulan ?? '0' }}B
+                            </p>
+                        </div>
+                        @endif
+                        
+                        <!-- Golongan (Gol) -->
+                        @if($item->gol)
+                        <div>
+                            <p class="text-gray-500 text-xs mb-1">Golongan (Gol)</p>
+                            <p class="font-medium text-green-600">{{ $item->gol }}</p>
+                        </div>
+                        @endif
+                        
+                        <!-- KNP YAD -->
+                        @if($item->knp_yad)
+                        <div>
+                            <p class="text-gray-500 text-xs mb-1">KNP YAD</p>
+                            <p class="font-medium text-gray-800">
+                                {{ \Carbon\Carbon::parse($item->knp_yad)->format('d/m/Y') }}
+                            </p>
+                        </div>
+                        @endif
                     </div>
 
                     <!-- Full Width Details -->

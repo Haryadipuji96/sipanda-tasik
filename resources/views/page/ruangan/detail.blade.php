@@ -124,6 +124,19 @@
                                         </td>
                                     </tr>
                                     <tr>
+                                        <td class="py-3 px-4 font-medium text-gray-700 bg-gray-50">Tahun Pengadaan</td>
+                                        <td class="py-3 px-4">
+                                            @if ($barang->tahun)
+                                                <span
+                                                    class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs font-medium">
+                                                    {{ $barang->tahun }}
+                                                </span>
+                                            @else
+                                                <span class="text-gray-400">-</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    {{-- <tr>
                                         <td class="py-3 px-4 font-medium text-gray-700 bg-gray-50">Tanggal Pengadaan
                                         </td>
                                         <td class="py-3 px-4">
@@ -138,7 +151,7 @@
                                                 {{ \Carbon\Carbon::parse($barang->tanggal_pengadaan)->format('d F Y') }}
                                             </div>
                                         </td>
-                                    </tr>
+                                    </tr> --}}
                                 </tbody>
                             </table>
                         </div>

@@ -180,11 +180,15 @@
                     <th width="8%">NIP</th>
                     <th width="10%">STATUS</th>
                     <th width="4%">JK</th>
-                    <th width="10%">PROGRAM STUDI</th>
-                    <th width="10%">FAKULTAS</th>
+                    {{-- <th width="10%">PROGRAM STUDI</th>
+                    <th width="10%">FAKULTAS</th> --}}
                     <th width="8%">TEMPAT LAHIR</th>
                     <th width="6%">TGL LAHIR</th>
                     <th width="6%">TMT KERJA</th>
+                    <th width="6%">MASA KERJA</th>
+                    <th width="8%">MASA KERJA GOL</th>
+                    <th width="5%">GOL</th>
+                    <th width="6%">KNP YAD</th>
                     <th width="8%">PENDIDIKAN</th>
                 </tr>
             </thead>
@@ -213,14 +217,41 @@
                             @endif
                         </td>
                         <td class="text-center">{{ $tendik->jenis_kelamin == 'laki-laki' ? 'L' : 'P' }}</td>
-                        <td>{{ $tendik->prodi->nama_prodi ?? 'Umum' }}</td>
-                        <td>{{ $tendik->prodi->fakultas->nama_fakultas ?? '-' }}</td>
+                        {{-- <td>{{ $tendik->prodi->nama_prodi ?? 'Umum' }}</td>
+                        <td>{{ $tendik->prodi->fakultas->nama_fakultas ?? '-' }}</td> --}}
                         <td>{{ $tendik->tempat_lahir ?? '-' }}</td>
                         <td class="text-center">
                             {{ $tendik->tanggal_lahir ? \Carbon\Carbon::parse($tendik->tanggal_lahir)->format('d-m-Y') : '-' }}
                         </td>
                         <td class="text-center">
                             {{ $tendik->tmt_kerja ? \Carbon\Carbon::parse($tendik->tmt_kerja)->format('d-m-Y') : '-' }}
+                        </td>
+                        <!-- Masa Kerja -->
+                        <td class="text-center">
+                            @if ($tendik->masa_kerja_tahun || $tendik->masa_kerja_bulan)
+                                {{ $tendik->masa_kerja_tahun ?? '0' }}T<br>
+                                {{ $tendik->masa_kerja_bulan ?? '0' }}B
+                            @else
+                                -
+                            @endif
+                        </td>
+
+                        <!-- Masa Kerja Golongan -->
+                        <td class="text-center">
+                            @if ($tendik->masa_kerja_golongan_tahun || $tendik->masa_kerja_golongan_bulan)
+                                {{ $tendik->masa_kerja_golongan_tahun ?? '0' }}T<br>
+                                {{ $tendik->masa_kerja_golongan_bulan ?? '0' }}B
+                            @else
+                                -
+                            @endif
+                        </td>
+
+                        <!-- Golongan (Gol) -->
+                        <td class="text-center">{{ $tendik->gol ?? '-' }}</td>
+
+                        <!-- KNP YAD -->
+                        <td class="text-center">
+                            {{ $tendik->knp_yad ? \Carbon\Carbon::parse($tendik->knp_yad)->format('d-m-Y') : '-' }}
                         </td>
                         <td class="text-center">{{ $tendik->pendidikan_terakhir ?? '-' }}</td>
                     </tr>

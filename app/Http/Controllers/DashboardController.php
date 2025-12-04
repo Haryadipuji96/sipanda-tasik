@@ -30,39 +30,30 @@ class DashboardController extends Controller
         ];
 
         // Data chart dengan query yang aman
-        $chartData = [
-            'dosenPerProdi' => $this->getSafeDosenData(),
-            'arsipPerBulan' => $this->getSafeArsipData(),
-            'ruanganPerTipe' => $this->getSafeRuanganPerTipe(),
-            'kondisiBarang' => $this->getSafeKondisiData(),
-        ];
+        $tendikStatus = $this->getTendikStatusChartData(); // TAMBAH INI
+        $arsipPerBulan = $this->getSafeArsipData();
+        $ruanganPerTipe = $this->getSafeRuanganPerTipe();
+        $kondisiBarang = $this->getSafeKondisiData();
 
-        return view('dashboard', array_merge($basicData, $chartData));
+        return view('dashboard', array_merge($basicData, [
+            'tendikStatus' => $tendikStatus, // TAMBAH INI
+            'arsipPerBulan' => $arsipPerBulan,
+            'ruanganPerTipe' => $ruanganPerTipe,
+            'kondisiBarang' => $kondisiBarang,
+        ]));
     }
 
-    private function getSafeDosenData()
+    private function getTendikStatusChartData()
     {
-        try {
-            // Gunakan raw SQL untuk menghindari strict mode issues
-            $results = DB::select("
-                SELECT program_studi as prodi, COUNT(*) as total 
-                FROM dosen 
-                GROUP BY program_studi
-            ");
-
-            return collect($results)->map(function ($item) {
+        return TenagaPendidik::select('status_kepegawaian', DB::raw('COUNT(*) as total'))
+            ->groupBy('status_kepegawaian')
+            ->get()
+            ->map(function ($item) {
                 return [
-                    'prodi' => $item->prodi ?: 'Tidak Ada Prodi',
+                    'status' => $item->status_kepegawaian ?? 'Tidak Ada Status',
                     'total' => $item->total
                 ];
             });
-        } catch (\Exception $e) {
-            // Fallback data
-            return collect([
-                ['prodi' => 'Teknik Informatika', 'total' => Dosen::count() > 0 ? rand(5, 15) : 0],
-                ['prodi' => 'Sistem Informasi', 'total' => Dosen::count() > 0 ? rand(3, 10) : 0],
-            ]);
-        }
     }
 
     private function getSafeArsipData()

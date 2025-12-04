@@ -381,8 +381,46 @@
                 <form method="GET" action="{{ route('ruangan.index') }}" id="filterForm">
                     <!-- Search Bar -->
                     <div class="mb-4">
-                        <x-search-bar-ruangan route="ruangan.index"
-                            placeholder="Cari nama ruangan, barang, kondisi, atau lokasi..." />
+                        <div class="relative w-full max-w-md">
+                            <!-- Input search -->
+                            <input type="text" name="search" value="{{ request('search') }}"
+                                placeholder="Cari nama ruangan, barang, kondisi, atau lokasi..."
+                                class="block w-full text-sm h-[38px] px-3 text-blue-900 bg-white rounded-lg border border-blue-300 appearance-none 
+                           focus:border-transparent focus:outline focus:outline-2 focus:outline-blue-500 focus:ring-0 
+                           hover:border-blue-400 peer overflow-ellipsis overflow-hidden text-nowrap pr-[42px]"
+                                onkeypress="handleSearchEnter(event)" />
+
+                            <!-- Floating label -->
+                            <label
+                                class="peer-placeholder-shown:-z-10 peer-focus:z-10 absolute text-[12px] leading-[150%] text-blue-500 
+                       peer-focus:text-blue-500 duration-300 
+                       transform -translate-y-[1rem] scale-75 top-1 z-10 origin-[0] bg-white px-2 
+                       peer-focus:px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 
+                       peer-placeholder-shown:top-1/2 peer-focus:top-1 peer-focus:scale-75 peer-focus:-translate-y-[1rem]">
+                                Cari nama ruangan, barang, kondisi, atau lokasi...
+                            </label>
+
+                            <!-- Icon search -->
+                            <div class="absolute top-2 right-2 text-blue-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"
+                                    height="20" width="20">
+                                    <path
+                                        d="m18.9 20.3-5.6-5.6q-.75.6-1.725.95Q10.6 16 9.5 16q-2.725 0-4.612-1.887Q3 12.225 3 9.5q0-2.725 1.888-4.613Q6.775 3 9.5 3t4.613 1.887Q16 6.775 16 9.5q0 1.1-.35 2.075-.35.975-.95 1.725l5.625 5.625q.275.275.275.675t-.3.7q-.275.275-.7.275-.425 0-.7-.275ZM9.5 14q1.875 0 3.188-1.312Q14 11.375 14 9.5q0-1.875-1.312-3.188Q11.375 5 9.5 5 7.625 5 6.312 6.312 5 7.625 5 9.5q0 1.875 1.312 3.188Q7.625 14 9.5 14Z" />
+                                </svg>
+                            </div>
+
+                            <!-- Reset button -->
+                            @if (request('search'))
+                                <a href="{{ route('ruangan.index', request()->except('search')) }}"
+                                    class="absolute top-2 right-8 bg-blue-100 text-blue-600 p-1 rounded-full hover:bg-blue-200 transition flex items-center justify-center"
+                                    title="Reset Pencarian">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </a>
+                            @endif
+                        </div>
                     </div>
 
                     <!-- Filter Controls -->
@@ -393,7 +431,8 @@
                             <div class="lg:col-span-1">
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Tipe Ruangan</label>
                                 <select name="tipe_ruangan" id="tipe_ruangan"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    onchange="submitFilterForm()">
                                     <option value="">Semua Tipe</option>
                                     <option value="sarana" {{ request('tipe_ruangan') == 'sarana' ? 'selected' : '' }}>
                                         Sarana
@@ -409,7 +448,8 @@
                             <div class="lg:col-span-1">
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Kondisi Ruangan</label>
                                 <select name="kondisi" id="kondisi"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    onchange="submitFilterForm()">
                                     <option value="">Semua Kondisi</option>
                                     <option value="Baik" {{ request('kondisi') == 'Baik' ? 'selected' : '' }}>Baik
                                     </option>
@@ -425,7 +465,6 @@
                             </div>
 
                             <div class="flex flex-col xs:flex-row gap-2 lg:col-span-2 justify-end">
-
                                 <!-- Tombol Download All PDF -->
                                 <a href="{{ route('ruangan.download-all-pdf') }}"
                                     class="inline-flex items-center justify-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition duration-200 shadow-sm hover:shadow-md flex-1 xs:flex-none xs:w-auto min-w-[140px]"
@@ -456,13 +495,15 @@
 
                             <!-- Right Side - Reset Button -->
                             <div class="flex-1 flex justify-end">
-                                <!-- Tombol Reset - Hanya tampil jika ada filter aktif -->
-                                <a href="{{ route('ruangan.index') }}" id="reset-btn"
-                                    class="inline-flex items-center justify-center px-3 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg text-sm font-medium transition duration-200 shadow-sm hover:shadow-md hidden min-w-[100px]"
-                                    title="Reset Filter">
-                                    <i class="fas fa-refresh mr-1"></i>
-                                    <span>Reset</span>
-                                </a>
+                                <!-- Tombol Reset - Tampilkan jika ada filter aktif -->
+                                @if (request('tipe_ruangan') || request('kondisi') || request('search'))
+                                    <a href="{{ route('ruangan.index') }}" id="reset-btn"
+                                        class="inline-flex items-center justify-center px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg text-sm font-medium transition duration-200 shadow-sm hover:shadow-md min-w-[100px]"
+                                        title="Reset Filter">
+                                        <i class="fas fa-refresh mr-2"></i>
+                                        <span>Reset</span>
+                                    </a>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -497,17 +538,6 @@
                                     <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
                                         Kondisi: {{ request('kondisi') }}
                                     </span>
-                                @endif
-
-                                @if (request('prodi'))
-                                    @php
-                                        $selectedProdi = $prodi->firstWhere('id', request('prodi'));
-                                    @endphp
-                                    @if ($selectedProdi)
-                                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
-                                            Prodi: {{ $selectedProdi->nama_prodi }}
-                                        </span>
-                                    @endif
                                 @endif
                             </div>
                         </div>
@@ -583,12 +613,31 @@
                             <td class="border px-3 py-2">
                                 @if ($item->tipe_ruangan == 'sarana')
                                     <div class="text-sm">
-                                        <div class="font-medium">
-                                            {!! highlight($item->prodi->nama_prodi ?? 'N/A', request('search')) !!}
-                                        </div>
-                                        <div class="text-gray-600 text-xs">
-                                            {!! highlight($item->prodi->fakultas->nama_fakultas ?? 'N/A', request('search')) !!}
-                                        </div>
+                                        @if ($item->prodis->count() > 0)
+                                            <div class="font-medium">
+                                                {{ $item->prodis->first()->nama_prodi ?? 'N/A' }}
+                                            </div>
+                                            @if ($item->prodis->count() > 1)
+                                                <div class="text-gray-600 text-xs mt-1">
+                                                    <i class="fas fa-users text-blue-500 mr-1"></i>
+                                                    Digunakan bersama dengan {{ $item->prodis->count() - 1 }} prodi
+                                                    lainnya
+                                                </div>
+                                            @endif
+                                            <div class="text-gray-600 text-xs">
+                                                {{ $item->prodis->first()->fakultas->nama_fakultas ?? 'N/A' }}
+                                            </div>
+                                        @elseif ($item->prodi)
+                                            <!-- Fallback untuk data lama -->
+                                            <div class="font-medium">
+                                                {{ $item->prodi->nama_prodi ?? 'N/A' }}
+                                            </div>
+                                            <div class="text-gray-600 text-xs">
+                                                {{ $item->prodi->fakultas->nama_fakultas ?? 'N/A' }}
+                                            </div>
+                                        @else
+                                            <span class="text-gray-400">-</span>
+                                        @endif
                                     </div>
                                 @else
                                     <div class="text-sm font-medium text-green-700">
@@ -772,6 +821,8 @@
 
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -1031,6 +1082,40 @@
                     setTimeout(checkFilterStatus, 100);
                 });
             }
+        });
+
+        // ==================== HELPER FUNCTIONS ====================
+        function submitFilterForm() {
+            document.getElementById('filterForm').submit();
+        }
+
+        function handleSearchEnter(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                document.getElementById('filterForm').submit();
+            }
+        }
+
+        // ==================== TOMBOL RESET ====================
+        function checkFilterStatus() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const hasFilters = urlParams.has('search') || urlParams.has('tipe_ruangan') ||
+                urlParams.has('kondisi') || urlParams.has('prodi');
+
+            const resetBtn = document.getElementById('reset-btn');
+
+            if (resetBtn) {
+                if (hasFilters) {
+                    resetBtn.classList.remove('hidden');
+                } else {
+                    resetBtn.classList.add('hidden');
+                }
+            }
+        }
+
+        // Panggil saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', function() {
+            checkFilterStatus();
         });
 
         document.addEventListener('DOMContentLoaded', function() {
